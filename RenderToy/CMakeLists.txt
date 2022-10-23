@@ -16,6 +16,8 @@ add_executable(${PROJECT_NAME} WIN32
     src/core/LogicalComponent/LogicalComponent.cpp
 
     src/core/Editor/Editor.cpp
+
+    src/core/ObjectMngr/ObjectMngr.cpp
 )
 add_link_options(${PROJECT_NAME} PRIVATE -mwindows)
 
