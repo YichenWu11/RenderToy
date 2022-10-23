@@ -6,6 +6,16 @@ add_definitions("-DUNICODE" "-D_UNICODE")
 
 add_executable(${PROJECT_NAME} WIN32
     src/core/Main.cpp
+
+    src/core/RenderToy/RenderToy.cpp
+
+    src/core/AssetMngr/AssetMngr.cpp
+
+    src/core/RenderComponent/RenderComponent.cpp
+
+    src/core/LogicalComponent/LogicalComponent.cpp
+
+    src/core/Editor/Editor.cpp
 )
 add_link_options(${PROJECT_NAME} PRIVATE -mwindows)
 
