@@ -1,4 +1,8 @@
 #include <RenderToy/RenderToy.h>
+#include <ObjectMngr/ObjectMngr.h>
+#include <ObjectMngr/BasicObject.h>
+#include <Pass/PhongPass.h>
+#include <CDX12/Resource/UploadBuffer.h>
 
 using namespace Chen;
 using namespace Chen::CDX12;
@@ -11,16 +15,27 @@ const int mouseMoveSensitivity = 1;
 
 const int maxObjectsNum = 168;
 
+const int gNumFrameResources = 3;
+
 // *********************************************************
 
 
-RenderToy::RenderToy(HINSTANCE hInstance) : DX12App(hInstance) {}
+RenderToy::RenderToy(HINSTANCE hInstance) : DX12App(hInstance) 
+{
+	DefaultInputLayout = 
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		};
+}
 
 RenderToy::~RenderToy() {}
 
-void RenderToy::RegisterComponent(std::string name, std::unique_ptr<IComponent>& component)
+void RenderToy::RegisterComponent(std::string name, std::unique_ptr<IComponent> component)
 {
-	if (mComponents.find(name) != mComponents.end()) 
+	if (mComponents.find(name) == mComponents.end()) 
 	{
 		mComponents[name] = std::move(component);
 		nameList.push_back(name);
@@ -32,39 +47,117 @@ bool RenderToy::Initialize()
 	if (!DX12App::Initialize())
 		return false;
 
+	mCmdList.Reset(mDirectCmdListAlloc.Get());
+
 	// TODO: Init
+	RegisterComponent("RenderComponent", std::make_unique<RenderComponent>());
+	RegisterComponent("LogicalComponent", std::make_unique<LogicalComponent>());
+
+	BuildShaders();
+	BuildPSOs();
+	BuildFrameResource();
+
+    ThrowIfFailed(mCmdList->Close());
+    mCmdQueue.Execute(mCmdList.Get());
+    FlushCommandQueue();
 
 	return true;
 }
 
 // **********************************************************
+
+void RenderToy::BuildShaders()
+{
+	std::vector<std::pair<std::string, Shader::Property>> rootProperties = {
+        std::make_pair<std::string, Shader::Property>(
+            "ObjectCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 0, 1}
+        ),
+        std::make_pair<std::string, Shader::Property>(
+            "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1}
+        )
+    };
+
+	// with a rootsig built
+	RenderResourceMngr::GetInstance().GetShaderMngr()->CreateShader(
+		"IShader", 
+		rootProperties, 
+		L"..\\..\\shaders\\color.hlsl",
+		L"..\\..\\shaders\\color.hlsl");
+
+	RenderResourceMngr::GetInstance().GetShaderMngr()->GetShader("IShader")->mInputLayout = DefaultInputLayout;
+}
+
+void RenderToy::BuildPSOs()
+{
+	RenderResourceMngr::GetInstance().GetPSOMngr()->CreatePipelineState(
+		"Base", 
+		mDevice.Get(),
+		RenderResourceMngr::GetInstance().GetShaderMngr()->GetShader("IShader"),
+		1,
+		mBackBufferFormat,
+		mDepthStencilFormat);
+}
+
+void RenderToy::BuildTexture()
+{
+	// auto& alloc = RenderResourceMngr::GetInstance().GetTexMngr()->GetTexAllocation();
+	
+}
+
 // Build FrameResource and Register Needed Resource
 
 void RenderToy::BuildFrameResource()
 {
-
+    for (int i = 0; i < gNumFrameResources; ++i)
+    {
+        mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
+            "PassCB", std::move(std::make_shared<UploadBuffer<PhongPass::PassConstants>>(
+				mDevice.Get(), 
+				1, 
+				true)));
+    //    mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
+    //        "ObjectCB", std::move(std::make_shared<UploadBuffer<Transform::Impl>>(
+				//mDevice.Get(), 
+				//(UINT)ObjectMngr::GetInstance().GetObjNum(), 
+				//true)));
+    }	
 }
 
 // **********************************************************
 
 void RenderToy::OnResize()
 {
+	DX12App::OnResize();
 
+	mCamera.SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 }
 
 void RenderToy::LogicTick(const GameTimer& gt)
 {
+    OnKeyboardInput(gt);
 
+    mCurrFrameResource = mFrameResourceMngr->GetCurrentFrameResource();
+
+	/*
+		Do logical Tick
+	*/
+	GetRenderComponent()->Tick();
+
+	if (mFrameResourceMngr->GetCurrentCpuFence() != 0) mFrameResourceMngr->BeginFrame(); // Begin Frame Here
 }
 
 void RenderToy::Populate(const GameTimer& gt)
 {
-
+	CmdListHandle cmdListHandle = { mCurrFrameResource->GetAllocator(), mCmdList.Get() };
+	GetRenderComponent()->Tick();
 }
 
 void RenderToy::Execute()
 {
-
+	mCmdQueue.Execute(mCmdList.Get());
+    ThrowIfFailed(mSwapChain->Present(0, 0));
+    mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+    mFrameResourceMngr->EndFrame(mCmdQueue.Get());  // // End Frame Here
 }
 
 void RenderToy::RenderTick(const GameTimer& gt)

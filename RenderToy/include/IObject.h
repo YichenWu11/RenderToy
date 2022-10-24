@@ -15,7 +15,7 @@ namespace Chen::RToy {
     class IObject
     {
     public:
-        IObject() { instanceID = ++CurrentID; }
+        IObject(std::string name) : objName(name) { instanceID = ++CurrentID; }
         IObject(const IObject&) = delete;
         IObject& operator=(const IObject&) = delete;
         IObject(IObject&&) = default;
@@ -48,9 +48,12 @@ namespace Chen::RToy {
             return std::any_cast<typename T::Impl>(impl);
         }
 
+        std::string GetObjName() { return objName; }
+
         uint32_t GetID() { return instanceID; }
 
-    private:
+    protected:
+        std::string objName;
         uint32_t instanceID;
         static std::atomic<uint32_t> CurrentID;
         std::map<std::string, IProperty*> mProperties;

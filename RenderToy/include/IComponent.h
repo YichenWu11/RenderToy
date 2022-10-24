@@ -1,5 +1,9 @@
 #pragma once
 
+#include <CDX12/DXUtil.h>
+#include <set>
+#include "IPass.h"
+
 namespace Chen::RToy {
     class IComponent 
     {
@@ -9,7 +13,30 @@ namespace Chen::RToy {
         IComponent& operator=(const IComponent&) = delete;
         virtual ~IComponent() {}
 
-        virtual void Init() = 0;
+        virtual void Init(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
         virtual void Tick() = 0;
+
+        void AddPass(std::unique_ptr<IPass> ptr)
+        {
+            if (mPasses.find(ptr->GetName()) == mPasses.end()) return;
+            mPasses[ptr->GetName()] = std::move(ptr);
+            NameList.emplace(ptr->GetName());
+        }
+
+        void DelPass(std::string name)
+        {
+            if (mPasses.find(name) == mPasses.end()) return;
+            mPasses.erase(mPasses.find(name));
+            NameList.erase(NameList.find(name));
+        }
+
+        std::set<std::string>& GetPassNameList() { return NameList; }
+
+    protected:
+        ID3D12Device* device;
+        ID3D12GraphicsCommandList* cmdList;
+        bool isInit{ false };
+        std::set<std::string> NameList;
+        std::map<std::string, std::unique_ptr<IPass>> mPasses;
     };
 }

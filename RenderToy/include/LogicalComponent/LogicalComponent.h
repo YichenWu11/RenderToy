@@ -2,7 +2,6 @@
 
 #include "../IComponent.h"
 #include "../IPass.h"
-#include <CDX12/DXUtil.h>
 
 namespace Chen::RToy {
     class LogicalComponent final : public IComponent
@@ -13,10 +12,9 @@ namespace Chen::RToy {
         LogicalComponent& operator=(const LogicalComponent&) = delete;
         ~LogicalComponent();
 
-        void Init() override;
+        void Init(ID3D12Device*, ID3D12GraphicsCommandList*) override;
         void Tick() override;
 
     private:
-        std::map<std::string, std::unique_ptr<IPass>> mPasses;
     };
 }

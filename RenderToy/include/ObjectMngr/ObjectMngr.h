@@ -14,7 +14,7 @@ namespace Chen::RToy {
             return instance;
         }
 
-        void AddObject(std::shared_ptr<IObject>& p2obj)
+        void AddObject(std::shared_ptr<IObject> p2obj)
         {
             if (mObjects.find(p2obj->GetID()) == mObjects.end())
                 mObjects[p2obj->GetID()] = p2obj;
@@ -25,6 +25,8 @@ namespace Chen::RToy {
             if (mObjects.find(id) != mObjects.end())
                 mObjects.erase(mObjects.find(id));
         }
+
+        size_t GetObjNum() { return mObjects.size(); }
 
     private:
         ObjectMngr() = default;

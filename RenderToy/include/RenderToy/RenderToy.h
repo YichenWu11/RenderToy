@@ -18,7 +18,7 @@ namespace Chen::RToy {
 
         bool Initialize() override;
 
-        void RegisterComponent(std::string name, std::unique_ptr<IComponent>& component);
+        void RegisterComponent(std::string name, std::unique_ptr<IComponent> component);
 
     private:
         void OnResize() override;
@@ -40,19 +40,41 @@ namespace Chen::RToy {
         // Build FrameResource and Register Needed Resource
 
         void BuildFrameResource();
+        void BuildPSOs();
+        void BuildShaders();
+        void BuildTexture();
 
         // **********************************************************
  
         void Populate(const GameTimer& gt);  // Populate Command
         void Execute();                      // Submit and Execute Command
 
+        // **********************************************************
+
+        IComponent* GetRenderComponent() 
+        {
+            assert(mComponents.find("RenderComponent") != mComponents.end());
+            return mComponents["RenderComponent"].get();
+        }
+
+        IComponent* GetLogicalComponent()
+        {
+            assert(mComponents.find("LogicalComponent") != mComponents.end());
+            return mComponents["LogicalComponent"].get();
+        }
+
+        // **********************************************************
+
         std::vector<std::string>& GetComponentNameList() { return nameList; }
 
     private:
-        std::map<std::string, std::unique_ptr<IComponent>> mComponents;
         std::vector<std::string> nameList;
+        std::map<std::string, std::unique_ptr<IComponent>> mComponents;
 
         POINT mLastMousePos;
         Camera mCamera;
+
+        std::vector<D3D12_INPUT_ELEMENT_DESC> DefaultInputLayout;
+        FrameResource* mCurrFrameResource = nullptr;
     };
 }

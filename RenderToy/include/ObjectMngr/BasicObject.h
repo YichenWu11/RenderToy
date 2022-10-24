@@ -23,7 +23,7 @@ namespace Chen::RToy {
     class BasicObject : public IObject
     {
     public:
-        BasicObject(std::string name) : objName(name) 
+        BasicObject(std::string name) : IObject(name) 
         {
             AddProperty(PropertyMngr::GetInstance().CreateAndGetProperty(PropertyMngr::Option::Mesh));
             AddProperty(PropertyMngr::GetInstance().CreateAndGetProperty(PropertyMngr::Option::Transform));
@@ -33,15 +33,13 @@ namespace Chen::RToy {
         BasicObject& operator=(const BasicObject&) = delete;
         BasicObject(BasicObject&&) = default;
         BasicObject& operator=(BasicObject&&) = default;
-
-        std::string GetObjName() { return objName; }
+        
         UINT GetCBIndex() { return ObjCBIndex; }
         bool IsVisible() { return visible; }
         void SetVisible() { visible = true; }
         void SetInvisible() { visible = false; }
 
     private:
-        std::string objName;
         bool visible {true};
 	    UINT ObjCBIndex = -1; // Index into GPU constant buffer corresponding to the ObjectCB
         DirectX::BoundingBox Bounds;

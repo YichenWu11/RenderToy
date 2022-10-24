@@ -21,7 +21,7 @@ namespace Chen::RToy {
         void SetDirty() { NumFramesDirty = 3; }
         void ClearOne() { --NumFramesDirty; }
 
-    private:
+    protected:
         std::string name;
         int NumFramesDirty = 3;
     };

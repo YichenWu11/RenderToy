@@ -43,7 +43,7 @@ namespace Chen::RToy {
                     break;
             }
 
-            AllProperties.push_back(p2property);
+            if (!p2property) AllProperties.push_back(p2property);
 
             return p2property;
         }
