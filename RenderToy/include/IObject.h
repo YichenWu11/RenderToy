@@ -2,7 +2,7 @@
 
 #include "IProperty.h"
 #include <atomic>
-#include <unordered_map>
+#include <map>
 #include <any>
 #include <cassert>
 
@@ -35,6 +35,11 @@ namespace Chen::RToy {
             if (mProperties.find(name) != mProperties.end()) mProperties.erase(mProperties.find(name));
         }
 
+        IProperty* GetProperty(std::string name)
+        {
+            return (mProperties.find(name) != mProperties.end()) ? mProperties.at(name) : nullptr;
+        }
+
         template<typename T>
         typename T::Impl GetPropertyImpl(std::string name)
         {
@@ -48,6 +53,6 @@ namespace Chen::RToy {
     private:
         uint32_t instanceID;
         static std::atomic<uint32_t> CurrentID;
-        std::unordered_map<std::string, IProperty*> mProperties;
+        std::map<std::string, IProperty*> mProperties;
     };
 }

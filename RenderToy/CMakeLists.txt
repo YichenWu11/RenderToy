@@ -23,6 +23,7 @@ add_executable(${PROJECT_NAME} WIN32
     src/core/PropertyMngr/Material.cpp
     src/core/PropertyMngr/Transform.cpp
     src/core/PropertyMngr/PropertyMngr.cpp
+    src/core/PropertyMngr/Mesh.cpp
 )
 
 add_link_options(${PROJECT_NAME} PRIVATE -mwindows)

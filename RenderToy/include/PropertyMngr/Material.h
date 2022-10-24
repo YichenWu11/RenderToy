@@ -20,6 +20,7 @@ namespace Chen::RToy {
         void SetFresnelR0(DirectX::XMFLOAT3 r0) { impl.material.FresnelR0 = r0; }
         void SetRoughness(float r) { impl.material.Roughness = r; }
         void SetMatTransform(DirectX::XMFLOAT4X4 mat) { impl.material.MatTransform = mat; }
+        void SetMaterial(BasicMaterial mat) { impl.material = mat; }
 
         std::string GetMatName() { return impl.material.Name; }
         int GetMatIndex() { return impl.material.MatIndex; }

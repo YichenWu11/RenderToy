@@ -2,6 +2,7 @@
 
 #include "./Material.h"
 #include "./Transform.h"
+#include "./Mesh.h"
 #include <vector>
 #include <memory>
 
@@ -13,6 +14,7 @@ namespace Chen::RToy {
         {
             Transform = 0,
             Material,
+            Mesh,
             Count
         };
 
@@ -33,6 +35,9 @@ namespace Chen::RToy {
                     break;
                 case Option::Material:
                     p2property = new Material();
+                    break;
+                case Option::Mesh:
+                    p2property = new Mesh();
                     break;
                 default:
                     break;

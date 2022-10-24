@@ -1,7 +1,49 @@
 #pragma once
 
+/*
+    BasicObject:
+        Properties:
+            - Transform  [ Default ]
+            - Material   [ SetMaterial(BasicMaterial mat) ]
+            - Mesh       [ SetMeshGeo(std::string) ]
+*/
+
 #include "../IObject.h"
+#include "../PropertyMngr/PropertyMngr.h"
 
 namespace Chen::RToy {
-    
+    enum class ObjectLayer : uint8_t
+    {
+        Opaque = 0,
+        Transparent,
+        Sky,
+        Count
+    };
+
+    class BasicObject : public IObject
+    {
+    public:
+        BasicObject(std::string name) : objName(name) 
+        {
+            AddProperty(PropertyMngr::GetInstance().CreateAndGetProperty(PropertyMngr::Option::Mesh));
+            AddProperty(PropertyMngr::GetInstance().CreateAndGetProperty(PropertyMngr::Option::Transform));
+            AddProperty(PropertyMngr::GetInstance().CreateAndGetProperty(PropertyMngr::Option::Material));
+        }
+        BasicObject(const BasicObject&) = delete;
+        BasicObject& operator=(const BasicObject&) = delete;
+        BasicObject(BasicObject&&) = default;
+        BasicObject& operator=(BasicObject&&) = default;
+
+        std::string GetObjName() { return objName; }
+        UINT GetCBIndex() { return ObjCBIndex; }
+        bool IsVisible() { return visible; }
+        void SetVisible() { visible = true; }
+        void SetInvisible() { visible = false; }
+
+    private:
+        std::string objName;
+        bool visible {true};
+	    UINT ObjCBIndex = -1; // Index into GPU constant buffer corresponding to the ObjectCB
+        DirectX::BoundingBox Bounds;
+    };
 }

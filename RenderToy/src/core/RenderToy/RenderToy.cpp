@@ -7,7 +7,7 @@ using namespace Chen::RToy;
 // *********************************************************
 // Constant
 
-const int mouseMoveSensity = 1;
+const int mouseMoveSensitivity = 1;
 
 const int maxObjectsNum = 168;
 
@@ -116,8 +116,8 @@ void RenderToy::OnMouseMove(WPARAM btnState, int x, int y)
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
 
 		// adjust the camera orientation
-		mCamera.Pitch(dy / mouseMoveSensity);
-		mCamera.RotateY(dx / mouseMoveSensity);
+		mCamera.Pitch(dy / mouseMoveSensitivity);
+		mCamera.RotateY(dx / mouseMoveSensitivity);
 	}
 
 	mLastMousePos.x = x;
