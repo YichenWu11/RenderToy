@@ -39,13 +39,16 @@ namespace Chen::RToy {
         // **********************************************************
         // Build FrameResource and Register Needed Resource
 
-        void BuildFrameResource();
         void BuildPSOs();
         void BuildShaders();
         void BuildTexture();
+        void BuildObjects();
+        void BuildFrameResource();
 
         // **********************************************************
  
+        void LogicalFillPack();
+        void RenderFillPack();
         void Populate(const GameTimer& gt);  // Populate Command
         void Execute();                      // Submit and Execute Command
 

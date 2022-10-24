@@ -14,7 +14,5 @@ namespace Chen::RToy {
 
         void Init(ID3D12Device*, ID3D12GraphicsCommandList*) override;
         void Tick() override;
-
-    private:
     };
 }

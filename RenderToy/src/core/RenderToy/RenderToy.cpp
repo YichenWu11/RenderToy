@@ -1,8 +1,9 @@
 #include <RenderToy/RenderToy.h>
 #include <ObjectMngr/ObjectMngr.h>
 #include <ObjectMngr/BasicObject.h>
-#include <Pass/PhongPass.h>
 #include <CDX12/Resource/UploadBuffer.h>
+#include <Pass/render/PhongPass.h>
+#include <Pass/logical/UpdatePass.h>
 
 using namespace Chen;
 using namespace Chen::CDX12;
@@ -22,6 +23,7 @@ const int gNumFrameResources = 3;
 
 RenderToy::RenderToy(HINSTANCE hInstance) : DX12App(hInstance) 
 {
+	mMainWndCaption = L"RenderToy";
 	DefaultInputLayout = 
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -52,6 +54,8 @@ bool RenderToy::Initialize()
 	// TODO: Init
 	RegisterComponent("RenderComponent", std::make_unique<RenderComponent>());
 	RegisterComponent("LogicalComponent", std::make_unique<LogicalComponent>());
+
+	RenderResourceMngr::GetInstance().Init(mDevice.Get(), mCmdList.Get());
 
 	BuildShaders();
 	BuildPSOs();
@@ -104,6 +108,13 @@ void RenderToy::BuildTexture()
 	
 }
 
+void RenderToy::BuildObjects()
+{
+	ObjectMngr::GetInstance().AddObject(std::make_shared<BasicObject>("box1"));
+	GetRenderComponent()->GetPass("PhongPass")->AddObject(ObjectMngr::GetInstance().GetObj(1));
+	
+}
+
 // Build FrameResource and Register Needed Resource
 
 void RenderToy::BuildFrameResource()
@@ -111,15 +122,15 @@ void RenderToy::BuildFrameResource()
     for (int i = 0; i < gNumFrameResources; ++i)
     {
         mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
-            "PassCB", std::move(std::make_shared<UploadBuffer<PhongPass::PassConstants>>(
+            "PassCB", std::move(std::make_shared<UploadBuffer<UpdatePass::PassConstants>>(
 				mDevice.Get(), 
 				1, 
 				true)));
-    //    mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
-    //        "ObjectCB", std::move(std::make_shared<UploadBuffer<Transform::Impl>>(
-				//mDevice.Get(), 
-				//(UINT)ObjectMngr::GetInstance().GetObjNum(), 
-				//true)));
+        mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
+            "ObjTransformCB", std::move(std::make_shared<UploadBuffer<Transform::Impl>>(
+				mDevice.Get(), 
+				1, //(UINT)ObjectMngr::GetInstance().GetObjNum() 
+				true)));
     }	
 }
 
@@ -132,6 +143,16 @@ void RenderToy::OnResize()
 	mCamera.SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 }
 
+void RenderToy::LogicalFillPack()
+{
+
+}
+
+void RenderToy::RenderFillPack()
+{
+
+}
+
 void RenderToy::LogicTick(const GameTimer& gt)
 {
     OnKeyboardInput(gt);
@@ -141,6 +162,7 @@ void RenderToy::LogicTick(const GameTimer& gt)
 	/*
 		Do logical Tick
 	*/
+	LogicalFillPack();
 	GetRenderComponent()->Tick();
 
 	if (mFrameResourceMngr->GetCurrentCpuFence() != 0) mFrameResourceMngr->BeginFrame(); // Begin Frame Here
@@ -149,6 +171,7 @@ void RenderToy::LogicTick(const GameTimer& gt)
 void RenderToy::Populate(const GameTimer& gt)
 {
 	CmdListHandle cmdListHandle = { mCurrFrameResource->GetAllocator(), mCmdList.Get() };
+	RenderFillPack();
 	GetRenderComponent()->Tick();
 }
 

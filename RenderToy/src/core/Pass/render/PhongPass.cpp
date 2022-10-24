@@ -1,4 +1,4 @@
-#include <Pass/PhongPass.h>
+#include <Pass/render/PhongPass.h>
 
 using namespace Chen::RToy;
 

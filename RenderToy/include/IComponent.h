@@ -18,9 +18,9 @@ namespace Chen::RToy {
 
         void AddPass(std::unique_ptr<IPass> ptr)
         {
-            if (mPasses.find(ptr->GetName()) == mPasses.end()) return;
-            mPasses[ptr->GetName()] = std::move(ptr);
+            if (mPasses.find(ptr->GetName()) != mPasses.end()) return;
             NameList.emplace(ptr->GetName());
+            mPasses[ptr->GetName()] = std::move(ptr);
         }
 
         void DelPass(std::string name)
@@ -28,6 +28,18 @@ namespace Chen::RToy {
             if (mPasses.find(name) == mPasses.end()) return;
             mPasses.erase(mPasses.find(name));
             NameList.erase(NameList.find(name));
+        }
+
+        IPass* GetPass(std::string name)
+        {
+            return (mPasses.find(name) != mPasses.end()) ? mPasses.at(name).get() : nullptr;
+        }
+
+        template<typename PassType>
+        void FillPack(std::string name, PassType::PassPack pack)
+        {
+            if (mPasses.find(name) == mPasses.end()) return;
+            mPasses.at(name)->FillPack(pack);
         }
 
         std::set<std::string>& GetPassNameList() { return NameList; }

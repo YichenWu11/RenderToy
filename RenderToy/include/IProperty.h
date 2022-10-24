@@ -20,6 +20,7 @@ namespace Chen::RToy {
 
         void SetDirty() { NumFramesDirty = 3; }
         void ClearOne() { --NumFramesDirty; }
+        bool IsDirty()  { return NumFramesDirty > 0; }
 
     protected:
         std::string name;

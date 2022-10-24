@@ -6,6 +6,7 @@ add_definitions("-DUNICODE" "-D_UNICODE")
 
 add_executable(${PROJECT_NAME} WIN32
     src/core/Main.cpp
+    src/core/IObject.cpp
 
     src/core/RenderToy/RenderToy.cpp
 
@@ -25,7 +26,10 @@ add_executable(${PROJECT_NAME} WIN32
     src/core/PropertyMngr/PropertyMngr.cpp
     src/core/PropertyMngr/Mesh.cpp
 
-    src/core/Pass/PhongPass.cpp
+    src/core/Pass/render/PhongPass.cpp
+
+    src/core/Pass/logical/UpdatePass.cpp
+    src/core/Pass/logical/TransUpdatePass.cpp
 )
 
 add_link_options(${PROJECT_NAME} PRIVATE -mwindows)

@@ -2,6 +2,8 @@
 
 #include "IObject.h"
 #include <CDX12/RenderResourceMngr.h>
+#include <CDX12/Resource/UploadBuffer.h>
+#include <CDX12/Math/MathHelper.h>
 #include <set>
 #include <map>
 
@@ -12,7 +14,7 @@ namespace Chen::RToy {
         IPass(std::string name) : passName(name) {}
         IPass(const IPass&) = delete;
         IPass& operator=(const IPass&) = delete;
-        virtual ~IPass() {}
+        virtual ~IPass() {}    
 
         virtual void Init(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
         virtual void Tick() = 0;
@@ -20,7 +22,7 @@ namespace Chen::RToy {
         std::string GetName() { return passName; }
 
         void AddObject(IObject* p2obj)
-        {
+        {       
             if (mObjects.find(p2obj->GetObjName()) == mObjects.end()) return;
             mObjects[p2obj->GetObjName()] = p2obj;
             NameList.emplace(p2obj->GetObjName());
@@ -32,6 +34,8 @@ namespace Chen::RToy {
             mObjects.erase(mObjects.find(name));
             NameList.erase(NameList.find(name));
         }
+
+        virtual void FillPack(std::any pack) {}
 
         std::set<std::string>& GetObjNameList() { return NameList; }
 

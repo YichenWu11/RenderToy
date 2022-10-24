@@ -28,6 +28,11 @@ namespace Chen::RToy {
 
         size_t GetObjNum() { return mObjects.size(); }
 
+        IObject* GetObj(std::uint32_t id) 
+        {
+            return (mObjects.find(id) != mObjects.end()) ? mObjects.at(id).get() : nullptr;
+        }
+
     private:
         ObjectMngr() = default;
         ~ObjectMngr() = default;
