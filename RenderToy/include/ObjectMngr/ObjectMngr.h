@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../IObject.h"
+#include "./BasicObject.h"
 #include <map>
 #include <memory>
 

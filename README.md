@@ -11,7 +11,7 @@
 <br/>
 
 **将操作前端,渲染部分和逻辑部分抽离开来**
-<img src="docs/images/RenderToy.png">
+<img src="docs/images/RenderToy_H.png">
 
 ---
 
