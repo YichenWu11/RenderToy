@@ -14,7 +14,7 @@ namespace Chen::RToy {
             return instance;
         }
 
-        void AddObject(std::shared_ptr<IObject> p2obj)
+        void AddObject(std::shared_ptr<IObject>& p2obj)
         {
             if (mObjects.find(p2obj->GetID()) == mObjects.end())
                 mObjects[p2obj->GetID()] = p2obj;

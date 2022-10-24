@@ -4,4 +4,4 @@
 * 每个 Pass 都可以通过 Public Mngrs 拿到一些整个系统中公共的资源 (Mesh, Texture, Material, PSO etc)
 * Pass 要尽可能的薄, Pass 与 Pass 之间要尽可能解耦合
 
-<img src="./images/pass.png">
+<img src="./images/process.png">

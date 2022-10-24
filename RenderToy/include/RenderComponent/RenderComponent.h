@@ -14,8 +14,7 @@ namespace Chen::RToy {
         ~RenderComponent();
 
         void Init() override;
-        void Update() override;
-        void Populate() override;
+        void Tick() override;
 
     private:
         std::map<std::string, std::unique_ptr<IPass>> mPasses;

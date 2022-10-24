@@ -22,8 +22,8 @@ namespace Chen::RToy {
 
     private:
         void OnResize() override;
-        void Update(const GameTimer& gt) override;
-        void Draw(const GameTimer& gt) override;
+        void LogicTick(const GameTimer& gt) override;
+        void RenderTick(const GameTimer& gt) override;
 
         // **********************************************************
         // KeyBoard and Mouse Control

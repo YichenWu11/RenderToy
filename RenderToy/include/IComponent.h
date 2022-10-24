@@ -10,7 +10,6 @@ namespace Chen::RToy {
         virtual ~IComponent() {}
 
         virtual void Init() = 0;
-        virtual void Update() = 0;
-        virtual void Populate() = 0; // Populate might be Draw or other interface for various component
+        virtual void Tick() = 0;
     };
 }

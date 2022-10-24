@@ -15,9 +15,14 @@ namespace Chen::RToy {
         IProperty& operator=(IProperty&&) = default;
 
         std::string GetName() { return name; }
+        virtual void Tick(std::any params) {}
         virtual std::any GetImpl() = 0;
+
+        void SetDirty() { NumFramesDirty = 3; }
+        void ClearOne() { --NumFramesDirty; }
 
     private:
         std::string name;
+        int NumFramesDirty = 3;
     };
 }

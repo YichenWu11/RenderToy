@@ -22,10 +22,12 @@ namespace Chen::RToy {
         IObject& operator=(IObject&&) = default;
         virtual ~IObject() {}
 
-        void AddProperty(std::string name, IProperty* property)
+        // call the Tick of every its property Every Frame If necessary
+
+        void AddProperty(IProperty* property)
         {
-            if (mProperties.find(name) != mProperties.end()) return;
-                mProperties[name] = property;
+            if (mProperties.find(property->GetName()) != mProperties.end()) return;
+                mProperties[property->GetName()] = property;
         }
 
         void DelProperty(std::string name)

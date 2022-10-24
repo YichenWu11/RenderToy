@@ -18,7 +18,13 @@ add_executable(${PROJECT_NAME} WIN32
     src/core/Editor/Editor.cpp
 
     src/core/ObjectMngr/ObjectMngr.cpp
+    src/core/ObjectMngr/BasicObject.cpp
+
+    src/core/PropertyMngr/Material.cpp
+    src/core/PropertyMngr/Transform.cpp
+    src/core/PropertyMngr/PropertyMngr.cpp
 )
+
 add_link_options(${PROJECT_NAME} PRIVATE -mwindows)
 
 target_include_directories(${PROJECT_NAME}

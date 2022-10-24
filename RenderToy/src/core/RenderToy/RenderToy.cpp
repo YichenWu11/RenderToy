@@ -52,7 +52,7 @@ void RenderToy::OnResize()
 
 }
 
-void RenderToy::Update(const GameTimer& gt)
+void RenderToy::LogicTick(const GameTimer& gt)
 {
 
 }
@@ -67,7 +67,7 @@ void RenderToy::Execute()
 
 }
 
-void RenderToy::Draw(const GameTimer& gt)
+void RenderToy::RenderTick(const GameTimer& gt)
 {
 	Populate(gt);
 	Execute();
