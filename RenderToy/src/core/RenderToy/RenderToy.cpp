@@ -145,12 +145,20 @@ void RenderToy::OnResize()
 
 void RenderToy::LogicalFillPack()
 {
-
+	LogicalComponent::ComPack pack;
+	/*
+	// Fill the ComPack of LogicalComponent
+	*/
+	GetLogicalComponent()->FillPack(pack);
 }
 
 void RenderToy::RenderFillPack()
 {
-
+	RenderComponent::ComPack pack;
+	/*
+	// Fill the ComPack of RenderComponent
+	*/
+	GetRenderComponent()->FillPack(pack);
 }
 
 void RenderToy::LogicTick(const GameTimer& gt)
@@ -171,6 +179,10 @@ void RenderToy::LogicTick(const GameTimer& gt)
 void RenderToy::Populate(const GameTimer& gt)
 {
 	CmdListHandle cmdListHandle = { mCurrFrameResource->GetAllocator(), mCmdList.Get() };
+
+	/*
+		Do Render Tick
+	*/
 	RenderFillPack();
 	GetRenderComponent()->Tick();
 }

@@ -35,12 +35,9 @@ namespace Chen::RToy {
             return (mPasses.find(name) != mPasses.end()) ? mPasses.at(name).get() : nullptr;
         }
 
-        template<typename PassType>
-        void FillPack(std::string name, PassType::PassPack pack)
-        {
-            if (mPasses.find(name) == mPasses.end()) return;
-            mPasses.at(name)->FillPack(pack);
-        }
+        virtual void FillPack(std::any pack) {}
+
+        virtual void FillPassPack() {}
 
         std::set<std::string>& GetPassNameList() { return NameList; }
 

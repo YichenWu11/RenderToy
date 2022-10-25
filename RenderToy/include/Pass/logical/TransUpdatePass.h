@@ -16,7 +16,7 @@ namespace Chen::RToy {
         void FillPack(std::any _pack) override 
         { 
             auto p = std::any_cast<PassPack>(_pack);
-            pack = p;
+            pack = std::move(p);
         }
 
         TransUpdatePass(std::string name = std::string("TransUpdatePass"));

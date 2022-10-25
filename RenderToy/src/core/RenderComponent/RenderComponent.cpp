@@ -22,3 +22,8 @@ void RenderComponent::Tick()
 {
     mPasses["PhongPass"]->Tick();
 }
+
+void RenderComponent::FillPassPack()
+{
+    
+}

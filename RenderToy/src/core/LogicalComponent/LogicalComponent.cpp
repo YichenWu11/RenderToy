@@ -26,3 +26,8 @@ void LogicalComponent::Tick()
     mPasses[std::string("UpdatePass")]->Tick();
     mPasses[std::string("TransUpdatePass")]->Tick();
 }
+
+void LogicalComponent::FillPassPack()
+{
+    
+}
