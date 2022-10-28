@@ -13,6 +13,11 @@ namespace Chen::RToy::Editor {
         Editor(const Editor&) = delete;
         Editor& operator=(const Editor&) = delete;
 
+        void Init()
+        {
+            
+        }
+
     private:
         Editor() = default;
         ~Editor();

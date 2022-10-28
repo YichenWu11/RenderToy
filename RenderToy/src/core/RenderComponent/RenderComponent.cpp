@@ -25,5 +25,14 @@ void RenderComponent::Tick()
 
 void RenderComponent::FillPassPack()
 {
-    
+    PhongPass::PassPack pack1;
+    pack1.mCmdList = pack.mCmdList;
+    pack1.currFrameResource = pack.currFrameResource;
+    pack1.currBackBuffer = pack.currBackBuffer;
+    pack1.currBackBufferView = pack.currBackBufferView;
+    pack1.depthStencilView = pack.depthStencilView;
+    pack1.mScissorRect = pack.mScissorRect;
+	pack1.mScreenViewport = pack.mScreenViewport;
+
+    mPasses["PhongPass"]->FillPack(pack1);
 }

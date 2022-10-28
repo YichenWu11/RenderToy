@@ -1,5 +1,12 @@
 #include <RenderToy/RenderToy.h>
 
+#include <ObjectMngr/ObjectMngr.h>
+#include <ObjectMngr/BasicObject.h>
+#include <CDX12/Resource/UploadBuffer.h>
+#include <Pass/render/PhongPass.h>
+#include <Pass/logical/UpdatePass.h>
+#include <Utility/Macro.h>
+
 using namespace Chen;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,

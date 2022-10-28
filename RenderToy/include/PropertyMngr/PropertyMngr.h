@@ -43,9 +43,14 @@ namespace Chen::RToy {
                     break;
             }
 
-            if (!p2property) AllProperties.push_back(p2property);
+            if (p2property != nullptr) AllProperties.push_back(p2property);
 
             return p2property;
+        }
+
+        void Init()
+        {
+            
         }
 
     private:
@@ -54,7 +59,11 @@ namespace Chen::RToy {
         {
             for (auto &p : AllProperties)
             {
-                if (p != nullptr) delete p;
+                if (p != nullptr) 
+                {
+                    delete p;
+                    p = nullptr;
+                }
             }
         }   
         std::vector<IProperty*> AllProperties;             

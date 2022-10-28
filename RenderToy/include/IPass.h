@@ -39,6 +39,9 @@ namespace Chen::RToy {
 
         std::set<std::string>& GetObjNameList() { return NameList; }
 
+        // *********************************************************************
+        // TODO: Basic Method to Draw Obj
+
     protected:
         ID3D12Device* device;
         ID3D12GraphicsCommandList* cmdList;

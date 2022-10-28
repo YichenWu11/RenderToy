@@ -1,9 +1,11 @@
 #include <RenderToy/RenderToy.h>
-#include <ObjectMngr/ObjectMngr.h>
+#include <Editor/Editor.h>
+#include <AssetMngr/AssetMngr.h>
 #include <ObjectMngr/BasicObject.h>
 #include <CDX12/Resource/UploadBuffer.h>
 #include <Pass/render/PhongPass.h>
 #include <Pass/logical/UpdatePass.h>
+#include <Utility/Macro.h>
 
 using namespace Chen;
 using namespace Chen::CDX12;
@@ -11,6 +13,9 @@ using namespace Chen::RToy;
 
 // *********************************************************
 // Constant
+
+#define GetEditor()    Chen::RToy::Editor::Editor::GetInstance()
+#define GetAssetMngr() Chen::RToy::Asset::AssetMngr::GetInstance()
 
 const int mouseMoveSensitivity = 1;
 
@@ -24,6 +29,7 @@ const int gNumFrameResources = 3;
 RenderToy::RenderToy(HINSTANCE hInstance) : DX12App(hInstance) 
 {
 	mMainWndCaption = L"RenderToy";
+	mCamera = std::make_unique<Camera>();
 	DefaultInputLayout = 
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -51,14 +57,27 @@ bool RenderToy::Initialize()
 
 	mCmdList.Reset(mDirectCmdListAlloc.Get());
 
-	// TODO: Init
+	// set camera position
+	mCamera->SetPosition(0.0f, 4.0f, -15.0f);
+
+	/*
+		Init
+	*/
+	GetRenderRsrcMngr().Init(mDevice.Get(), mCmdList.Get());
+	GetObjectMngr().Init();
+	GetPropertyMngr().Init();
+	GetEditor().Init();
+	GetAssetMngr().Init();
+
+	/*
+		TODO: Add objects to Passes
+	*/
 	RegisterComponent("RenderComponent", std::make_unique<RenderComponent>());
 	RegisterComponent("LogicalComponent", std::make_unique<LogicalComponent>());
 
-	RenderResourceMngr::GetInstance().Init(mDevice.Get(), mCmdList.Get());
-
-	BuildShaders();
+	BuildShaders();  // before BuildPSOs();
 	BuildPSOs();
+	BuildTextures();
 	BuildFrameResource();
 
     ThrowIfFailed(mCmdList->Close());
@@ -74,7 +93,7 @@ void RenderToy::BuildShaders()
 {
 	std::vector<std::pair<std::string, Shader::Property>> rootProperties = {
         std::make_pair<std::string, Shader::Property>(
-            "ObjectCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 0, 1}
+            "ObjTransformCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 0, 1}
         ),
         std::make_pair<std::string, Shader::Property>(
             "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1}
@@ -82,36 +101,29 @@ void RenderToy::BuildShaders()
     };
 
 	// with a rootsig built
-	RenderResourceMngr::GetInstance().GetShaderMngr()->CreateShader(
+	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"IShader", 
 		rootProperties, 
 		L"..\\..\\shaders\\color.hlsl",
 		L"..\\..\\shaders\\color.hlsl");
 
-	RenderResourceMngr::GetInstance().GetShaderMngr()->GetShader("IShader")->mInputLayout = DefaultInputLayout;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->mInputLayout = DefaultInputLayout;
 }
 
 void RenderToy::BuildPSOs()
 {
-	RenderResourceMngr::GetInstance().GetPSOMngr()->CreatePipelineState(
+	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
 		"Base", 
 		mDevice.Get(),
-		RenderResourceMngr::GetInstance().GetShaderMngr()->GetShader("IShader"),
+		GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader"),
 		1,
 		mBackBufferFormat,
 		mDepthStencilFormat);
 }
 
-void RenderToy::BuildTexture()
+void RenderToy::BuildTextures()
 {
 	// auto& alloc = RenderResourceMngr::GetInstance().GetTexMngr()->GetTexAllocation();
-	
-}
-
-void RenderToy::BuildObjects()
-{
-	ObjectMngr::GetInstance().AddObject(std::make_shared<BasicObject>("box1"));
-	GetRenderComponent()->GetPass("PhongPass")->AddObject(ObjectMngr::GetInstance().GetObj(1));
 	
 }
 
@@ -131,6 +143,11 @@ void RenderToy::BuildFrameResource()
 				mDevice.Get(), 
 				1, //(UINT)ObjectMngr::GetInstance().GetObjNum() 
 				true)));
+		mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
+            "MatIndexCB", std::move(std::make_shared<UploadBuffer<Material::ID>>(
+				mDevice.Get(), 
+				1, //(UINT)ObjectMngr::GetInstance().GetObjNum() 
+				true)));
     }	
 }
 
@@ -140,7 +157,7 @@ void RenderToy::OnResize()
 {
 	DX12App::OnResize();
 
-	mCamera.SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+	mCamera->SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 }
 
 void RenderToy::LogicalFillPack()
@@ -149,6 +166,12 @@ void RenderToy::LogicalFillPack()
 	/*
 	// Fill the ComPack of LogicalComponent
 	*/
+	pack.currFrameResource = mCurrFrameResource;
+	pack.p2camera = mCamera.get();
+	pack.p2timer  = &mTimer;
+	pack.width = mClientWidth;
+	pack.height = mClientHeight;
+
 	GetLogicalComponent()->FillPack(pack);
 }
 
@@ -158,6 +181,14 @@ void RenderToy::RenderFillPack()
 	/*
 	// Fill the ComPack of RenderComponent
 	*/
+	pack.mCmdList = mCmdList;
+	pack.currFrameResource = mCurrFrameResource;
+	pack.currBackBuffer = CurrentBackBuffer();
+	pack.currBackBufferView = CurrentBackBufferView();
+	pack.depthStencilView = DepthStencilView();
+	pack.mScissorRect = mScissorRect;
+	pack.mScreenViewport = mScreenViewport;
+
 	GetRenderComponent()->FillPack(pack);
 }
 
@@ -171,7 +202,7 @@ void RenderToy::LogicTick(const GameTimer& gt)
 		Do logical Tick
 	*/
 	LogicalFillPack();
-	GetRenderComponent()->Tick();
+	GetLogicalComponent()->Tick();
 
 	if (mFrameResourceMngr->GetCurrentCpuFence() != 0) mFrameResourceMngr->BeginFrame(); // Begin Frame Here
 }
@@ -192,7 +223,7 @@ void RenderToy::Execute()
 	mCmdQueue.Execute(mCmdList.Get());
     ThrowIfFailed(mSwapChain->Present(0, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-    mFrameResourceMngr->EndFrame(mCmdQueue.Get());  // // End Frame Here
+    mFrameResourceMngr->EndFrame(mCmdQueue.Get());  // End Frame Here
 }
 
 void RenderToy::RenderTick(const GameTimer& gt)
@@ -209,15 +240,15 @@ void RenderToy::OnKeyboardInput(const GameTimer& gt)
 	const float dt = gt.DeltaTime();
 
 	// adjust the camera position
-	if (GetAsyncKeyState('W') & 0x8000) mCamera.Walk(10.0f * dt);
+	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(10.0f * dt);
 
-	if (GetAsyncKeyState('S') & 0x8000) mCamera.Walk(-10.0f * dt);
+	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-10.0f * dt);
 
-	if (GetAsyncKeyState('A') & 0x8000) mCamera.Strafe(-10.0f * dt);
+	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-10.0f * dt);
 
-	if (GetAsyncKeyState('D') & 0x8000) mCamera.Strafe(10.0f * dt);
+	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(10.0f * dt);
 
-	mCamera.UpdateViewMatrix();
+	mCamera->UpdateViewMatrix();
 }
 
 void RenderToy::OnMouseDown(WPARAM btnState, int x, int y)
@@ -244,8 +275,8 @@ void RenderToy::OnMouseMove(WPARAM btnState, int x, int y)
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
 
 		// adjust the camera orientation
-		mCamera.Pitch(dy / mouseMoveSensitivity);
-		mCamera.RotateY(dx / mouseMoveSensitivity);
+		mCamera->Pitch(dy / mouseMoveSensitivity);
+		mCamera->RotateY(dx / mouseMoveSensitivity);
 	}
 
 	mLastMousePos.x = x;

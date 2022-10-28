@@ -3,7 +3,7 @@
 * 每个物体都继承自最原始的基类 IObject，派生出的 Object 可以拥有不同的属性(IProperty), 比如 Transform, Material 等
 * 每个物体有一个 InstanceID (GUID) 来做唯一标识
 * 每个 Pass 含有多个物体，即就是在此 Pass 中要处理(绘制)的物体
-* 每个 Object 在创建时用一个 shared_ptr 保存，每个 Pass 中存的物体用 weak_ptr 引用
+* 每个 Object 在创建时用一个 shared_ptr 保存，每个 Pass 中存物体的原生指针，只负责用
 * 每个 Impl in IProperty 都是对齐(如果需要)的，可以直接申请给帧资源
 * *<font color=lightyellow>所有的 Object 统一用一个全局的 ObjectMngr 来管理</font>*
 

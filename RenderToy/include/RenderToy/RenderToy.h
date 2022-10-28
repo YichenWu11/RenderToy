@@ -41,8 +41,7 @@ namespace Chen::RToy {
 
         void BuildPSOs();
         void BuildShaders();
-        void BuildTexture();
-        void BuildObjects();
+        void BuildTextures();
         void BuildFrameResource();
 
         // **********************************************************
@@ -75,7 +74,7 @@ namespace Chen::RToy {
         std::map<std::string, std::unique_ptr<IComponent>> mComponents;
 
         POINT mLastMousePos;
-        Camera mCamera;
+        std::unique_ptr<Camera> mCamera;
 
         std::vector<D3D12_INPUT_ELEMENT_DESC> DefaultInputLayout;
         FrameResource* mCurrFrameResource = nullptr;

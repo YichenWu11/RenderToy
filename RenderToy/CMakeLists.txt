@@ -30,6 +30,10 @@ add_executable(${PROJECT_NAME} WIN32
 
     src/core/Pass/logical/UpdatePass.cpp
     src/core/Pass/logical/TransUpdatePass.cpp
+    src/core/Pass/logical/MatUpdatePass.cpp
+    src/core/Pass/logical/MeshUpdatePass.cpp
+
+    src/core/Utility/Macro.cpp
 )
 
 add_link_options(${PROJECT_NAME} PRIVATE -mwindows)

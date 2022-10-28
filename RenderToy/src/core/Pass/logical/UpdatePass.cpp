@@ -16,13 +16,12 @@ UpdatePass::~UpdatePass()
 
 void UpdatePass::Init(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList)
 {
-    device = _device;
-    cmdList = _cmdList;
+
 }
 
 void UpdatePass::Tick()
 {
-    XMMATRIX view = pack.p2camera->GetView();
+	XMMATRIX view = pack.p2camera->GetView();
 	XMMATRIX proj = pack.p2camera->GetProj();
 
 	XMMATRIX viewProj = XMMatrixMultiply(view, proj);

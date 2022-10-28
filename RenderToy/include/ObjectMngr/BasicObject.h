@@ -6,6 +6,8 @@
             - Transform  [ Default ]
             - Material   [ SetMaterial(BasicMaterial mat) ]
             - Mesh       [ SetMeshGeo(std::string) ]
+        ID:
+            ^ The ID is the index of this object in the whole ObjTransformCB.
 */
 
 #include "../IObject.h"
@@ -40,6 +42,6 @@ namespace Chen::RToy {
 
     private:
         bool visible {true};
-        DirectX::BoundingBox Bounds;
+        ObjectLayer layer {ObjectLayer::Opaque};
     };
 }

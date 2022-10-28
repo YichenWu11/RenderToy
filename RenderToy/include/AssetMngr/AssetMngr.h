@@ -12,6 +12,11 @@ namespace Chen::RToy::Asset {
             return instance;
         }
 
+        void Init()
+        {
+            
+        }
+
         void DebugOutputContents();
 
     private:

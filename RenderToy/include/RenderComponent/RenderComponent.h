@@ -2,6 +2,8 @@
 
 #include "../IComponent.h"
 #include "../IPass.h"
+#include <CDX12/GCmdList.h>
+#include <CDX12/FrameResource.h>
 
 namespace Chen::RToy {
     class RenderComponent final : public IComponent
@@ -16,6 +18,7 @@ namespace Chen::RToy {
         {
             auto p = std::any_cast<ComPack>(_pack);
             pack = std::move(p);
+            FillPassPack();
         }
 
         void FillPassPack() override;
@@ -25,7 +28,13 @@ namespace Chen::RToy {
 
         struct ComPack
         {
-            
+            Chen::CDX12::GCmdList mCmdList;
+            Chen::CDX12::FrameResource* currFrameResource;
+            ID3D12Resource* currBackBuffer{nullptr};
+            D3D12_CPU_DESCRIPTOR_HANDLE currBackBufferView{0};
+            D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView{0};
+            D3D12_VIEWPORT mScreenViewport;
+            D3D12_RECT mScissorRect; 
         };
 
     private:

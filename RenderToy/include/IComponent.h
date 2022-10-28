@@ -16,6 +16,8 @@ namespace Chen::RToy {
         virtual void Init(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
         virtual void Tick() = 0;
 
+        // TODO: AddObject and DelObject
+
         void AddPass(std::unique_ptr<IPass> ptr)
         {
             if (mPasses.find(ptr->GetName()) != mPasses.end()) return;

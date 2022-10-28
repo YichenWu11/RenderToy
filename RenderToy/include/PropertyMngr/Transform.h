@@ -12,23 +12,15 @@ namespace Chen::RToy {
         Transform(std::string n = std::string("Transform")) : IProperty(n) {}
         ~Transform() = default;
         
-        void SetRotation(DirectX::XMFLOAT4X4 r)  { impl.Rotation = r; }
-        void SetScale(DirectX::XMFLOAT4X4 s)     { impl.Scale = s; }
-        void SetTranslate(DirectX::XMFLOAT4X4 t) { impl.Translate = t; }
+        void SetRotation(DirectX::XMFLOAT4X4 r)  { impl.Rotation = r; SetDirty(); }
+        void SetScale(DirectX::XMFLOAT4X4 s)     { impl.Scale = s; SetDirty(); }
+        void SetTranslate(DirectX::XMFLOAT4X4 t) { impl.Translate = t; SetDirty(); }
 
         DirectX::XMFLOAT4X4 GetRotation() { return impl.Rotation; }
         DirectX::XMFLOAT4X4 GetScale() { return impl.Scale; }
         DirectX::XMFLOAT4X4 GetTranslate() { return impl.Translate; }
 
         std::any GetImpl() override { return impl; }
-
-        void Tick(std::any params) override 
-        {
-            Impl new_impl = std::any_cast<Impl>(params);
-            SetRotation(new_impl.Rotation);
-            SetScale(new_impl.Scale);
-            SetTranslate(new_impl.Translate);
-        }
 
         struct Impl
         {

@@ -19,6 +19,7 @@ namespace Chen::RToy {
         {
             auto p = std::any_cast<ComPack>(_pack);
             pack = std::move(p);
+            FillPassPack();
         }
 
         void FillPassPack() override;
