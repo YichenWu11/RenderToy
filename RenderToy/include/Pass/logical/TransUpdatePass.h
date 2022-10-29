@@ -22,7 +22,7 @@ namespace Chen::RToy {
         TransUpdatePass(std::string name = std::string("TransUpdatePass"));
         ~TransUpdatePass();
 
-        void Init(ID3D12Device*, ID3D12GraphicsCommandList*) override;
+        void Init(ID3D12Device*) override;
         void Tick() override;
 
     private:

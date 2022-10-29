@@ -17,11 +17,11 @@ LogicalComponent::~LogicalComponent()
 
 }
 
-void LogicalComponent::Init(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList)
+void LogicalComponent::Init(ID3D12Device* _device)
 {
-    mPasses[std::string("UpdatePass")]->Init(_device, _cmdList);
-    mPasses[std::string("TransUpdatePass")]->Init(_device, _cmdList);
-    mPasses[std::string("MeshUpdatePass")]->Init(_device, _cmdList);
+    mPasses[std::string("UpdatePass")]->Init(_device);
+    mPasses[std::string("TransUpdatePass")]->Init(_device);
+    mPasses[std::string("MeshUpdatePass")]->Init(_device);
 }
 
 void LogicalComponent::Tick()

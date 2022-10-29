@@ -1,4 +1,5 @@
 #include <Pass/render/PhongPass.h>
+#include <Pass/logical/UpdatePass.h>
 #include <PropertyMngr/Transform.h>
 #include <PropertyMngr/Material.h>
 #include <PropertyMngr/Mesh.h>
@@ -9,7 +10,7 @@ using namespace Chen::RToy;
 
 PhongPass::PhongPass(std::string name) : IPass(name) 
 {
-
+    AddObject(GetObjectMngr().GetObj("box1"));
 }
 
 PhongPass::~PhongPass()
@@ -17,10 +18,9 @@ PhongPass::~PhongPass()
 
 }
 
-void PhongPass::Init(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList)
+void PhongPass::Init(ID3D12Device* _device)
 {
     device = _device;
-    cmdList = _cmdList;
 }
 
 void PhongPass::Tick()
@@ -33,7 +33,7 @@ void PhongPass::Tick()
         D3D12_RESOURCE_STATE_PRESENT,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     
-    pack.mCmdList.ClearRenderTargetView(pack.currBackBufferView, DirectX::Colors::Aqua);
+    pack.mCmdList.ClearRenderTargetView(pack.currBackBufferView, DirectX::Colors::DarkGray);
     pack.mCmdList.ClearDepthStencilView(pack.depthStencilView);
 
     pack.mCmdList.OMSetRenderTarget(pack.currBackBufferView, pack.depthStencilView);
@@ -41,6 +41,20 @@ void PhongPass::Tick()
     /*
         // Render
     */
+    pack.mCmdList->SetPipelineState(GetRenderRsrcMngr().GetPSOMngr()->GetPipelineState("Base"));
+
+    // mCmdList.SetDescriptorHeaps(csuGpuDH.GetDescriptorHeap());
+    pack.mCmdList->SetGraphicsRootSignature(
+        GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->RootSig());
+
+    auto passCB = 
+        pack.currFrameResource->GetResource<std::shared_ptr<UploadBuffer<UpdatePass::PassConstants>>>("PassCB")->GetResource();
+    GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->SetResource(
+        "PassCB", pack.mCmdList.Get(), passCB->GetGPUVirtualAddress());
+
+    DrawObjects();
+
+    // *********************************
 
     pack.mCmdList.ResourceBarrierTransition(
         pack.currBackBuffer,
@@ -62,9 +76,9 @@ void PhongPass::DrawObjects()
         pack.mCmdList->IASetIndexBuffer(get_rvalue_ptr(mesh.pMesh->IndexBufferView()));
         pack.mCmdList->IASetPrimitiveTopology(mesh.PrimitiveType);
 
-        D3D12_GPU_VIRTUAL_ADDRESS transCBAddress = objectCB->GetResource()->GetGPUVirtualAddress() + obj.second->GetID() * objCBByteSize;
+        D3D12_GPU_VIRTUAL_ADDRESS transCBAddress = objectCB->GetResource()->GetGPUVirtualAddress() + (obj.second->GetID()-1) * objCBByteSize;
 
-        GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->SetResource("ObjTransformCB", cmdList, transCBAddress);
+        GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->SetResource("ObjTransformCB", pack.mCmdList.Get(), transCBAddress);
         pack.mCmdList->DrawIndexedInstanced(mesh.IndexCount, 1, mesh.StartIndexLocation, mesh.BaseVertexLocation, 0);
     }
 }

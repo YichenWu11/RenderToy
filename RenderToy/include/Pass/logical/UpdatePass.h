@@ -51,7 +51,7 @@ namespace Chen::RToy {
         UpdatePass(std::string name = std::string("UpdatePass"));
         ~UpdatePass();
 
-        void Init(ID3D12Device*, ID3D12GraphicsCommandList*) override;
+        void Init(ID3D12Device*) override;
         void Tick() override;
     private:
         PassPack pack;

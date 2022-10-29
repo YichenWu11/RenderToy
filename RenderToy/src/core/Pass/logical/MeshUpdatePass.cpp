@@ -5,12 +5,13 @@
 
 #include <Pass/logical/MeshUpdatePass.h>
 #include <PropertyMngr/Mesh.h>
+#include <Utility/Macro.h>
 
 using namespace Chen::RToy;
 
 MeshUpdatePass::MeshUpdatePass(std::string name) : IPass(name) 
 {
-
+    AddObject(GetObjectMngr().GetObj("box1"));
 }
 
 MeshUpdatePass::~MeshUpdatePass()
@@ -18,9 +19,9 @@ MeshUpdatePass::~MeshUpdatePass()
 
 }
 
-void MeshUpdatePass::Init(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList)
+void MeshUpdatePass::Init(ID3D12Device* _device)
 {
-
+    device = _device;
 }
 
 void MeshUpdatePass::Tick()

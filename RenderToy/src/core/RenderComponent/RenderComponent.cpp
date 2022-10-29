@@ -13,9 +13,9 @@ RenderComponent::~RenderComponent()
 
 }
 
-void RenderComponent::Init(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList)
+void RenderComponent::Init(ID3D12Device* _device)
 {
-    mPasses["PhongPass"]->Init(_device, _cmdList);
+    mPasses["PhongPass"]->Init(_device);
 }
 
 void RenderComponent::Tick()

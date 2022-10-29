@@ -1,11 +1,12 @@
 #include <Pass/logical/MatUpdatePass.h>
 #include <PropertyMngr/Material.h>
+#include <Utility/Macro.h>
 
 using namespace Chen::RToy;
 
 MatUpdatePass::MatUpdatePass(std::string name) : IPass(name) 
 {
-    
+    AddObject(GetObjectMngr().GetObj("box1"));
 }
 
 MatUpdatePass::~MatUpdatePass()
@@ -13,9 +14,9 @@ MatUpdatePass::~MatUpdatePass()
 
 }
 
-void MatUpdatePass::Init(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList)
+void MatUpdatePass::Init(ID3D12Device* _device)
 {
-
+    device = _device;
 }
 
 void MatUpdatePass::Tick()

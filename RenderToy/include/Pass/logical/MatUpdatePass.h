@@ -22,7 +22,7 @@ namespace Chen::RToy {
         MatUpdatePass(std::string name = std::string("MatUpdatePass"));
         ~MatUpdatePass();
 
-        void Init(ID3D12Device*, ID3D12GraphicsCommandList*) override;
+        void Init(ID3D12Device*) override;
         void Tick() override;
 
 

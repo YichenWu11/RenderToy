@@ -14,9 +14,9 @@ UpdatePass::~UpdatePass()
 
 }
 
-void UpdatePass::Init(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList)
+void UpdatePass::Init(ID3D12Device* _device)
 {
-
+	device = _device;
 }
 
 void UpdatePass::Tick()

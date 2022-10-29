@@ -30,7 +30,7 @@ namespace Chen::RToy {
         PhongPass(std::string name = std::string("PhongPass"));
         ~PhongPass();
 
-        void Init(ID3D12Device*, ID3D12GraphicsCommandList*) override;
+        void Init(ID3D12Device*) override;
         void Tick() override;
 
         void DrawObjects();

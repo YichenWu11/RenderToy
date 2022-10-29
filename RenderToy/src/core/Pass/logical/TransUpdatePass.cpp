@@ -1,12 +1,13 @@
 #include <Pass/logical/TransUpdatePass.h>
 #include <PropertyMngr/Transform.h>
 #include <DirectXMath.h>
+#include <Utility/Macro.h>
 
 using namespace Chen::RToy;
 
 TransUpdatePass::TransUpdatePass(std::string name) : IPass(name) 
 {
-    
+    AddObject(GetObjectMngr().GetObj("box1"));
 }
 
 TransUpdatePass::~TransUpdatePass()
@@ -14,9 +15,9 @@ TransUpdatePass::~TransUpdatePass()
 
 }
 
-void TransUpdatePass::Init(ID3D12Device* _device, ID3D12GraphicsCommandList* _cmdList)
+void TransUpdatePass::Init(ID3D12Device* _device)
 {
-
+    device = _device;
 }
 
 void TransUpdatePass::Tick()
@@ -39,7 +40,7 @@ void TransUpdatePass::Tick()
             DirectX::XMStoreFloat4x4(&new_impl.Scale, DirectX::XMMatrixTranspose(scale));
 
             pack.currFrameResource->GetResource<std::shared_ptr<Chen::CDX12::UploadBuffer<Transform::Impl>>>(
-                "ObjTransformCB")->CopyData(p2obj.second->GetID(), new_impl);
+                "ObjTransformCB")->CopyData(p2obj.second->GetID()-1, new_impl);
             p2obj.second->GetProperty("Transform")->ClearOne();
         }
     }

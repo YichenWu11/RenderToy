@@ -21,7 +21,7 @@ namespace Chen::RToy {
         MeshUpdatePass(std::string name = std::string("MeshUpdatePass"));
         ~MeshUpdatePass();
 
-        void Init(ID3D12Device*, ID3D12GraphicsCommandList*) override;
+        void Init(ID3D12Device*) override;
         void Tick() override; 
 
     private:

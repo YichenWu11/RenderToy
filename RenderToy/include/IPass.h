@@ -16,14 +16,14 @@ namespace Chen::RToy {
         IPass& operator=(const IPass&) = delete;
         virtual ~IPass() {}    
 
-        virtual void Init(ID3D12Device*, ID3D12GraphicsCommandList*) = 0;
+        virtual void Init(ID3D12Device*) = 0;
         virtual void Tick() = 0;
 
         std::string GetName() { return passName; }
 
         void AddObject(IObject* p2obj)
         {       
-            if (mObjects.find(p2obj->GetObjName()) == mObjects.end()) return;
+            if (mObjects.find(p2obj->GetObjName()) != mObjects.end()) return;
             mObjects[p2obj->GetObjName()] = p2obj;
             NameList.emplace(p2obj->GetObjName());
         }
@@ -44,7 +44,6 @@ namespace Chen::RToy {
 
     protected:
         ID3D12Device* device;
-        ID3D12GraphicsCommandList* cmdList;
         std::string passName;
         std::set<std::string> NameList;
         std::map<std::string, IObject*> mObjects;

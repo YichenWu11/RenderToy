@@ -17,7 +17,7 @@ using namespace Chen::RToy;
 #define GetEditor()    Chen::RToy::Editor::Editor::GetInstance()
 #define GetAssetMngr() Chen::RToy::Asset::AssetMngr::GetInstance()
 
-const int mouseMoveSensitivity = 1;
+const int mouseMoveSensitivity = 2;
 
 const int maxObjectsNum = 168;
 
@@ -69,11 +69,11 @@ bool RenderToy::Initialize()
 	GetEditor().Init();
 	GetAssetMngr().Init();
 
-	/*
-		TODO: Add objects to Passes
-	*/
 	RegisterComponent("RenderComponent", std::make_unique<RenderComponent>());
 	RegisterComponent("LogicalComponent", std::make_unique<LogicalComponent>());
+
+	GetRenderComponent()->Init(mDevice.Get());
+	GetLogicalComponent()->Init(mDevice.Get());
 
 	BuildShaders();  // before BuildPSOs();
 	BuildPSOs();
@@ -141,12 +141,12 @@ void RenderToy::BuildFrameResource()
         mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
             "ObjTransformCB", std::move(std::make_shared<UploadBuffer<Transform::Impl>>(
 				mDevice.Get(), 
-				1, //(UINT)ObjectMngr::GetInstance().GetObjNum() 
+				168,
 				true)));
 		mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
             "MatIndexCB", std::move(std::make_shared<UploadBuffer<Material::ID>>(
 				mDevice.Get(), 
-				1, //(UINT)ObjectMngr::GetInstance().GetObjNum() 
+				168, 
 				true)));
     }	
 }
@@ -240,13 +240,13 @@ void RenderToy::OnKeyboardInput(const GameTimer& gt)
 	const float dt = gt.DeltaTime();
 
 	// adjust the camera position
-	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(10.0f * dt);
+	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(8.0f * dt);
 
-	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-10.0f * dt);
+	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-8.0f * dt);
 
-	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-10.0f * dt);
+	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-8.0f * dt);
 
-	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(10.0f * dt);
+	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(8.0f * dt);
 
 	mCamera->UpdateViewMatrix();
 }
