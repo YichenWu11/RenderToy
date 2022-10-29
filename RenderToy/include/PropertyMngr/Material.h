@@ -40,7 +40,11 @@ namespace Chen::RToy {
         // special
         struct ID
         {
-            int matIndex;
+            UINT matIndex;
+            /* for alignment */
+            UINT Pad0;
+            UINT Pad1;
+            UINT Pad2;
         };
 
     private:

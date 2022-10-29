@@ -7,6 +7,7 @@ using namespace Chen::RToy;
 MatUpdatePass::MatUpdatePass(std::string name) : IPass(name) 
 {
     AddObject(GetObjectMngr().GetObj("box1"));
+    AddObject(GetObjectMngr().GetObj("sphere1"));
 }
 
 MatUpdatePass::~MatUpdatePass()
@@ -29,7 +30,7 @@ void MatUpdatePass::Tick()
             Material::ID new_id(matImpl.material->MatIndex);
             // TODO: create a CB(register for every frameResource)： MatIndexCB，store the material index of obj
             pack.currFrameResource->GetResource<std::shared_ptr<Chen::CDX12::UploadBuffer<Material::ID>>>(
-                "MatIndexCB")->CopyData(p2obj.second->GetID(), new_id);
+                "MatIndexCB")->CopyData(p2obj.second->GetID()-1, new_id);
             p2obj.second->GetProperty("Material")->ClearOne();
         }
     }

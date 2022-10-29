@@ -23,6 +23,8 @@ namespace Chen::RToy {
 
         void FillPassPack() override;
 
+        void FillObjectsForPass() override;
+
         void Init(ID3D12Device*) override;
         void Tick() override;
 

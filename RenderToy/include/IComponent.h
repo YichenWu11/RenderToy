@@ -41,6 +41,8 @@ namespace Chen::RToy {
 
         virtual void FillPassPack() {}
 
+        virtual void FillObjectsForPass() {}
+
         std::set<std::string>& GetPassNameList() { return NameList; }
 
     protected:

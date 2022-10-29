@@ -36,3 +36,8 @@ void RenderComponent::FillPassPack()
 
     mPasses["PhongPass"]->FillPack(pack1);
 }
+
+void RenderComponent::FillObjectsForPass()
+{
+    
+}

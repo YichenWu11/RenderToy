@@ -51,3 +51,8 @@ void LogicalComponent::FillPassPack()
     MeshUpdatePass::PassPack pack3;
     mPasses[std::string("MeshUpdatePass")]->FillPack(pack3);
 }
+
+void LogicalComponent::FillObjectsForPass()
+{
+    
+}

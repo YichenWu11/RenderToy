@@ -100,12 +100,12 @@ void RenderToy::BuildShaders()
         )
     };
 
-	// with a rootsig built
+	// with a rootsig built together
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"IShader", 
 		rootProperties, 
-		L"..\\..\\shaders\\color.hlsl",
-		L"..\\..\\shaders\\color.hlsl");
+		L"..\\..\\..\\shaders\\color.hlsl",
+		L"..\\..\\..\\shaders\\color.hlsl");
 
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->mInputLayout = DefaultInputLayout;
 }

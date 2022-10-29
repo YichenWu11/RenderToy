@@ -8,6 +8,7 @@ using namespace Chen::RToy;
 TransUpdatePass::TransUpdatePass(std::string name) : IPass(name) 
 {
     AddObject(GetObjectMngr().GetObj("box1"));
+    AddObject(GetObjectMngr().GetObj("sphere1"));
 }
 
 TransUpdatePass::~TransUpdatePass()

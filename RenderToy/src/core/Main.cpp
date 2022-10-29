@@ -7,6 +7,8 @@
 #include <Pass/logical/UpdatePass.h>
 #include <Utility/Macro.h>
 
+#include <iostream>
+
 using namespace Chen;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,

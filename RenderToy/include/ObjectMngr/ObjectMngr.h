@@ -19,7 +19,14 @@ namespace Chen::RToy {
         {
             // Add the default Objects.
             AddObject(std::make_shared<BasicObject>("box1"));
-            // dynamic_cast<Mesh*>(GetObj("box1")->GetProperty("Mesh"))->SetSubMesh("sphere");
+            AddObject(std::make_shared<BasicObject>("sphere1"));
+            dynamic_cast<Mesh*>(GetObj("sphere1")->GetProperty("Mesh"))->SetSubMesh("sphere");
+            DirectX::XMFLOAT4X4 world;
+            DirectX::XMStoreFloat4x4(&world, DirectX::XMMatrixTranslation(10.0, 10.0, 10.0));
+            DirectX::XMFLOAT4X4 scale;
+            DirectX::XMStoreFloat4x4(&scale, DirectX::XMMatrixScaling(10.0, 10.0, 10.0));
+            dynamic_cast<Transform*>(GetObj("sphere1")->GetProperty("Transform"))->SetTranslate(world);
+            dynamic_cast<Transform*>(GetObj("sphere1")->GetProperty("Transform"))->SetScale(scale);
         }
 
         void AddObject(std::shared_ptr<IObject> p2obj)

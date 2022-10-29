@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 3.5)
 project(RenderToy_Core)
 
 add_definitions("-DUNICODE" "-D_UNICODE")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS") 
 
 add_executable(${PROJECT_NAME} WIN32
     src/core/Main.cpp
