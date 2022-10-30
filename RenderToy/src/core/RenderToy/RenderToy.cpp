@@ -148,6 +148,15 @@ void RenderToy::BuildPSOs()
 		mDepthStencilFormat);
 
 	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
+		"Transparent", 
+		mDevice.Get(),
+		GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader"),
+		1,
+		mBackBufferFormat,
+		mDepthStencilFormat,
+		true);
+
+	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
 		"Sky", 
 		mDevice.Get(),
 		GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader"),
@@ -161,32 +170,50 @@ void RenderToy::BuildTextures()
 	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
 		mDevice.Get(),
 		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\bricks.dds",
-		"bricks",
+		L"..\\..\\assets\\texture\\common\\tile.dds",
+		"tile",
 		TextureMngr::TexFileFormat::DDS);
+
 	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
 		mDevice.Get(),
 		mCmdQueue.Get(),
 		L"..\\..\\assets\\texture\\common\\bricks2.dds",
 		"bricks2",
 		TextureMngr::TexFileFormat::DDS);
+
 	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
 		mDevice.Get(),
 		mCmdQueue.Get(),
 		L"..\\..\\assets\\texture\\common\\bricks2_nmap.dds",
 		"bricks_nmap",
 		TextureMngr::TexFileFormat::DDS);
+
 	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
 		mDevice.Get(),
 		mCmdQueue.Get(),
 		L"..\\..\\assets\\texture\\common\\tile_nmap.dds",
 		"tile_nmap",
 		TextureMngr::TexFileFormat::DDS);
+
 	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
 		mDevice.Get(),
 		mCmdQueue.Get(),
 		L"..\\..\\assets\\texture\\common\\checkboard.dds",
 		"checkboard",
+		TextureMngr::TexFileFormat::DDS);
+
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\common\\white1x1.dds",
+		"default",
+		TextureMngr::TexFileFormat::DDS);
+
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\common\\BrokenGlass.dds",
+		"glass",
 		TextureMngr::TexFileFormat::DDS);
 
 	GetRenderRsrcMngr().GetTexMngr()->SetCubeIndex(
@@ -203,12 +230,12 @@ void RenderToy::BuildTextures()
 void RenderToy::BuildMaterials()
 {
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-		"bricks",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks"),
+		"tile",
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile"),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		XMFLOAT3(0.2f, 0.2f, 0.2f),
 		0.8f,
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks_nmap"));
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile_nmap"));
 
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"matForSphere",
@@ -225,6 +252,21 @@ void RenderToy::BuildMaterials()
 		XMFLOAT3(0.2f, 0.2f, 0.2f),
 		0.8f,
 		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile_nmap"));
+
+	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+		"mirror",
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("default"),
+		XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f),
+		XMFLOAT3(0.98f, 0.97f, 0.95f),
+		0.1f);
+
+	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+		"glass",
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("glass"),
+		XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f),
+		XMFLOAT3(0.98f, 0.97f, 0.95f),
+		0.1f);
+
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"sky",
 		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("cubeMap"),

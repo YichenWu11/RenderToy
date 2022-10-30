@@ -11,6 +11,8 @@ using namespace Chen::RToy;
 PhongPass::PhongPass(std::string name) : IPass(name) 
 {
     AddObject(GetObjectMngr().GetObj("box1"));
+    AddObject(GetObjectMngr().GetObj("box2"));
+    AddObject(GetObjectMngr().GetObj("box3"));
     AddObject(GetObjectMngr().GetObj("sphere1"));
     AddObject(GetObjectMngr().GetObj("ground"));
     AddObject(GetObjectMngr().GetObj("skyBox"));
@@ -73,8 +75,10 @@ void PhongPass::Tick()
     DrawObjects();
 
     pack.mCmdList->SetPipelineState(GetRenderRsrcMngr().GetPSOMngr()->GetPipelineState("Sky"));
-
     DrawObjects(ObjectLayer::Sky);
+
+    pack.mCmdList->SetPipelineState(GetRenderRsrcMngr().GetPSOMngr()->GetPipelineState("Transparent"));
+    DrawObjects(ObjectLayer::Transparent);
 
     // *********************************
 
@@ -107,7 +111,7 @@ void PhongPass::DrawObjects(ObjectLayer layer)
             D3D12_GPU_VIRTUAL_ADDRESS transCBAddress = objectCB->GetResource()->GetGPUVirtualAddress() + (obj.second->GetID()-1) * objCBByteSize;
             D3D12_GPU_VIRTUAL_ADDRESS matIdxCBAddress = matIdxCB->GetResource()->GetGPUVirtualAddress() + (obj.second->GetID()-1) * matCBByteSize;
 
-            if (layer == ObjectLayer::Opaque)
+            if (layer == ObjectLayer::Opaque || layer == ObjectLayer::Transparent)
             {
                 GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->SetResource("ObjTransformCB", pack.mCmdList.Get(), transCBAddress);
                 GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->SetResource("MatIndexCB", pack.mCmdList.Get(), matIdxCBAddress);
