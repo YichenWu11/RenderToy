@@ -107,10 +107,13 @@ void RenderToy::BuildShaders()
             "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1} /* b1 space0 */
         ),
 		std::make_pair<std::string, Shader::Property>(
-            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 1, 50} /* t1 space0 */
+            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 2, 50} /* t1 space0 */
         ),	
 		std::make_pair<std::string, Shader::Property>(
-			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 1} /* t1 space0 */
+			"ShadowMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 1, 1} /* t0 space0 */
+		),
+		std::make_pair<std::string, Shader::Property>(
+			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 1} /* t0 space0 */
 		),
 		std::make_pair<std::string, Shader::Property>(
             "Materials", Shader::Property{ShaderVariableType::StructuredBuffer, 1, 0, 168} /* t0 space1 */
@@ -135,6 +138,17 @@ void RenderToy::BuildShaders()
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->mInputLayout = DefaultInputLayout;
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->depthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	// For Shadow Map
+	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
+		"ShadowShader", 
+		rootProperties, 
+		L"..\\..\\shaders\\Phong\\Shadows.hlsl",
+		L"..\\..\\shaders\\Phong\\Shadows.hlsl");
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->mInputLayout = DefaultInputLayout;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->rasterizerState.DepthBias = 100000;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->rasterizerState.DepthBiasClamp = 0.0f;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->rasterizerState.SlopeScaledDepthBias = 1.0f;
 }
 
 void RenderToy::BuildPSOs()
@@ -163,6 +177,14 @@ void RenderToy::BuildPSOs()
 		1,
 		mBackBufferFormat,
 		mDepthStencilFormat);
+
+	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
+		"ShadowMap",
+		mDevice.Get(),
+		GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader"),
+		0,
+		mBackBufferFormat,
+		mDepthStencilFormat, false, true);
 }
 
 void RenderToy::BuildTextures()
@@ -223,8 +245,16 @@ void RenderToy::BuildTextures()
 			L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
 			"cubeMap",
 			TextureMngr::TexFileFormat::DDS,
-			TextureDimension::Cubemap)
-	);
+			TextureDimension::Cubemap));
+
+	GetRenderRsrcMngr().GetTexMngr()->SetSMIndex(
+		GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+			mDevice.Get(),
+			mCmdQueue.Get(),
+			L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
+			"shadowMap",
+			TextureMngr::TexFileFormat::DDS,
+			TextureDimension::Tex2D));
 }
 
 void RenderToy::BuildMaterials()

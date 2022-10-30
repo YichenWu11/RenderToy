@@ -68,6 +68,7 @@ namespace Chen::RToy {
 
             // Transparent box
             AddObject(std::make_shared<BasicObject>("box3"));
+            //dynamic_cast<Mesh*>(GetObj("box3")->GetProperty("Mesh"))->SetSubMesh("sphere");
             DirectX::XMFLOAT4X4 scale_box3;
             DirectX::XMStoreFloat4x4(&scale_box3, DirectX::XMMatrixScaling(6.0, 6.0, 6.0));
             DirectX::XMFLOAT4X4 trans_box3;

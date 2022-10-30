@@ -33,6 +33,9 @@ add_executable(${PROJECT_NAME} WIN32
     src/core/Pass/logical/TransUpdatePass.cpp
     src/core/Pass/logical/MatUpdatePass.cpp
     src/core/Pass/logical/MeshUpdatePass.cpp
+    src/core/Pass/logical/ShadowPrePass.cpp
+
+    src/core/Pass/logical/shadow/ShadowMap.cpp
 
     src/core/Utility/Macro.cpp
 )
