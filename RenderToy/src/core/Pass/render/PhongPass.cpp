@@ -12,6 +12,7 @@ PhongPass::PhongPass(std::string name) : IPass(name)
 {
     AddObject(GetObjectMngr().GetObj("box1"));
     AddObject(GetObjectMngr().GetObj("sphere1"));
+    AddObject(GetObjectMngr().GetObj("ground"));
 }
 
 PhongPass::~PhongPass()
@@ -60,7 +61,7 @@ void PhongPass::Tick()
         "Materials", pack.mCmdList.Get(), matBuffer->GetGPUVirtualAddress());
 
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->SetResource(
-        "Textures", pack.mCmdList.Get(), GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetGpuHandle());
+        "Textures", pack.mCmdList.Get(), GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetGpuHandle(0));
 
     DrawObjects();
 

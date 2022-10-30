@@ -9,6 +9,7 @@ TransUpdatePass::TransUpdatePass(std::string name) : IPass(name)
 {
     AddObject(GetObjectMngr().GetObj("box1"));
     AddObject(GetObjectMngr().GetObj("sphere1"));
+    AddObject(GetObjectMngr().GetObj("ground"));
 }
 
 TransUpdatePass::~TransUpdatePass()

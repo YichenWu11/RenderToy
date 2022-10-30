@@ -21,6 +21,8 @@ const float mouseMoveSensitivity = 1.0;
 
 const int maxObjectsNum = 168;
 
+const int maxMaterialNum = 168;
+
 const int gNumFrameResources = 3;
 
 // *********************************************************
@@ -141,21 +143,34 @@ void RenderToy::BuildTextures()
 		L"..\\..\\assets\\texture\\common\\bricks.dds",
 		"bricks",
 		TextureMngr::TexFileFormat::DDS);
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\common\\checkboard.dds",
+		"checkborad",
+		TextureMngr::TexFileFormat::DDS);
 }
 
 void RenderToy::BuildMaterials()
 {
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"bricks",
-		0,
-		XMFLOAT4(0.2, 0.6, 0.4, 1.0),
-		XMFLOAT3(1.0, 1.0, 1.0),
-		0.8);
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks"),
+		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f),
+		XMFLOAT3(0.8f, 1.0f, 1.0f),
+		0.8f);
 
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"matForSphere",
-		0,
-		XMFLOAT4(0.8, 0.6, 0.4, 1.0),
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks"),
+		XMFLOAT4(0.8f, 0.9f, 0.9f, 1.0f),
+		XMFLOAT3(1.0f, 1.0f, 1.0f),
+		0.8f);
+
+	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+		"bricksForGround",
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("checkborad"),
+		XMFLOAT4(0.9, 0.9, 0.9, 1.0),
 		XMFLOAT3(1.0, 1.0, 1.0),
 		0.8);
 }
@@ -174,17 +189,17 @@ void RenderToy::BuildFrameResource()
         mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
             "ObjTransformCB", std::move(std::make_shared<UploadBuffer<Transform::Impl>>(
 				mDevice.Get(), 
-				168,
+				maxObjectsNum,
 				true)));
 		mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
             "MatIndexCB", std::move(std::make_shared<UploadBuffer<Material::ID>>(
 				mDevice.Get(), 
-				168, 
+				maxObjectsNum,
 				true)));
 		mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
             "MaterialData", std::move(std::make_shared<UploadBuffer<BasicMaterialData>>(
 				mDevice.Get(), 
-				20, 
+				maxMaterialNum, 
 				false)));
     }	
 }
@@ -278,13 +293,13 @@ void RenderToy::OnKeyboardInput(const GameTimer& gt)
 	const float dt = gt.DeltaTime();
 
 	// adjust the camera position
-	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(10.0f * dt);
+	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(12.0f * dt);
 
-	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-10.0f * dt);
+	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-12.0f * dt);
 
-	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-10.0f * dt);
+	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-12.0f * dt);
 
-	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(10.0f * dt);
+	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(12.0f * dt);
 
 	mCamera->UpdateViewMatrix();
 }

@@ -20,6 +20,12 @@ namespace Chen::RToy {
             SetDirty(); 
         }
 
+        void SetMatTransform(DirectX::XMFLOAT4X4 mat)
+        {
+            impl.material->MatTransform = mat;
+            SetDirty();
+        }
+
         std::string GetMatName() { return impl.material->Name; }
         int GetMatIndex() { return impl.material->MatIndex; }
         int GetDiffuse() { return impl.material->DiffuseSrvHeapIndex; }

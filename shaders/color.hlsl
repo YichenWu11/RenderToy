@@ -75,6 +75,7 @@ VertexOut VS(VertexIn vin)
 {
 	VertexOut vout;
 	
+    MaterialData matData = gMaterialData[matIndex];
 	// Transform to homogeneous clip space.
     float4x4 world = mul(gRotation, mul(gScale, gTranslate));
     float4 posW = mul(float4(vin.PosL, 1.0f), world);
@@ -82,7 +83,7 @@ VertexOut VS(VertexIn vin)
 	
 	// Just pass vertex color into the pixel shader.
     vout.Color = float4(vin.NormalL, 1.0f);
-    vout.TexC  = vin.TexC;
+    vout.TexC  = mul(float4(vin.TexC, 0.0, 1.0), matData.MatTransform).xy;
     
     return vout;
 }
@@ -96,7 +97,7 @@ float4 PS(VertexOut pin) : SV_Target
 	uint diffuseMapIndex = matData.DiffuseMapIndex;
 	uint normalMapIndex = matData.NormalMapIndex;
 
-    // diffuseAlbedo *= gTextureMaps[0].Sample(gsamAnisotropicWrap, pin.TexC);
+    diffuseAlbedo *= gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
 
     return diffuseAlbedo;
 }

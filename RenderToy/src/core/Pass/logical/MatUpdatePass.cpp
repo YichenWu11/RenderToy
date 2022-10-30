@@ -8,6 +8,7 @@ MatUpdatePass::MatUpdatePass(std::string name) : IPass(name)
 {
     AddObject(GetObjectMngr().GetObj("box1"));
     AddObject(GetObjectMngr().GetObj("sphere1"));
+    AddObject(GetObjectMngr().GetObj("ground"));
 }
 
 MatUpdatePass::~MatUpdatePass()
@@ -24,6 +25,7 @@ void MatUpdatePass::Tick()
 {
     for (auto& p2obj : mObjects)
     {
+        // Tick Every Frame
         auto matImpl = p2obj.second->GetPropertyImpl<Material>("Material");
         Material::ID new_id;
         new_id.matIndex = matImpl.material->MatIndex;

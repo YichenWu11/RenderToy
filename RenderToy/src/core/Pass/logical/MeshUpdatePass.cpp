@@ -13,6 +13,7 @@ MeshUpdatePass::MeshUpdatePass(std::string name) : IPass(name)
 {
     AddObject(GetObjectMngr().GetObj("box1"));
     AddObject(GetObjectMngr().GetObj("sphere1"));
+    AddObject(GetObjectMngr().GetObj("ground"));
 }
 
 MeshUpdatePass::~MeshUpdatePass()

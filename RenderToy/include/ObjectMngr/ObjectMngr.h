@@ -35,7 +35,21 @@ namespace Chen::RToy {
             dynamic_cast<Transform*>(GetObj("sphere1")->GetProperty("Transform"))->SetScale(scale);
             dynamic_cast<Material*>(GetObj("sphere1")->GetProperty("Material"))->SetMaterial(
                 Chen::CDX12::RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial("matForSphere"));
-        }
+
+            AddObject(std::make_shared<BasicObject>("ground"));
+            dynamic_cast<Mesh*>(GetObj("ground")->GetProperty("Mesh"))->SetSubMesh("grid");
+            DirectX::XMFLOAT4X4 scale_ground;
+            DirectX::XMStoreFloat4x4(&scale_ground, DirectX::XMMatrixScaling(5.0, 5.0, 5.0));
+            DirectX::XMFLOAT4X4 world_ground;
+            DirectX::XMStoreFloat4x4(&world_ground, DirectX::XMMatrixTranslation(0.0, -10.0, 0.0));
+            DirectX::XMFLOAT4X4 mat_trans;
+            DirectX::XMStoreFloat4x4(&mat_trans, DirectX::XMMatrixScaling(5.0, 5.0, 5.0));
+            dynamic_cast<Transform*>(GetObj("ground")->GetProperty("Transform"))->SetScale(scale_ground);
+            dynamic_cast<Transform*>(GetObj("ground")->GetProperty("Transform"))->SetTranslate(world_ground);
+            dynamic_cast<Material*>(GetObj("ground")->GetProperty("Material"))->SetMaterial(
+                Chen::CDX12::RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial("bricksForGround"));
+            dynamic_cast<Material*>(GetObj("ground")->GetProperty("Material"))->SetMatTransform(mat_trans);
+        }   
 
         void AddObject(std::shared_ptr<IObject> p2obj)
         {
