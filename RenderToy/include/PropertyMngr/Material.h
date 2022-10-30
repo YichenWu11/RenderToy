@@ -17,7 +17,6 @@ namespace Chen::RToy {
         void SetMaterial(BasicMaterial* mat) 
         { 
             impl.material = mat; 
-            matID.matIndex = mat->MatIndex;
             SetDirty(); 
         }
 
@@ -49,6 +48,5 @@ namespace Chen::RToy {
 
     private:
         Impl impl;
-        ID   matID;
     };
 }

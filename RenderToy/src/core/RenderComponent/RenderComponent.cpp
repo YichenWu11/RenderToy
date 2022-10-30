@@ -25,7 +25,7 @@ void RenderComponent::Tick()
 
 void RenderComponent::FillPassPack()
 {
-    PhongPass::PassPack pack1;
+    static PhongPass::PassPack pack1;
     pack1.mCmdList = pack.mCmdList;
     pack1.currFrameResource = pack.currFrameResource;
     pack1.currBackBuffer = pack.currBackBuffer;

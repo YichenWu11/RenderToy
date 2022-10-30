@@ -42,6 +42,7 @@ namespace Chen::RToy {
         void BuildPSOs();
         void BuildShaders();
         void BuildTextures();
+        void BuildMaterials();
         void BuildFrameResource();
 
         // **********************************************************

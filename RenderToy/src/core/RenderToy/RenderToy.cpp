@@ -17,7 +17,7 @@ using namespace Chen::RToy;
 #define GetEditor()    Chen::RToy::Editor::Editor::GetInstance()
 #define GetAssetMngr() Chen::RToy::Asset::AssetMngr::GetInstance()
 
-const int mouseMoveSensitivity = 2;
+const float mouseMoveSensitivity = 1.0;
 
 const int maxObjectsNum = 168;
 
@@ -64,6 +64,10 @@ bool RenderToy::Initialize()
 		Init
 	*/
 	GetRenderRsrcMngr().Init(mDevice.Get(), mCmdList.Get());
+
+	BuildTextures();
+	BuildMaterials();
+
 	GetObjectMngr().Init();
 	GetPropertyMngr().Init();
 	GetEditor().Init();
@@ -77,7 +81,6 @@ bool RenderToy::Initialize()
 
 	BuildShaders();  // before BuildPSOs();
 	BuildPSOs();
-	BuildTextures();
 	BuildFrameResource();
 
     ThrowIfFailed(mCmdList->Close());
@@ -93,19 +96,28 @@ void RenderToy::BuildShaders()
 {
 	std::vector<std::pair<std::string, Shader::Property>> rootProperties = {
         std::make_pair<std::string, Shader::Property>(
-            "ObjTransformCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 0, 1}
+            "ObjTransformCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 0, 1} /* b0 space0 */
+        ),
+		std::make_pair<std::string, Shader::Property>(
+            "MatIndexCB", Shader::Property{ShaderVariableType::ConstantBuffer, 1, 0, 1} /* b0 space1 */
         ),
         std::make_pair<std::string, Shader::Property>(
-            "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1}
-        )
+            "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1} /* b1 space0 */
+        ),
+		std::make_pair<std::string, Shader::Property>(
+            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 1, 10} /* t1 space0 */
+        ),	
+		std::make_pair<std::string, Shader::Property>(
+            "Materials", Shader::Property{ShaderVariableType::StructuredBuffer, 0, 0, 10} /* t0 space0 */
+        ),	
     };
 
 	// with a rootsig built together
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"IShader", 
 		rootProperties, 
-		L"..\\..\\..\\shaders\\color.hlsl",
-		L"..\\..\\..\\shaders\\color.hlsl");
+		L"..\\..\\shaders\\color.hlsl",
+		L"..\\..\\shaders\\color.hlsl");
 
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->mInputLayout = DefaultInputLayout;
 }
@@ -123,8 +135,29 @@ void RenderToy::BuildPSOs()
 
 void RenderToy::BuildTextures()
 {
-	// auto& alloc = RenderResourceMngr::GetInstance().GetTexMngr()->GetTexAllocation();
-	
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\common\\bricks.dds",
+		"bricks",
+		TextureMngr::TexFileFormat::DDS);
+}
+
+void RenderToy::BuildMaterials()
+{
+	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+		"bricks",
+		0,
+		XMFLOAT4(0.2, 0.6, 0.4, 1.0),
+		XMFLOAT3(1.0, 1.0, 1.0),
+		0.8);
+
+	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+		"matForSphere",
+		0,
+		XMFLOAT4(0.8, 0.6, 0.4, 1.0),
+		XMFLOAT3(1.0, 1.0, 1.0),
+		0.8);
 }
 
 // Build FrameResource and Register Needed Resource
@@ -148,6 +181,11 @@ void RenderToy::BuildFrameResource()
 				mDevice.Get(), 
 				168, 
 				true)));
+		mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
+            "MaterialData", std::move(std::make_shared<UploadBuffer<BasicMaterialData>>(
+				mDevice.Get(), 
+				20, 
+				false)));
     }	
 }
 
@@ -162,13 +200,13 @@ void RenderToy::OnResize()
 
 void RenderToy::LogicalFillPack()
 {
-	LogicalComponent::ComPack pack;
+	static LogicalComponent::ComPack pack;
 	/*
 	// Fill the ComPack of LogicalComponent
 	*/
 	pack.currFrameResource = mCurrFrameResource;
 	pack.p2camera = mCamera.get();
-	pack.p2timer  = &mTimer;
+	pack.p2timer = &mTimer;
 	pack.width = mClientWidth;
 	pack.height = mClientHeight;
 
@@ -177,7 +215,7 @@ void RenderToy::LogicalFillPack()
 
 void RenderToy::RenderFillPack()
 {
-	RenderComponent::ComPack pack;
+	static RenderComponent::ComPack pack;
 	/*
 	// Fill the ComPack of RenderComponent
 	*/
@@ -198,13 +236,13 @@ void RenderToy::LogicTick(const GameTimer& gt)
 
     mCurrFrameResource = mFrameResourceMngr->GetCurrentFrameResource();
 
+	if (mFrameResourceMngr->GetCurrentCpuFence() != 0) mFrameResourceMngr->BeginFrame(); // Begin Frame Here
+
 	/*
 		Do logical Tick
 	*/
 	LogicalFillPack();
 	GetLogicalComponent()->Tick();
-
-	if (mFrameResourceMngr->GetCurrentCpuFence() != 0) mFrameResourceMngr->BeginFrame(); // Begin Frame Here
 }
 
 void RenderToy::Populate(const GameTimer& gt)
@@ -240,13 +278,13 @@ void RenderToy::OnKeyboardInput(const GameTimer& gt)
 	const float dt = gt.DeltaTime();
 
 	// adjust the camera position
-	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(8.0f * dt);
+	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(10.0f * dt);
 
-	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-8.0f * dt);
+	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-10.0f * dt);
 
-	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-8.0f * dt);
+	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-10.0f * dt);
 
-	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(8.0f * dt);
+	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(10.0f * dt);
 
 	mCamera->UpdateViewMatrix();
 }
