@@ -8,8 +8,11 @@
 #include <CDX12/FrameResource.h>
 #include <CDX12/Common/Camera.h>
 #include <CDX12/Common/GameTimer.h>
+#include <CDX12/Common/Light.h>
 
 using namespace Chen::CDX12;
+
+#define MaxLightNum 16
 
 namespace Chen::RToy {
     class UpdatePass : public IPass
@@ -31,6 +34,8 @@ namespace Chen::RToy {
             float FarZ = 0.0f;
             float TotalTime = 0.0f;
             float DeltaTime = 0.0f;
+            DirectX::XMFLOAT4 AmbientLight = { 0.4f, 0.4f, 0.6f, 1.0f };
+            Chen::CDX12::Light Lights[MaxLightNum];
         };
 
         struct PassPack
@@ -38,8 +43,8 @@ namespace Chen::RToy {
             Chen::CDX12::FrameResource* currFrameResource;
             Chen::CDX12::Camera* p2camera;
             Chen::CDX12::GameTimer* p2timer;
-            float width;
-            float height;
+            int width;
+            int height;
         };  
 
         void FillPack(std::any _pack) override

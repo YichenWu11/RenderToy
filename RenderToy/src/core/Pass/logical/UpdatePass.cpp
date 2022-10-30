@@ -10,6 +10,7 @@ UpdatePass::UpdatePass(std::string name) : IPass(name)
     AddObject(GetObjectMngr().GetObj("box1"));
     AddObject(GetObjectMngr().GetObj("sphere1"));
 	AddObject(GetObjectMngr().GetObj("ground"));
+	AddObject(GetObjectMngr().GetObj("skyBox"));
 }
 
 UpdatePass::~UpdatePass()
@@ -48,6 +49,13 @@ void UpdatePass::Tick()
 	passCB.FarZ = 1000.0f;
 	passCB.TotalTime = pack.p2timer->TotalTime();
 	passCB.DeltaTime = pack.p2timer->DeltaTime();
+
+	passCB.Lights[0].Direction = XMFLOAT3(0.57735f, -0.87735f, 0.57735f);
+	passCB.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
+	passCB.Lights[1].Direction = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
+	passCB.Lights[1].Strength = { 0.1f, 0.1f, 0.1f };
+	passCB.Lights[2].Direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
+	passCB.Lights[2].Strength = { 0.1f, 0.1f, 0.1f };
 
     pack.currFrameResource->GetResource<std::shared_ptr<Chen::CDX12::UploadBuffer<PassConstants>>>(
         "PassCB")->CopyData(0, passCB);

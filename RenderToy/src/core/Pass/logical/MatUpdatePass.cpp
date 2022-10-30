@@ -9,6 +9,7 @@ MatUpdatePass::MatUpdatePass(std::string name) : IPass(name)
     AddObject(GetObjectMngr().GetObj("box1"));
     AddObject(GetObjectMngr().GetObj("sphere1"));
     AddObject(GetObjectMngr().GetObj("ground"));
+    AddObject(GetObjectMngr().GetObj("skyBox"));
 }
 
 MatUpdatePass::~MatUpdatePass()

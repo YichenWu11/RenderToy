@@ -19,9 +19,9 @@ using namespace Chen::RToy;
 
 const float mouseMoveSensitivity = 1.0;
 
-const int maxObjectsNum = 168;
+const UINT maxObjectsNum = 168;
 
-const int maxMaterialNum = 168;
+const UINT maxMaterialNum = 168;
 
 const int gNumFrameResources = 3;
 
@@ -107,10 +107,13 @@ void RenderToy::BuildShaders()
             "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1} /* b1 space0 */
         ),
 		std::make_pair<std::string, Shader::Property>(
-            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 1, 10} /* t1 space0 */
+            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 1, 50} /* t1 space0 */
         ),	
 		std::make_pair<std::string, Shader::Property>(
-            "Materials", Shader::Property{ShaderVariableType::StructuredBuffer, 0, 0, 10} /* t0 space0 */
+			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 1} /* t1 space0 */
+		),
+		std::make_pair<std::string, Shader::Property>(
+            "Materials", Shader::Property{ShaderVariableType::StructuredBuffer, 1, 0, 168} /* t0 space1 */
         ),	
     };
 
@@ -118,10 +121,20 @@ void RenderToy::BuildShaders()
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"IShader", 
 		rootProperties, 
-		L"..\\..\\shaders\\color.hlsl",
-		L"..\\..\\shaders\\color.hlsl");
+		L"..\\..\\shaders\\Phong\\PhongShading.hlsl",
+		L"..\\..\\shaders\\Phong\\PhongShading.hlsl");
 
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->mInputLayout = DefaultInputLayout;
+
+	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
+		"SkyShader", 
+		rootProperties, 
+		L"..\\..\\shaders\\Phong\\Sky.hlsl",
+		L"..\\..\\shaders\\Phong\\Sky.hlsl");
+
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->mInputLayout = DefaultInputLayout;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->depthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 }
 
 void RenderToy::BuildPSOs()
@@ -130,6 +143,14 @@ void RenderToy::BuildPSOs()
 		"Base", 
 		mDevice.Get(),
 		GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader"),
+		1,
+		mBackBufferFormat,
+		mDepthStencilFormat);
+
+	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
+		"Sky", 
+		mDevice.Get(),
+		GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader"),
 		1,
 		mBackBufferFormat,
 		mDepthStencilFormat);
@@ -146,9 +167,37 @@ void RenderToy::BuildTextures()
 	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
 		mDevice.Get(),
 		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\checkboard.dds",
-		"checkborad",
+		L"..\\..\\assets\\texture\\common\\bricks2.dds",
+		"bricks2",
 		TextureMngr::TexFileFormat::DDS);
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\common\\bricks2_nmap.dds",
+		"bricks_nmap",
+		TextureMngr::TexFileFormat::DDS);
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\common\\tile_nmap.dds",
+		"tile_nmap",
+		TextureMngr::TexFileFormat::DDS);
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\common\\checkboard.dds",
+		"checkboard",
+		TextureMngr::TexFileFormat::DDS);
+
+	GetRenderRsrcMngr().GetTexMngr()->SetCubeIndex(
+		GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+			mDevice.Get(),
+			mCmdQueue.Get(),
+			L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
+			"cubeMap",
+			TextureMngr::TexFileFormat::DDS,
+			TextureDimension::Cubemap)
+	);
 }
 
 void RenderToy::BuildMaterials()
@@ -156,23 +205,32 @@ void RenderToy::BuildMaterials()
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"bricks",
 		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks"),
-		XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f),
-		XMFLOAT3(0.8f, 1.0f, 1.0f),
-		0.8f);
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		XMFLOAT3(0.2f, 0.2f, 0.2f),
+		0.8f,
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks_nmap"));
 
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"matForSphere",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks"),
-		XMFLOAT4(0.8f, 0.9f, 0.9f, 1.0f),
-		XMFLOAT3(1.0f, 1.0f, 1.0f),
-		0.8f);
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks2"),
+		XMFLOAT4(1.0f, 0.9f, 0.9f, 1.0f),
+		XMFLOAT3(0.1f, 0.1f, 0.1f),
+		0.8f,
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks_nmap"));
 
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"bricksForGround",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("checkborad"),
-		XMFLOAT4(0.9, 0.9, 0.9, 1.0),
-		XMFLOAT3(1.0, 1.0, 1.0),
-		0.8);
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("checkboard"),
+		XMFLOAT4(0.9f, 0.9f, 0.9f, 1.0f),
+		XMFLOAT3(0.2f, 0.2f, 0.2f),
+		0.8f,
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile_nmap"));
+	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+		"sky",
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("cubeMap"),
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		XMFLOAT3(0.1f, 0.1f, 0.1f),
+		0.8f);
 }
 
 // Build FrameResource and Register Needed Resource
@@ -293,13 +351,13 @@ void RenderToy::OnKeyboardInput(const GameTimer& gt)
 	const float dt = gt.DeltaTime();
 
 	// adjust the camera position
-	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(12.0f * dt);
+	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(15.0f * dt);
 
-	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-12.0f * dt);
+	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-15.0f * dt);
 
-	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-12.0f * dt);
+	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-15.0f * dt);
 
-	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(12.0f * dt);
+	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(15.0f * dt);
 
 	mCamera->UpdateViewMatrix();
 }

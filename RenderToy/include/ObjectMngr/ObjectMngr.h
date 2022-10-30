@@ -20,7 +20,7 @@ namespace Chen::RToy {
             // Add the default Objects.
             AddObject(std::make_shared<BasicObject>("box1"));
             DirectX::XMFLOAT4X4 scale_box;
-            DirectX::XMStoreFloat4x4(&scale_box, DirectX::XMMatrixScaling(4.0, 4.0, 4.0));
+            DirectX::XMStoreFloat4x4(&scale_box, DirectX::XMMatrixScaling(6.0, 6.0, 6.0));
             dynamic_cast<Transform*>(GetObj("box1")->GetProperty("Transform"))->SetScale(scale_box);
             dynamic_cast<Material*>(GetObj("box1")->GetProperty("Material"))->SetMaterial(
                 Chen::CDX12::RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial("bricks"));
@@ -28,13 +28,16 @@ namespace Chen::RToy {
             AddObject(std::make_shared<BasicObject>("sphere1"));
             dynamic_cast<Mesh*>(GetObj("sphere1")->GetProperty("Mesh"))->SetSubMesh("sphere");
             DirectX::XMFLOAT4X4 world;
-            DirectX::XMStoreFloat4x4(&world, DirectX::XMMatrixTranslation(10.0, 10.0, 10.0));
+            DirectX::XMStoreFloat4x4(&world, DirectX::XMMatrixTranslation(14.0, 0.0, 10.0));
             DirectX::XMFLOAT4X4 scale;
-            DirectX::XMStoreFloat4x4(&scale, DirectX::XMMatrixScaling(10.0, 10.0, 10.0));
+            DirectX::XMStoreFloat4x4(&scale, DirectX::XMMatrixScaling(8.0, 8.0, 8.0));
+            DirectX::XMFLOAT4X4 mat_scale;
+            DirectX::XMStoreFloat4x4(&mat_scale, DirectX::XMMatrixScaling(2.0, 2.0, 2.0));
             dynamic_cast<Transform*>(GetObj("sphere1")->GetProperty("Transform"))->SetTranslate(world);
             dynamic_cast<Transform*>(GetObj("sphere1")->GetProperty("Transform"))->SetScale(scale);
             dynamic_cast<Material*>(GetObj("sphere1")->GetProperty("Material"))->SetMaterial(
                 Chen::CDX12::RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial("matForSphere"));
+            dynamic_cast<Material*>(GetObj("sphere1")->GetProperty("Material"))->SetMatTransform(mat_scale);
 
             AddObject(std::make_shared<BasicObject>("ground"));
             dynamic_cast<Mesh*>(GetObj("ground")->GetProperty("Mesh"))->SetSubMesh("grid");
@@ -49,6 +52,15 @@ namespace Chen::RToy {
             dynamic_cast<Material*>(GetObj("ground")->GetProperty("Material"))->SetMaterial(
                 Chen::CDX12::RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial("bricksForGround"));
             dynamic_cast<Material*>(GetObj("ground")->GetProperty("Material"))->SetMatTransform(mat_trans);
+
+            // SkyBox
+            AddObject(std::make_shared<BasicObject>("skyBox"));
+            dynamic_cast<Mesh*>(GetObj("skyBox")->GetProperty("Mesh"))->SetSubMesh("sphere");
+            DirectX::XMFLOAT4X4 scale_sky;
+            DirectX::XMStoreFloat4x4(&scale_sky, DirectX::XMMatrixScaling(4000.0, 4000.0, 4000.0));
+            dynamic_cast<Material*>(GetObj("skyBox")->GetProperty("Material"))->SetMaterial(
+                Chen::CDX12::RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial("sky"));
+            dynamic_cast<BasicObject*>(GetObj("skyBox"))->SetLayer(ObjectLayer::Sky);
         }   
 
         void AddObject(std::shared_ptr<IObject> p2obj)

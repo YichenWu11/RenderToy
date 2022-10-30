@@ -3,6 +3,7 @@
 #include <IPass.h>
 #include <CDX12/GCmdList.h>
 #include <CDX12/FrameResource.h>
+#include <ObjectMngr/BasicObject.h>
 
 using namespace Chen::CDX12;
 
@@ -33,7 +34,7 @@ namespace Chen::RToy {
         void Init(ID3D12Device*) override;
         void Tick() override;
 
-        void DrawObjects();
+        void DrawObjects(ObjectLayer layer = ObjectLayer::Opaque);
 
     private:
         PassPack pack;

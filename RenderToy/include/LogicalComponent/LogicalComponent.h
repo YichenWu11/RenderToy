@@ -34,8 +34,8 @@ namespace Chen::RToy {
             Chen::CDX12::FrameResource* currFrameResource;
             Chen::CDX12::Camera* p2camera;
             Chen::CDX12::GameTimer* p2timer;
-            float width;
-            float height;
+            int width;
+            int height;
         };
         
     private:

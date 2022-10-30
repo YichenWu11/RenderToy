@@ -40,6 +40,9 @@ namespace Chen::RToy {
         void SetVisible() { visible = true; }
         void SetInvisible() { visible = false; }
 
+        ObjectLayer GetLayer() { return layer; }
+        void SetLayer(ObjectLayer l) { layer = l; }
+
     private:
         bool visible {true};
         ObjectLayer layer {ObjectLayer::Opaque};
