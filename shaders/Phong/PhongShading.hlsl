@@ -97,7 +97,4 @@ float4 PS(VertexOut pin) : SV_Target
     litColor.a = saturate(diffuseAlbedo.a + 0.4f);
 
     return litColor;
-    // return gShadowMap.Sample(gsamAnisotropicWrap, pin.TexC);
-    // return float4(shadowFactor.rrr, 1.0f);
-    // return float4(pin.ShadowPosH.rgb, 1.0f);
 }

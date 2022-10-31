@@ -6,5 +6,7 @@
 - [ ] AssetMngr
 - [ ] Editor (imgui)
 - [ ] Objects Sync Design and Implementation
-- [ ] Normal map
-- [ ] Shadow map
+- [x] Normal map
+- [x] Shadow map
+- [ ] SSAO
+- [ ] CSM + PCF
