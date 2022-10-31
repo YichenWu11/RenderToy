@@ -3,11 +3,13 @@
 #include <Pass/logical/TransUpdatePass.h>
 #include <Pass/logical/MeshUpdatePass.h>
 #include <Pass/logical/MatUpdatePass.h>
+#include <Pass/logical/ShadowPrePass.h>
 
 using namespace Chen::RToy;
 
 LogicalComponent::LogicalComponent()
 {
+    AddPass(std::move(std::make_unique<ShadowPrePass>()));  
     AddPass(std::move(std::make_unique<UpdatePass>()));  
     AddPass(std::move(std::make_unique<TransUpdatePass>()));
     AddPass(std::move(std::make_unique<MeshUpdatePass>()));
@@ -21,6 +23,7 @@ LogicalComponent::~LogicalComponent()
 
 void LogicalComponent::Init(ID3D12Device* _device)
 {
+    mPasses[std::string("ShadowPrePass")]->Init(_device);
     mPasses[std::string("UpdatePass")]->Init(_device);
     mPasses[std::string("TransUpdatePass")]->Init(_device);
     mPasses[std::string("MeshUpdatePass")]->Init(_device);
@@ -29,6 +32,7 @@ void LogicalComponent::Init(ID3D12Device* _device)
 
 void LogicalComponent::Tick()
 {
+    mPasses[std::string("ShadowPrePass")]->Tick();
     mPasses[std::string("UpdatePass")]->Tick();
     mPasses[std::string("TransUpdatePass")]->Tick();
     mPasses[std::string("MeshUpdatePass")]->Tick();
@@ -59,6 +63,13 @@ void LogicalComponent::FillPassPack()
     static MatUpdatePass::PassPack pack4;
     pack4.currFrameResource = pack.currFrameResource;
     mPasses[std::string("MatUpdatePass")]->FillPack(pack4);
+
+    // ShadowPrePass
+    static ShadowPrePass::PassPack pack5;
+    pack5.currFrameResource = pack.currFrameResource;
+    pack5.mCmdList = pack.mCmdList;
+    pack5.shadowDsv = pack.shadowDsv;
+    mPasses[std::string("ShadowPrePass")]->FillPack(pack5);
 }
 
 void LogicalComponent::FillObjectsForPass()

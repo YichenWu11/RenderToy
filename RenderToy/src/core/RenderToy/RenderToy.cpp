@@ -107,13 +107,10 @@ void RenderToy::BuildShaders()
             "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1} /* b1 space0 */
         ),
 		std::make_pair<std::string, Shader::Property>(
-            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 2, 50} /* t1 space0 */
+            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 2, 50} /* t2 space0 */
         ),	
 		std::make_pair<std::string, Shader::Property>(
-			"ShadowMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 1, 1} /* t0 space0 */
-		),
-		std::make_pair<std::string, Shader::Property>(
-			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 1} /* t0 space0 */
+			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 2} /* t0 space0 and t1 space0 */
 		),
 		std::make_pair<std::string, Shader::Property>(
             "Materials", Shader::Property{ShaderVariableType::StructuredBuffer, 1, 0, 168} /* t0 space1 */
@@ -146,9 +143,6 @@ void RenderToy::BuildShaders()
 		L"..\\..\\shaders\\Phong\\Shadows.hlsl",
 		L"..\\..\\shaders\\Phong\\Shadows.hlsl");
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->mInputLayout = DefaultInputLayout;
-	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->rasterizerState.DepthBias = 100000;
-	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->rasterizerState.DepthBiasClamp = 0.0f;
-	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->rasterizerState.SlopeScaledDepthBias = 1.0f;
 }
 
 void RenderToy::BuildPSOs()
@@ -261,7 +255,7 @@ void RenderToy::BuildMaterials()
 {
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"tile",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile"),
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("shadowMap"),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		XMFLOAT3(0.2f, 0.2f, 0.2f),
 		0.8f,
@@ -314,7 +308,7 @@ void RenderToy::BuildFrameResource()
         mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
             "PassCB", std::move(std::make_shared<UploadBuffer<UpdatePass::PassConstants>>(
 				mDevice.Get(), 
-				1, 
+				6, 
 				true)));
         mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
             "ObjTransformCB", std::move(std::make_shared<UploadBuffer<Transform::Impl>>(
@@ -354,6 +348,9 @@ void RenderToy::LogicalFillPack()
 	pack.p2timer = &mTimer;
 	pack.width = mClientWidth;
 	pack.height = mClientHeight;
+	pack.mCmdList = mCmdList;
+	// for shadowMap
+	pack.shadowDsv = dsvCpuDH.GetCpuHandle(1);
 
 	GetLogicalComponent()->FillPack(pack);
 }

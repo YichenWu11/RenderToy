@@ -38,6 +38,7 @@ add_executable(${PROJECT_NAME} WIN32
     src/core/Pass/logical/shadow/ShadowMap.cpp
 
     src/core/Utility/Macro.cpp
+    src/core/Utility/GlobalParam.cpp
 )
 
 add_link_options(${PROJECT_NAME} PRIVATE -mwindows)

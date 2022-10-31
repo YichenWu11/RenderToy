@@ -108,7 +108,7 @@ void ShadowMap::BuildResource()
 	texDesc.Height = mHeight;
 	texDesc.DepthOrArraySize = 1;
 	texDesc.MipLevels = 1;
-	texDesc.Format = mFormat;  // Caution : same as dsvDesc !!!
+	texDesc.Format = mFormat;  
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;

@@ -26,6 +26,8 @@ namespace Chen::RToy {
             DirectX::XMFLOAT4X4 InvProj = Math::MathHelper::Identity4x4();
             DirectX::XMFLOAT4X4 ViewProj = Math::MathHelper::Identity4x4();
             DirectX::XMFLOAT4X4 InvViewProj = Math::MathHelper::Identity4x4();
+            DirectX::XMFLOAT4X4 ViewProjTex = Math::MathHelper::Identity4x4();
+            DirectX::XMFLOAT4X4 ShadowTransform = Math::MathHelper::Identity4x4();
             DirectX::XMFLOAT3 EyePosW = { 0.0f, 0.0f, 0.0f };
             float cbPerObjectPad1 = 0.0f;  // For alignment
             DirectX::XMFLOAT2 RenderTargetSize = { 0.0f, 0.0f };
@@ -34,7 +36,9 @@ namespace Chen::RToy {
             float FarZ = 0.0f;
             float TotalTime = 0.0f;
             float DeltaTime = 0.0f;
+
             DirectX::XMFLOAT4 AmbientLight = { 0.4f, 0.4f, 0.6f, 1.0f };
+
             Chen::CDX12::Light Lights[MaxLightNum];
         };
 

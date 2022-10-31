@@ -53,10 +53,12 @@ void PhongPass::Tick()
     pack.mCmdList->SetGraphicsRootSignature(
         GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->RootSig());
 
+    UINT passCBByteSize = DXUtil::CalcConstantBufferByteSize(sizeof(UpdatePass::PassConstants));
     auto passCB = 
         pack.currFrameResource->GetResource<std::shared_ptr<UploadBuffer<UpdatePass::PassConstants>>>("PassCB")->GetResource();
+    D3D12_GPU_VIRTUAL_ADDRESS passCBAddress = passCB->GetGPUVirtualAddress() + 0 * passCBByteSize;
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->SetResource(
-        "PassCB", pack.mCmdList.Get(), passCB->GetGPUVirtualAddress());
+        "PassCB", pack.mCmdList.Get(), passCBAddress);
 
     auto matBuffer =
         pack.currFrameResource->GetResource<std::shared_ptr<UploadBuffer<BasicMaterialData>>>("MaterialData")->GetResource();

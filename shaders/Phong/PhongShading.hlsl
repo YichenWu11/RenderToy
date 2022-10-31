@@ -11,7 +11,8 @@ struct VertexIn
 struct VertexOut
 {
 	float4 PosH    : SV_POSITION;
-    float3 PosW    : POSITION;
+    float4 ShadowPosH : POSITION0;
+    float3 PosW    : POSITION1;
     float3 NormalW : NORMAL;
 	float3 TangentW : TANGENT;
 	float2 TexC    : TEXCOORD;
@@ -40,6 +41,8 @@ VertexOut VS(VertexIn vin)
 	// Output vertex attributes for interpolation across triangle.
 	float4 texC = float4(vin.TexC, 0.0f, 1.0f);
 	vout.TexC = mul(texC, matData.MatTransform).xy;
+
+    vout.ShadowPosH = mul(posW, gShadowTransform);
 	
     return vout;
 }
@@ -71,12 +74,16 @@ float4 PS(VertexOut pin) : SV_Target
     // Light terms.
     float4 ambient = gAmbientLight*diffuseAlbedo;
 
+    // Only the first light casts a shadow.
+    float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
+    shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
+
     float shininess = (1.0f - roughness);
     if (normalMapIndex != -1) shininess *= normalMapSample.a;
 
     Material mat = { diffuseAlbedo, fresnelR0, shininess };
     float4 directLight = ComputeLighting(gLights, mat, pin.PosW,
-        bumpedNormalW, toEyeW, (1.0, 1.0, 1.0));
+        bumpedNormalW, toEyeW, shadowFactor);
 
     float4 litColor = directLight + ambient;
 
@@ -90,6 +97,7 @@ float4 PS(VertexOut pin) : SV_Target
     litColor.a = saturate(diffuseAlbedo.a + 0.4f);
 
     return litColor;
+    // return gShadowMap.Sample(gsamAnisotropicWrap, pin.TexC);
+    // return float4(shadowFactor.rrr, 1.0f);
+    // return float4(pin.ShadowPosH.rgb, 1.0f);
 }
-
-

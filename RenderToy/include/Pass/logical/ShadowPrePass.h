@@ -8,19 +8,14 @@
 #include <ObjectMngr/BasicObject.h>
 
 namespace Chen::RToy {
-    class ShadowPass : public IPass
+    class ShadowPrePass : public IPass
     {
     public:
         struct PassPack
         {
             Chen::CDX12::GCmdList mCmdList;
             Chen::CDX12::FrameResource* currFrameResource;
-            ID3D12Resource* currBackBuffer;
-            D3D12_CPU_DESCRIPTOR_HANDLE currBackBufferView;
-            D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView;  
             D3D12_CPU_DESCRIPTOR_HANDLE shadowDsv;  
-            D3D12_VIEWPORT mScreenViewport;
-            D3D12_RECT mScissorRect; 
         };
 
         void FillPack(std::any _pack) override 
@@ -29,18 +24,33 @@ namespace Chen::RToy {
             pack = std::move(p);
         }
 
-        ShadowPass(std::string name = std::string("ShadowPass"));
-        ~ShadowPass();
+        ShadowPrePass(std::string name = std::string("ShadowPrePass"));
+        ~ShadowPrePass();
 
         void Init(ID3D12Device*) override;
         void Tick() override;
 
-        void DrawObjects(ObjectLayer layer = ObjectLayer::Opaque);
+        void TickShadowTransform();
+        void TickShadowPrePassCB();
+        void DrawObjects();
         void DrawToShadowMap();
     private:
         PassPack pack;
 
         std::unique_ptr<ShadowMap> mShadowMap;
         DirectX::BoundingSphere mSceneBounds;
+
+        float mLightNearZ = 0.0f;
+        float mLightFarZ = 0.0f;
+        DirectX::XMFLOAT3 mLightPosW;
+        DirectX::XMFLOAT4X4 mLightView = Math::MathHelper::Identity4x4();
+        DirectX::XMFLOAT4X4 mLightProj = Math::MathHelper::Identity4x4();
+        DirectX::XMFLOAT4X4 mShadowTransform = Math::MathHelper::Identity4x4();
+
+        DirectX::XMFLOAT3 mBaseLightDirections[3] = {
+            DirectX::XMFLOAT3(0.57735f, -0.87735f, 0.57735f),
+            DirectX::XMFLOAT3(-0.57735f, -0.57735f, 0.57735f),
+            DirectX::XMFLOAT3(0.0f, -0.707f, -0.707f)
+        };
     };
 }
