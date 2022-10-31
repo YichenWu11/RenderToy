@@ -28,6 +28,7 @@ add_executable(${PROJECT_NAME} WIN32
     src/core/PropertyMngr/Mesh.cpp
 
     src/core/Pass/render/PhongPass.cpp
+    src/core/Pass/render/ShadowPass.cpp
 
     src/core/Pass/logical/UpdatePass.cpp
     src/core/Pass/logical/TransUpdatePass.cpp

@@ -13,7 +13,6 @@ namespace Chen::RToy {
     public:
         struct PassPack
         {
-            Chen::CDX12::GCmdList mCmdList;
             Chen::CDX12::FrameResource* currFrameResource;
             D3D12_CPU_DESCRIPTOR_HANDLE shadowDsv;  
         };
@@ -32,14 +31,10 @@ namespace Chen::RToy {
 
         void TickShadowTransform();
         void TickShadowPrePassCB();
-        void DrawObjects();
-        void DrawToShadowMap();
     private:
         PassPack pack;
 
-        std::unique_ptr<ShadowMap> mShadowMap;
         DirectX::BoundingSphere mSceneBounds;
-
         float mLightNearZ = 0.0f;
         float mLightFarZ = 0.0f;
         DirectX::XMFLOAT3 mLightPosW;

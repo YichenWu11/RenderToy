@@ -67,7 +67,6 @@ void LogicalComponent::FillPassPack()
     // ShadowPrePass
     static ShadowPrePass::PassPack pack5;
     pack5.currFrameResource = pack.currFrameResource;
-    pack5.mCmdList = pack.mCmdList;
     pack5.shadowDsv = pack.shadowDsv;
     mPasses[std::string("ShadowPrePass")]->FillPack(pack5);
 }

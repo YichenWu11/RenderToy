@@ -35,6 +35,7 @@ namespace Chen::RToy {
             ID3D12Resource* currBackBuffer{nullptr};
             D3D12_CPU_DESCRIPTOR_HANDLE currBackBufferView{0};
             D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView{0};
+            D3D12_CPU_DESCRIPTOR_HANDLE shadowDsv;
             D3D12_VIEWPORT mScreenViewport;
             D3D12_RECT mScissorRect; 
         };

@@ -6,6 +6,7 @@
 #include <Pass/render/PhongPass.h>
 #include <Pass/logical/UpdatePass.h>
 #include <Utility/Macro.h>
+#include <Utility/GlobalParam.h>
 
 using namespace Chen;
 using namespace Chen::CDX12;
@@ -74,6 +75,7 @@ bool RenderToy::Initialize()
 	GetPropertyMngr().Init();
 	GetEditor().Init();
 	GetAssetMngr().Init();
+	GlobalParam::GetInstance().Init(mDevice.Get());
 
 	RegisterComponent("RenderComponent", std::make_unique<RenderComponent>());
 	RegisterComponent("LogicalComponent", std::make_unique<LogicalComponent>());
@@ -255,7 +257,7 @@ void RenderToy::BuildMaterials()
 {
 	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
 		"tile",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("shadowMap"),
+		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile"),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		XMFLOAT3(0.2f, 0.2f, 0.2f),
 		0.8f,
@@ -368,6 +370,8 @@ void RenderToy::RenderFillPack()
 	pack.depthStencilView = DepthStencilView();
 	pack.mScissorRect = mScissorRect;
 	pack.mScreenViewport = mScreenViewport;
+	// for shadowMap
+	pack.shadowDsv = dsvCpuDH.GetCpuHandle(1);
 
 	GetRenderComponent()->FillPack(pack);
 }
