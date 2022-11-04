@@ -35,5 +35,9 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
+#ifdef COLOR_GRADING
+	return ColorGrading(gCubeMap.Sample(gsamLinearWrap, pin.PosL));
+#else
 	return gCubeMap.Sample(gsamLinearWrap, pin.PosL);
+#endif
 }

@@ -61,7 +61,7 @@
         },
         {
             "name": "cgLutMap",
-            "path": "lut/color_grading_lut_04.png",
+            "path": "lut/color_grading_lut_01.png",
             "format": 1,
             "texDimension": 2
         },

@@ -10,6 +10,8 @@
     #define NUM_SPOT_LIGHTS 0
 #endif
 
+#define COLOR_GRADING
+
 #include "./LightUtil.hlsl"
 
 cbuffer cbPerObject : register(b0)
@@ -167,9 +169,9 @@ float4 ColorGrading(float4 color)
     float4 outColor = lerp(lutcolorL, lutcolorR, weight);
 
     color.r = saturate(color.r*outColor.r);
-    color.g = saturate(color.r*outColor.g);
-    color.b = saturate(color.r*outColor.b);
-    color.a = saturate(color.r*outColor.a);
+    color.g = saturate(color.g*outColor.g);
+    color.b = saturate(color.b*outColor.b);
+    color.a = saturate(color.a*outColor.a);
 
     return color;
 }
