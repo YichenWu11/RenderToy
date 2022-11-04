@@ -2,7 +2,8 @@
     "rootPath": "../../assets/texture/",
     "cubeIndex": 7,
     "smIndex": 8,
-    "ssaoStartIndex": 9,
+    "cgLutIndex": 9,
+    "ssaoStartIndex": 10,
     "textures":[
         {
             "name": "tile",
@@ -56,6 +57,12 @@
             "name": "shadowMap",
             "path": "sky/snowcube1024.dds",
             "format": 0,
+            "texDimension": 2
+        },
+        {
+            "name": "cgLutMap",
+            "path": "lut/color_grading_lut_04.png",
+            "format": 1,
             "texDimension": 2
         },
         {

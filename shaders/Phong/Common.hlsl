@@ -67,9 +67,10 @@ StructuredBuffer<MaterialData> gMaterialData : register(t0, space1);
 
 TextureCube gCubeMap : register(t0);
 Texture2D gShadowMap : register(t1);
-Texture2D gSsaoMap   : register(t2);
+Texture2D gCgLutMap  : register(t2);
+Texture2D gSsaoMap   : register(t3);
 
-Texture2D gTextureMaps[50] : register(t3);
+Texture2D gTextureMaps[50] : register(t4);
 
 SamplerState gsamPointWrap        : register(s0);
 SamplerState gsamPointClamp       : register(s1);
@@ -134,4 +135,41 @@ float CalcShadowFactor(float4 shadowPosH)
     }
     
     return percentLit / 9.0f;
+}
+
+//---------------------------------------------------------------------------------------
+// Color Grading
+//---------------------------------------------------------------------------------------
+float4 ColorGrading(float4 color)
+{
+    uint width, height, numMips;
+    gCgLutMap.GetDimensions(0, width, height, numMips);
+
+    float2 lutSize = float2(width, height);
+
+    float blockNum = lutSize.x / lutSize.y;
+    float blockIndexL = floor(color.b * blockNum);
+    float blockIndexR = ceil(color.b * blockNum);
+
+    float lutCoordXL = (blockIndexL * lutSize.y + color.r * lutSize.y) / lutSize.x;
+    float lutCoordXR = (blockIndexR * lutSize.y + color.r * lutSize.y) / lutSize.x;
+
+    float lutCoorY = color.g;
+
+    float2 lutCoordL = float2(lutCoordXL, lutCoorY);
+    float2 lutCoordR = float2(lutCoordXR, lutCoorY);
+
+    float4 lutcolorL = gCgLutMap.Sample(gsamAnisotropicWrap, lutCoordL);
+    float4 lutcolorR = gCgLutMap.Sample(gsamAnisotropicWrap, lutCoordR);
+
+    float weight = frac(color.b * lutSize.y);
+
+    float4 outColor = lerp(lutcolorL, lutcolorR, weight);
+
+    color.r = saturate(color.r*outColor.r);
+    color.g = saturate(color.r*outColor.g);
+    color.b = saturate(color.r*outColor.b);
+    color.a = saturate(color.r*outColor.a);
+
+    return color;
 }

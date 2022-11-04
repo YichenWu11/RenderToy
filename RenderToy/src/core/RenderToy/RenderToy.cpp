@@ -122,10 +122,10 @@ void RenderToy::BuildShaders()
             "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1} /* b1 space0 */
         ),
 		std::make_pair<std::string, Shader::Property>(
-            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 3, 50} /* t3 space0 */
+            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 4, 50} /* t4 space0 */
         ),	
 		std::make_pair<std::string, Shader::Property>(
-			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 3} /* t0  t1 t2 space0 */
+			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 4} /* t0 t1 t2 t3 space0 */
 		),
 		std::make_pair<std::string, Shader::Property>(
             "Materials", Shader::Property{ShaderVariableType::StructuredBuffer, 1, 0, 168} /* t0 space1 */
@@ -354,6 +354,7 @@ void RenderToy::PreBuildTexAndMatFromJson()
 
 	GetRenderRsrcMngr().GetTexMngr()->SetCubeIndex(document["cubeIndex"].GetInt());
 	GetRenderRsrcMngr().GetTexMngr()->SetSMIndex(document["smIndex"].GetInt());
+	GetRenderRsrcMngr().GetTexMngr()->SetCGLutIndex(document["cgLutIndex"].GetInt());
 	GetRenderRsrcMngr().GetTexMngr()->SetSSAOIdxStart(document["ssaoStartIndex"].GetInt());
 	GetRenderRsrcMngr().GetTexMngr()->SetNullCubeIdx(document["ssaoStartIndex"].GetInt()+5);
 

@@ -103,6 +103,10 @@ float4 PS(VertexOut pin) : SV_Target
     // Common convention to take alpha from diffuse albedo.
     litColor.a = saturate(diffuseAlbedo.a + 0.4f);
 
+#ifdef COLOR_GRADING
+    litColor = ColorGrading(litColor);
+#endif
+
     return litColor;
     // return float4(shadowFactor.rrr, 1.0f);
 }
