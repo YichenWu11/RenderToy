@@ -2,20 +2,21 @@
 
 struct VertexIn
 {
-	float3 PosL    : POSITION;
-    float3 NormalL : NORMAL;
-	float2 TexC    : TEXCOORD;
+	float3 PosL     : POSITION;
+    float3 NormalL  : NORMAL;
+	float2 TexC     : TEXCOORD;
 	float3 TangentU : TANGENT;
 };
 
 struct VertexOut
 {
-	float4 PosH    : SV_POSITION;
+	float4 PosH       : SV_POSITION;
     float4 ShadowPosH : POSITION0;
-    float3 PosW    : POSITION1;
-    float3 NormalW : NORMAL;
-	float3 TangentW : TANGENT;
-	float2 TexC    : TEXCOORD;
+    float3 PosW       : POSITION1;
+    float4 SsaoPosH   : POSITION2;
+    float3 NormalW    : NORMAL;
+	float3 TangentW   : TANGENT;
+	float2 TexC       : TEXCOORD;
 };
 
 VertexOut VS(VertexIn vin)
@@ -38,6 +39,8 @@ VertexOut VS(VertexIn vin)
     // Transform to homogeneous clip space.
     vout.PosH = mul(posW, gViewProj);
 	
+    vout.SsaoPosH = mul(posW, gViewProjTex);
+
 	// Output vertex attributes for interpolation across triangle.
 	float4 texC = float4(vin.TexC, 0.0f, 1.0f);
 	vout.TexC = mul(texC, matData.MatTransform).xy;
@@ -71,8 +74,12 @@ float4 PS(VertexOut pin) : SV_Target
     // Vector from point being lit to eye. 
     float3 toEyeW = normalize(gEyePosW - pin.PosW);
 
+    // Finish texture projection and sample SSAO map.
+    pin.SsaoPosH /= pin.SsaoPosH.w;
+    float ambientAccess = gSsaoMap.Sample(gsamLinearClamp, pin.SsaoPosH.xy, 0.0f).r;
+
     // Light terms.
-    float4 ambient = gAmbientLight*diffuseAlbedo;
+    float4 ambient = ambientAccess*gAmbientLight*diffuseAlbedo;
 
     // Only the first light casts a shadow.
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
@@ -97,4 +104,5 @@ float4 PS(VertexOut pin) : SV_Target
     litColor.a = saturate(diffuseAlbedo.a + 0.4f);
 
     return litColor;
+    // return float4(shadowFactor.rrr, 1.0f);
 }

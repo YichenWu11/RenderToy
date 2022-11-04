@@ -8,5 +8,11 @@
 - [ ] Objects Sync Design and Implementation
 - [x] Normal map
 - [x] Shadow map
-- [ ] SSAO
+- [x] SSAO
+  - [x] Create SSAO/SSAOBlur/DrawNormals Shader and PSO
+  - [x] Build Descriptors For SSAO
+  - [ ] Finish SSAOPass
+- [ ] Shadow Map 和 SSAO 的 OnResize 都还没处理
 - [ ] CSM + PCF
+- [ ] assimp 加载模型
+- [ ] 预加载纹理，模型等改为解析 json

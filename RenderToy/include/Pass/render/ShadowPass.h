@@ -3,8 +3,6 @@
 #include <IPass.h>
 #include <Pass/logical/shadow/ShadowMap.h>
 #include <Pass/logical/UpdatePass.h>
-#include <CDX12/GCmdList.h>
-#include <CDX12/FrameResource.h>
 #include <ObjectMngr/BasicObject.h>
 
 namespace Chen::RToy {

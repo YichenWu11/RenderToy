@@ -1,8 +1,6 @@
 #pragma once
 
 #include <IPass.h>
-#include <CDX12/GCmdList.h>
-#include <CDX12/FrameResource.h>
 #include <ObjectMngr/BasicObject.h>
 
 using namespace Chen::CDX12;

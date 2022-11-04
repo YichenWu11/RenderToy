@@ -2,6 +2,8 @@
 
 #include "IObject.h"
 #include <CDX12/RenderResourceMngr.h>
+#include <CDX12/FrameResource.h>
+#include <CDX12/GCmdList.h>
 #include <CDX12/Resource/UploadBuffer.h>
 #include <CDX12/Math/MathHelper.h>
 #include <set>

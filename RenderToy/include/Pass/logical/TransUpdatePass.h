@@ -1,6 +1,5 @@
 #pragma once
 
-#include <CDX12/FrameResource.h>
 #include <IPass.h>
 
 namespace Chen::RToy {

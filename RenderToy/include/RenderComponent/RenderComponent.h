@@ -2,8 +2,6 @@
 
 #include "../IComponent.h"
 #include "../IPass.h"
-#include <CDX12/GCmdList.h>
-#include <CDX12/FrameResource.h>
 
 namespace Chen::RToy {
     class RenderComponent final : public IComponent

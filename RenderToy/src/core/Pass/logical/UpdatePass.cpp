@@ -1,7 +1,6 @@
 #include <Pass/logical/UpdatePass.h>
 #include <CDX12/Metalib.h>
 #include <Utility/Macro.h>
-#include <Utility/GlobalParam.h>
 
 using namespace Chen::RToy;
 using namespace DirectX;
@@ -45,7 +44,7 @@ void UpdatePass::Tick()
 		0.5f, 0.5f, 0.0f, 1.0f);
 
 	XMMATRIX viewProjTex = XMMatrixMultiply(viewProj, T);
-	XMMATRIX shadowTransform = XMLoadFloat4x4(get_rvalue_ptr((GlobalParam::GetInstance().GetShadowTransform())));;
+	XMMATRIX shadowTransform = XMLoadFloat4x4(get_rvalue_ptr((GetGlobalParam().GetShadowTransform())));;
 
 	static PassConstants passCB;
 
@@ -65,7 +64,7 @@ void UpdatePass::Tick()
 	passCB.TotalTime = pack.p2timer->TotalTime();
 	passCB.DeltaTime = pack.p2timer->DeltaTime();
 
-	passCB.Lights[0].Direction = DirectX::XMFLOAT3(0.57735f, -0.87735f, 0.57735f);
+	passCB.Lights[0].Direction = GetGlobalParam().GetMainLightDir();
 	passCB.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
 	passCB.Lights[1].Direction = DirectX::XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
 	passCB.Lights[1].Strength = { 0.1f, 0.1f, 0.1f };
@@ -74,6 +73,8 @@ void UpdatePass::Tick()
 
     pack.currFrameResource->GetResource<std::shared_ptr<Chen::CDX12::UploadBuffer<PassConstants>>>(
         "PassCB")->CopyData(0, passCB);
+
+	GetGlobalParam().SetMainPassData(passCB);
 
 	// Material Buffer
 	for (auto &p2obj : mObjects)

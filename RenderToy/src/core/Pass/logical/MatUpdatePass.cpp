@@ -1,5 +1,4 @@
 #include <Pass/logical/MatUpdatePass.h>
-#include <PropertyMngr/Material.h>
 #include <Utility/Macro.h>
 
 using namespace Chen::RToy;

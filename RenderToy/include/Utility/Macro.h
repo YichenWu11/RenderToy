@@ -7,6 +7,7 @@
 #include <PropertyMngr/Mesh.h>
 #include <PropertyMngr/Transform.h>
 #include <PropertyMngr/Material.h>
+#include <Utility/GlobalParam.h>
 
 // ******************************************************************************
 // Get Global Singleton Mngr
@@ -15,6 +16,9 @@
 #define GetRenderRsrcMngr()     Chen::CDX12::RenderResourceMngr::GetInstance()
 #define GetObjectMngr()         Chen::RToy::ObjectMngr::GetInstance()
 #define GetPropertyMngr()       Chen::RToy::PropertyMngr::GetInstance()
+
+// Global Param Pass and Save Helper
+#define GetGlobalParam()        Chen::RToy::GlobalParam::GetInstance()
 
 // ******************************************************************************
 

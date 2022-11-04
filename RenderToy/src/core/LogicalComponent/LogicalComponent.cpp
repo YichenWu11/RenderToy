@@ -4,12 +4,14 @@
 #include <Pass/logical/MeshUpdatePass.h>
 #include <Pass/logical/MatUpdatePass.h>
 #include <Pass/logical/ShadowPrePass.h>
+#include <Pass/logical/SsaoPrePass.h>
 
 using namespace Chen::RToy;
 
 LogicalComponent::LogicalComponent()
 {
     AddPass(std::move(std::make_unique<ShadowPrePass>()));  
+    AddPass(std::move(std::make_unique<SsaoPrePass>()));  
     AddPass(std::move(std::make_unique<UpdatePass>()));  
     AddPass(std::move(std::make_unique<TransUpdatePass>()));
     AddPass(std::move(std::make_unique<MeshUpdatePass>()));
@@ -24,6 +26,7 @@ LogicalComponent::~LogicalComponent()
 void LogicalComponent::Init(ID3D12Device* _device)
 {
     mPasses[std::string("ShadowPrePass")]->Init(_device);
+    mPasses[std::string("SsaoPrePass")]->Init(_device);
     mPasses[std::string("UpdatePass")]->Init(_device);
     mPasses[std::string("TransUpdatePass")]->Init(_device);
     mPasses[std::string("MeshUpdatePass")]->Init(_device);
@@ -33,6 +36,7 @@ void LogicalComponent::Init(ID3D12Device* _device)
 void LogicalComponent::Tick()
 {
     mPasses[std::string("ShadowPrePass")]->Tick();
+    mPasses[std::string("SsaoPrePass")]->Tick();
     mPasses[std::string("UpdatePass")]->Tick();
     mPasses[std::string("TransUpdatePass")]->Tick();
     mPasses[std::string("MeshUpdatePass")]->Tick();
@@ -69,6 +73,15 @@ void LogicalComponent::FillPassPack()
     pack5.currFrameResource = pack.currFrameResource;
     pack5.shadowDsv = pack.shadowDsv;
     mPasses[std::string("ShadowPrePass")]->FillPack(pack5);
+
+    // SsaoPrePass
+    static SsaoPrePass::PassPack pack6;
+    pack6.currFrameResource = pack.currFrameResource;
+    pack6.p2camera = pack.p2camera;
+    pack6.mDepthStencilBuffer = pack.mDepthStencilBuffer;
+	pack6.rtvHandle = pack.rtvHandle;
+    pack6.rtvDescriptorSize = pack.rtvDescriptorSize;
+    mPasses[std::string("SsaoPrePass")]->FillPack(pack6);
 }
 
 void LogicalComponent::FillObjectsForPass()

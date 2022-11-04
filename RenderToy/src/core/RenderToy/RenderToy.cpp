@@ -1,12 +1,14 @@
 #include <RenderToy/RenderToy.h>
+#include <LogicalComponent/LogicalComponent.h>
+#include <RenderComponent/RenderComponent.h>
 #include <Editor/Editor.h>
 #include <AssetMngr/AssetMngr.h>
 #include <ObjectMngr/BasicObject.h>
 #include <CDX12/Resource/UploadBuffer.h>
 #include <Pass/render/PhongPass.h>
 #include <Pass/logical/UpdatePass.h>
+#include <Pass/logical/SsaoPrePass.h>
 #include <Utility/Macro.h>
-#include <Utility/GlobalParam.h>
 
 using namespace Chen;
 using namespace Chen::CDX12;
@@ -75,17 +77,17 @@ bool RenderToy::Initialize()
 	GetPropertyMngr().Init();
 	GetEditor().Init();
 	GetAssetMngr().Init();
-	GlobalParam::GetInstance().Init(mDevice.Get());
+	GetGlobalParam().Init(mDevice.Get(), mCmdList.Get(), mClientWidth, mClientHeight);
 
 	RegisterComponent("RenderComponent", std::make_unique<RenderComponent>());
 	RegisterComponent("LogicalComponent", std::make_unique<LogicalComponent>());
 
-	GetRenderComponent()->Init(mDevice.Get());
-	GetLogicalComponent()->Init(mDevice.Get());
-
 	BuildShaders();  // before BuildPSOs();
 	BuildPSOs();
 	BuildFrameResource();
+
+	GetRenderComponent()->Init(mDevice.Get());
+	GetLogicalComponent()->Init(mDevice.Get());
 
     ThrowIfFailed(mCmdList->Close());
     mCmdQueue.Execute(mCmdList.Get());
@@ -98,6 +100,8 @@ bool RenderToy::Initialize()
 
 void RenderToy::BuildShaders()
 {
+	// Caution: Remember to Set the InputLayout of Shader, otherwise Exception Raised.
+
 	std::vector<std::pair<std::string, Shader::Property>> rootProperties = {
         std::make_pair<std::string, Shader::Property>(
             "ObjTransformCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 0, 1} /* b0 space0 */
@@ -109,10 +113,10 @@ void RenderToy::BuildShaders()
             "PassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1} /* b1 space0 */
         ),
 		std::make_pair<std::string, Shader::Property>(
-            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 2, 50} /* t2 space0 */
+            "Textures", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 3, 50} /* t3 space0 */
         ),	
 		std::make_pair<std::string, Shader::Property>(
-			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 2} /* t0 space0 and t1 space0 */
+			"CubeMap", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 3} /* t0  t1 t2 space0 */
 		),
 		std::make_pair<std::string, Shader::Property>(
             "Materials", Shader::Property{ShaderVariableType::StructuredBuffer, 1, 0, 168} /* t0 space1 */
@@ -125,7 +129,6 @@ void RenderToy::BuildShaders()
 		rootProperties, 
 		L"..\\..\\shaders\\Phong\\PhongShading.hlsl",
 		L"..\\..\\shaders\\Phong\\PhongShading.hlsl");
-
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->mInputLayout = DefaultInputLayout;
 
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
@@ -133,7 +136,6 @@ void RenderToy::BuildShaders()
 		rootProperties, 
 		L"..\\..\\shaders\\Phong\\Sky.hlsl",
 		L"..\\..\\shaders\\Phong\\Sky.hlsl");
-
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->mInputLayout = DefaultInputLayout;
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->depthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
@@ -145,6 +147,105 @@ void RenderToy::BuildShaders()
 		L"..\\..\\shaders\\Phong\\Shadows.hlsl",
 		L"..\\..\\shaders\\Phong\\Shadows.hlsl");
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->mInputLayout = DefaultInputLayout;
+
+	// ********************************************************************************************************
+	// For SSAO
+
+	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
+		"DrawNormalsShader",
+		rootProperties,
+		L"..\\..\\shaders\\Phong\\DrawNormals.hlsl",
+		L"..\\..\\shaders\\Phong\\DrawNormals.hlsl");
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("DrawNormalsShader")->mInputLayout = DefaultInputLayout;
+
+	ComPtr<ID3D12RootSignature> mSsaoRootSignature = nullptr;
+	ComPtr<ID3D12RootSignature> mSsaoBlurRootSignature = nullptr;
+
+	CD3DX12_DESCRIPTOR_RANGE texTable0;
+	texTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
+
+	CD3DX12_DESCRIPTOR_RANGE texTable1;
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2, 0);
+
+	// Root parameter can be a table, root descriptor or root constants.
+	CD3DX12_ROOT_PARAMETER slotRootParameter[4];
+
+	// Perfomance TIP: Order from most frequent to least frequent.
+	slotRootParameter[0].InitAsConstantBufferView(0);
+	slotRootParameter[1].InitAsConstants(1, 1);
+	slotRootParameter[2].InitAsDescriptorTable(1, &texTable0, D3D12_SHADER_VISIBILITY_PIXEL);
+	slotRootParameter[3].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_PIXEL);
+
+	auto staticSamplers = GlobalSamplers::GetSSAOSamplers();
+
+	// A root signature is an array of root parameters.
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter,
+		(UINT)staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(mDevice->CreateRootSignature(
+		0,
+		serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(mSsaoRootSignature.GetAddressOf())));
+
+	ThrowIfFailed(mDevice->CreateRootSignature(
+		0,
+		serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(mSsaoBlurRootSignature.GetAddressOf())));
+
+	std::vector<std::pair<std::string, Shader::Property>> ssaoRootProperties = {
+		std::make_pair<std::string, Shader::Property>(
+			"SsaoPassCB", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 0, 1} /* b0 space0 */
+		),
+		std::make_pair<std::string, Shader::Property>(
+			"HorizontalBlur", Shader::Property{ShaderVariableType::ConstantBuffer, 0, 1, 1} /* Don't use it */
+		),
+		std::make_pair<std::string, Shader::Property>(
+			"NormalMapGpuSrv", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 0, 2} 
+		),
+		std::make_pair<std::string, Shader::Property>(
+			"RandomVectorMapGpuSrv", Shader::Property{ShaderVariableType::SRVDescriptorHeap, 0, 2, 1} 
+		),
+	};
+
+	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
+		"SsaoShader", 
+		ssaoRootProperties,
+		std::move(mSsaoRootSignature),
+		L"..\\..\\shaders\\Phong\\Ssao.hlsl",
+		L"..\\..\\shaders\\Phong\\Ssao.hlsl");
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->mInputLayout =
+		std::vector<D3D12_INPUT_ELEMENT_DESC>();
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthEnable = false;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	
+
+	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
+		"SsaoBlurShader",
+		ssaoRootProperties,
+		std::move(mSsaoBlurRootSignature),
+		L"..\\..\\shaders\\Phong\\SsaoBlur.hlsl",
+		L"..\\..\\shaders\\Phong\\SsaoBlur.hlsl");
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->mInputLayout =
+		std::vector<D3D12_INPUT_ELEMENT_DESC>();
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->depthStencilState.DepthEnable = false;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+
+	// ********************************************************************************************************
 }
 
 void RenderToy::BuildPSOs()
@@ -181,6 +282,30 @@ void RenderToy::BuildPSOs()
 		0,
 		mBackBufferFormat,
 		mDepthStencilFormat, false, true);
+
+	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
+		"Ssao",
+		mDevice.Get(),
+		GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader"),
+		1,
+		Ssao::AmbientMapFormat,
+		DXGI_FORMAT_UNKNOWN);
+
+	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
+		"SsaoBlur",
+		mDevice.Get(),
+		GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader"),
+		1,
+		Ssao::AmbientMapFormat,
+		DXGI_FORMAT_UNKNOWN);
+
+	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
+		"DrawNormals",
+		mDevice.Get(),
+		GetRenderRsrcMngr().GetShaderMngr()->GetShader("DrawNormalsShader"),
+		1,
+		Ssao::NormalMapFormat,
+		mDepthStencilFormat);
 }
 
 void RenderToy::BuildTextures()
@@ -251,6 +376,51 @@ void RenderToy::BuildTextures()
 			"shadowMap",
 			TextureMngr::TexFileFormat::DDS,
 			TextureDimension::Tex2D));
+
+	// ********************************************************************************************************
+	// For SSAO
+
+	GetRenderRsrcMngr().GetTexMngr()->SetSSAOIdxStart(
+		GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+			mDevice.Get(),
+			mCmdQueue.Get(),
+			L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
+			"AmbientMap0",
+			TextureMngr::TexFileFormat::DDS,
+			TextureDimension::Tex2D));
+
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
+		"AmbientMap1",
+		TextureMngr::TexFileFormat::DDS);
+
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
+		"NormalMap",
+		TextureMngr::TexFileFormat::DDS);
+
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
+		"DepthMap",
+		TextureMngr::TexFileFormat::DDS);
+
+	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+		mDevice.Get(),
+		mCmdQueue.Get(),
+		L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
+		"RandomVectorMap0",
+		TextureMngr::TexFileFormat::DDS);
+
+	GetRenderRsrcMngr().GetTexMngr()->SetNullCubeIdx(
+		GetRenderRsrcMngr().GetTexMngr()->GetSSAOIdxStart() + 5);
+
+	// ********************************************************************************************************
 }
 
 void RenderToy::BuildMaterials()
@@ -323,6 +493,11 @@ void RenderToy::BuildFrameResource()
 				maxObjectsNum,
 				true)));
 		mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
+            "SsaoCB", std::move(std::make_shared<UploadBuffer<SsaoPrePass::SsaoConstants>>(
+				mDevice.Get(), 
+				1, 
+				true)));		
+		mFrameResourceMngr->GetFrameResources()[i]->RegisterResource(
             "MaterialData", std::move(std::make_shared<UploadBuffer<BasicMaterialData>>(
 				mDevice.Get(), 
 				maxMaterialNum, 
@@ -353,6 +528,10 @@ void RenderToy::LogicalFillPack()
 	pack.mCmdList = mCmdList;
 	// for shadowMap
 	pack.shadowDsv = dsvCpuDH.GetCpuHandle(1);
+	// for ssao
+	pack.mDepthStencilBuffer = mDepthStencilBuffer.Get();
+	pack.rtvHandle = rtvCpuDH.GetCpuHandle(SwapChainBufferCount);
+	pack.rtvDescriptorSize = rtvCpuDH.GetDescriptorSize();
 
 	GetLogicalComponent()->FillPack(pack);
 }

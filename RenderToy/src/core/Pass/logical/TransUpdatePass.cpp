@@ -1,5 +1,4 @@
 #include <Pass/logical/TransUpdatePass.h>
-#include <PropertyMngr/Transform.h>
 #include <DirectXMath.h>
 #include <Utility/Macro.h>
 

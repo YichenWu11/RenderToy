@@ -1,5 +1,6 @@
 #pragma once
 
+#include <CDX12/Math/MathHelper.h>
 #include <string>
 #include <any>
 

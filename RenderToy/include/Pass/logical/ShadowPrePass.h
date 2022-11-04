@@ -1,10 +1,7 @@
 #pragma once
 
 #include <IPass.h>
-#include <Pass/logical/shadow/ShadowMap.h>
 #include <Pass/logical/UpdatePass.h>
-#include <CDX12/GCmdList.h>
-#include <CDX12/FrameResource.h>
 #include <ObjectMngr/BasicObject.h>
 
 namespace Chen::RToy {
@@ -41,11 +38,5 @@ namespace Chen::RToy {
         DirectX::XMFLOAT4X4 mLightView = Math::MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 mLightProj = Math::MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 mShadowTransform = Math::MathHelper::Identity4x4();
-
-        DirectX::XMFLOAT3 mBaseLightDirections[3] = {
-            DirectX::XMFLOAT3(0.57735f, -0.87735f, 0.57735f),
-            DirectX::XMFLOAT3(-0.57735f, -0.57735f, 0.57735f),
-            DirectX::XMFLOAT3(0.0f, -0.707f, -0.707f)
-        };
     };
 }

@@ -1,8 +1,5 @@
 #include <Pass/render/PhongPass.h>
 #include <Pass/logical/UpdatePass.h>
-#include <PropertyMngr/Transform.h>
-#include <PropertyMngr/Material.h>
-#include <PropertyMngr/Mesh.h>
 #include <Utility/Macro.h>
 #include <memory>
 

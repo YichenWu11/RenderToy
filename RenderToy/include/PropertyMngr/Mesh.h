@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../IProperty.h"
+#include <IProperty.h>
 #include <CDX12/RenderResourceMngr.h>
-#include <CDX12/Math/MathHelper.h>
 #include <CDX12/Geometry/MeshMngr.h>
 
 using namespace Chen::CDX12::Math;

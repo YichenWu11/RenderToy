@@ -1,7 +1,6 @@
 #pragma once
 
 #include <IPass.h>
-#include <CDX12/FrameResource.h>
 
 namespace Chen::RToy {
     class MatUpdatePass : public IPass

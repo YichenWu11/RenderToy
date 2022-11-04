@@ -1,6 +1,8 @@
 #pragma once
 
 #include <CDX12/DXUtil.h>
+#include <CDX12/GCmdList.h>
+#include <CDX12/FrameResource.h>
 #include <set>
 #include "IPass.h"
 

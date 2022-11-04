@@ -1,7 +1,6 @@
 #include <Pass/logical/ShadowPrePass.h>
 #include <Pass/logical/UpdatePass.h>
 #include <Utility/Macro.h>
-#include <Utility/GlobalParam.h>
 #include <memory>
 
 using namespace Chen::RToy;
@@ -35,7 +34,7 @@ void ShadowPrePass::Tick()
     static bool is_sm_init = false;
     if (!is_sm_init)
     {
-        GlobalParam::GetInstance().GetShadowMap()->BuildDescriptors(
+        GetGlobalParam().GetShadowMap()->BuildDescriptors(
             CD3DX12_CPU_DESCRIPTOR_HANDLE(GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetCpuHandle(
                 GetRenderRsrcMngr().GetTexMngr()->GetSMIndex()
             )),
@@ -53,7 +52,7 @@ void ShadowPrePass::Tick()
 void ShadowPrePass::TickShadowTransform()
 {
     	//// Only the first "main" light casts a shadow.
-	DirectX::XMVECTOR lightDir = DirectX::XMLoadFloat3(&mBaseLightDirections[0]);
+	DirectX::XMVECTOR lightDir = DirectX::XMLoadFloat3(get_rvalue_ptr(GetGlobalParam().GetMainLightDir()));
 	DirectX::XMVECTOR lightPos = -2.0f * mSceneBounds.Radius * lightDir;
 	DirectX::XMVECTOR targetPos = DirectX::XMLoadFloat3(&mSceneBounds.Center);
 	DirectX::XMVECTOR lightUp = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -89,7 +88,7 @@ void ShadowPrePass::TickShadowTransform()
 	DirectX::XMStoreFloat4x4(&mLightProj, lightProj);
 	DirectX::XMStoreFloat4x4(&mShadowTransform, S);
 
-    GlobalParam::GetInstance().SetShadowTransform(mShadowTransform);
+    GetGlobalParam().SetShadowTransform(mShadowTransform);
 }
 
 void ShadowPrePass::TickShadowPrePassCB()
@@ -104,8 +103,8 @@ void ShadowPrePass::TickShadowPrePassCB()
 	DirectX::XMMATRIX invProj = DirectX::XMMatrixInverse(get_rvalue_ptr(DirectX::XMMatrixDeterminant(proj)), proj);
 	DirectX::XMMATRIX invViewProj = DirectX::XMMatrixInverse(get_rvalue_ptr(DirectX::XMMatrixDeterminant(viewProj)), viewProj);
 
-	UINT w = GlobalParam::GetInstance().GetShadowMap()->Width();
-	UINT h = GlobalParam::GetInstance().GetShadowMap()->Height();
+	UINT w = GetGlobalParam().GetShadowMap()->Width();
+	UINT h = GetGlobalParam().GetShadowMap()->Height();
 
 	DirectX::XMStoreFloat4x4(&mShadowPrePassCB.View, DirectX::XMMatrixTranspose(view));
 	DirectX::XMStoreFloat4x4(&mShadowPrePassCB.InvView, DirectX::XMMatrixTranspose(invView));

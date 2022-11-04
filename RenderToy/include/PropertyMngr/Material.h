@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../IProperty.h"
-#include <CDX12/Math/MathHelper.h>
+#include <IProperty.h>
 #include <CDX12/Material/MaterialMngr.h>
 
 using namespace Chen::CDX12::Math;

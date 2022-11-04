@@ -1,11 +1,7 @@
 #include <Pass/render/ShadowPass.h>
 #include <Pass/logical/UpdatePass.h>
-#include <PropertyMngr/Transform.h>
-#include <PropertyMngr/Material.h>
-#include <PropertyMngr/Mesh.h>
 #include <CDX12/Metalib.h>
 #include <Utility/Macro.h>
-#include <Utility/GlobalParam.h>
 #include <memory>
 
 using namespace Chen::RToy;
@@ -44,19 +40,19 @@ void ShadowPass::Tick()
 
 void ShadowPass::DrawToShadowMap()
 {
-    pack.mCmdList.RSSetViewport(GlobalParam::GetInstance().GetShadowMap()->Viewport());
-    pack.mCmdList.RSSetScissorRect(GlobalParam::GetInstance().GetShadowMap()->ScissorRect());
+    pack.mCmdList.RSSetViewport(GetGlobalParam().GetShadowMap()->Viewport());
+    pack.mCmdList.RSSetScissorRect(GetGlobalParam().GetShadowMap()->ScissorRect());
 
     pack.mCmdList.ResourceBarrierTransition(
-        GlobalParam::GetInstance().GetShadowMap()->Resource(),
+        GetGlobalParam().GetShadowMap()->Resource(),
         D3D12_RESOURCE_STATE_GENERIC_READ,
         D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
     UINT passCBByteSize = DXUtil::CalcConstantBufferByteSize(sizeof(UpdatePass::PassConstants));
 
-    pack.mCmdList.ClearDepthStencilView(GlobalParam::GetInstance().GetShadowMap()->Dsv());
+    pack.mCmdList.ClearDepthStencilView(GetGlobalParam().GetShadowMap()->Dsv());
 
-    pack.mCmdList->OMSetRenderTargets(0, nullptr, false, get_rvalue_ptr(GlobalParam::GetInstance().GetShadowMap()->Dsv()));
+    pack.mCmdList->OMSetRenderTargets(0, nullptr, false, get_rvalue_ptr(GetGlobalParam().GetShadowMap()->Dsv()));
 
     auto passCB = 
         pack.currFrameResource->GetResource<std::shared_ptr<UploadBuffer<UpdatePass::PassConstants>>>("PassCB")->GetResource();
@@ -69,7 +65,7 @@ void ShadowPass::DrawToShadowMap()
     DrawObjects();
 
     pack.mCmdList.ResourceBarrierTransition(
-        GlobalParam::GetInstance().GetShadowMap()->Resource(),
+        GetGlobalParam().GetShadowMap()->Resource(),
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_GENERIC_READ);
 }

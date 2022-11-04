@@ -4,7 +4,6 @@
 */
 
 #include <Pass/logical/MeshUpdatePass.h>
-#include <PropertyMngr/Mesh.h>
 #include <Utility/Macro.h>
 
 using namespace Chen::RToy;

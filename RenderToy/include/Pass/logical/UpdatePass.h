@@ -4,8 +4,7 @@
     Pass to Update All PassConstants
 */
 
-#include "../../IPass.h"
-#include <CDX12/FrameResource.h>
+#include <IPass.h>
 #include <CDX12/Common/Camera.h>
 #include <CDX12/Common/GameTimer.h>
 #include <CDX12/Common/Light.h>

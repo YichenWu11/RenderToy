@@ -2,8 +2,7 @@
 
 #include <CDX12/Common/DX12App.h>
 #include <CDX12/Common/Camera.h>
-#include "LogicalComponent/LogicalComponent.h"
-#include "RenderComponent/RenderComponent.h"
+#include <IComponent.h>
 
 using namespace Chen::CDX12;
 
