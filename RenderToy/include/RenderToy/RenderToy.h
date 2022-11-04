@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CDX12/Common/DX12App.h>
+#include <CDX12/FrameResource.h>
 #include <CDX12/Common/Camera.h>
 #include <IComponent.h>
 
@@ -38,10 +39,10 @@ namespace Chen::RToy {
         // **********************************************************
         // Build FrameResource and Register Needed Resource
 
+        void PreBuildTexAndMatFromJson();
+
         void BuildPSOs();
         void BuildShaders();
-        void BuildTextures();
-        void BuildMaterials();
         void BuildFrameResource();
 
         // **********************************************************

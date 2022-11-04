@@ -15,4 +15,4 @@
 - [ ] Shadow Map 和 SSAO 的 OnResize 都还没处理
 - [ ] CSM + PCF
 - [ ] assimp 加载模型
-- [ ] 预加载纹理，模型等改为解析 json
+- [x] 预加载纹理，模型等改为解析 json

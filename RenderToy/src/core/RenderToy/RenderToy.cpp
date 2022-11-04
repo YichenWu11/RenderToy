@@ -1,18 +1,28 @@
+#include <CDX12/Resource/UploadBuffer.h>
+
+#include <rapidjson/document.h> 
+#include <rapidjson/filereadstream.h>
+
 #include <RenderToy/RenderToy.h>
+
 #include <LogicalComponent/LogicalComponent.h>
 #include <RenderComponent/RenderComponent.h>
+
 #include <Editor/Editor.h>
 #include <AssetMngr/AssetMngr.h>
 #include <ObjectMngr/BasicObject.h>
-#include <CDX12/Resource/UploadBuffer.h>
+
 #include <Pass/render/PhongPass.h>
 #include <Pass/logical/UpdatePass.h>
 #include <Pass/logical/SsaoPrePass.h>
+
 #include <Utility/Macro.h>
 
 using namespace Chen;
 using namespace Chen::CDX12;
 using namespace Chen::RToy;
+
+using namespace rapidjson;
 
 // *********************************************************
 // Constant
@@ -70,8 +80,7 @@ bool RenderToy::Initialize()
 	*/
 	GetRenderRsrcMngr().Init(mDevice.Get(), mCmdList.Get());
 
-	BuildTextures();
-	BuildMaterials();
+	PreBuildTexAndMatFromJson();
 
 	GetObjectMngr().Init();
 	GetPropertyMngr().Init();
@@ -308,168 +317,73 @@ void RenderToy::BuildPSOs()
 		mDepthStencilFormat);
 }
 
-void RenderToy::BuildTextures()
+void RenderToy::PreBuildTexAndMatFromJson()
 {
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\tile.dds",
-		"tile",
-		TextureMngr::TexFileFormat::DDS);
+	FILE* fp;
+	errno_t err = fopen_s(&fp, "../../assets/json/PreMatAndTex.json", "rb");
+	if (err == 0) OutputDebugString(L"\n\nFile Open Error!!!\n\n");
 
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\bricks2.dds",
-		"bricks2",
-		TextureMngr::TexFileFormat::DDS);
+	char readBuffer[65536];
+	FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\bricks2_nmap.dds",
-		"bricks_nmap",
-		TextureMngr::TexFileFormat::DDS);
+	Document document;
+	document.ParseStream(is);
 
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\tile_nmap.dds",
-		"tile_nmap",
-		TextureMngr::TexFileFormat::DDS);
+	assert(document.HasMember("textures"));
+	assert(document.HasMember("materials"));
 
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\checkboard.dds",
-		"checkboard",
-		TextureMngr::TexFileFormat::DDS);
+	const Value& textures = document["textures"];
+	const Value& materials = document["materials"];
 
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\white1x1.dds",
-		"default",
-		TextureMngr::TexFileFormat::DDS);
+	assert(textures.IsArray());
+	assert(materials.IsArray());
 
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\common\\BrokenGlass.dds",
-		"glass",
-		TextureMngr::TexFileFormat::DDS);
+	std::string rootPath = document["rootPath"].GetString();
 
-	GetRenderRsrcMngr().GetTexMngr()->SetCubeIndex(
+	for (SizeType idx = 0; idx < textures.Size(); ++idx)
+	{
+		std::string path = rootPath + textures[idx]["path"].GetString();
 		GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
 			mDevice.Get(),
 			mCmdQueue.Get(),
-			L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
-			"cubeMap",
-			TextureMngr::TexFileFormat::DDS,
-			TextureDimension::Cubemap));
+			AnsiToWString(path).c_str(),
+			textures[idx]["name"].GetString(),
+			TextureMngr::TexFileFormat(textures[idx]["format"].GetUint()),
+			TextureDimension(textures[idx]["texDimension"].GetUint()));
+	}
 
-	GetRenderRsrcMngr().GetTexMngr()->SetSMIndex(
-		GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-			mDevice.Get(),
-			mCmdQueue.Get(),
-			L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
-			"shadowMap",
-			TextureMngr::TexFileFormat::DDS,
-			TextureDimension::Tex2D));
+	GetRenderRsrcMngr().GetTexMngr()->SetCubeIndex(document["cubeIndex"].GetInt());
+	GetRenderRsrcMngr().GetTexMngr()->SetSMIndex(document["smIndex"].GetInt());
+	GetRenderRsrcMngr().GetTexMngr()->SetSSAOIdxStart(document["ssaoStartIndex"].GetInt());
+	GetRenderRsrcMngr().GetTexMngr()->SetNullCubeIdx(document["ssaoStartIndex"].GetInt()+5);
 
-	// ********************************************************************************************************
-	// For SSAO
+	for (SizeType idx = 0; idx < materials.Size(); ++idx)
+	{
+		std::string name = materials[idx]["name"].GetString();
+		std::string texName = materials[idx]["texName"].GetString();
+		int nmapIndex = -1;
+		if (!materials[idx]["normalName"].IsNull())
+			nmapIndex = GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(
+				materials[idx]["normalName"].GetString());
 
-	GetRenderRsrcMngr().GetTexMngr()->SetSSAOIdxStart(
-		GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-			mDevice.Get(),
-			mCmdQueue.Get(),
-			L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
-			"AmbientMap0",
-			TextureMngr::TexFileFormat::DDS,
-			TextureDimension::Tex2D));
+		GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+			name,
+			GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(texName),
+			XMFLOAT4(
+				materials[idx]["diffuseAlbedo"]["x"].GetFloat(), 
+				materials[idx]["diffuseAlbedo"]["y"].GetFloat(), 
+				materials[idx]["diffuseAlbedo"]["z"].GetFloat(), 
+				materials[idx]["diffuseAlbedo"]["w"].GetFloat()),
+			XMFLOAT3(
+				materials[idx]["fresnelR0"]["x"].GetFloat(), 
+				materials[idx]["fresnelR0"]["y"].GetFloat(), 
+				materials[idx]["fresnelR0"]["z"].GetFloat()),
+			materials[idx]["roughness"].GetFloat(), nmapIndex);
+	}
 
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
-		"AmbientMap1",
-		TextureMngr::TexFileFormat::DDS);
-
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
-		"NormalMap",
-		TextureMngr::TexFileFormat::DDS);
-
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
-		"DepthMap",
-		TextureMngr::TexFileFormat::DDS);
-
-	GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-		mDevice.Get(),
-		mCmdQueue.Get(),
-		L"..\\..\\assets\\texture\\sky\\snowcube1024.dds",
-		"RandomVectorMap0",
-		TextureMngr::TexFileFormat::DDS);
-
-	GetRenderRsrcMngr().GetTexMngr()->SetNullCubeIdx(
-		GetRenderRsrcMngr().GetTexMngr()->GetSSAOIdxStart() + 5);
-
-	// ********************************************************************************************************
+	fclose(fp);
 }
 
-void RenderToy::BuildMaterials()
-{
-	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-		"tile",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile"),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		XMFLOAT3(0.2f, 0.2f, 0.2f),
-		0.8f,
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile_nmap"));
-
-	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-		"matForSphere",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks2"),
-		XMFLOAT4(1.0f, 0.9f, 0.9f, 1.0f),
-		XMFLOAT3(0.1f, 0.1f, 0.1f),
-		0.8f,
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("bricks_nmap"));
-
-	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-		"bricksForGround",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("checkboard"),
-		XMFLOAT4(0.9f, 0.9f, 0.9f, 1.0f),
-		XMFLOAT3(0.2f, 0.2f, 0.2f),
-		0.8f,
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("tile_nmap"));
-
-	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-		"mirror",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("default"),
-		XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f),
-		XMFLOAT3(0.98f, 0.97f, 0.95f),
-		0.1f);
-
-	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-		"glass",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("glass"),
-		XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f),
-		XMFLOAT3(0.98f, 0.97f, 0.95f),
-		0.1f);
-
-	GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-		"sky",
-		GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex("cubeMap"),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		XMFLOAT3(0.1f, 0.1f, 0.1f),
-		0.8f);
-}
 
 // Build FrameResource and Register Needed Resource
 
