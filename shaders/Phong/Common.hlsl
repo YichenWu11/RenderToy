@@ -10,7 +10,7 @@
     #define NUM_SPOT_LIGHTS 0
 #endif
 
-#define COLOR_GRADING
+// #define COLOR_GRADING
 
 #include "./LightUtil.hlsl"
 

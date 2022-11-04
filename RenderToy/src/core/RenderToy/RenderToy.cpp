@@ -427,6 +427,14 @@ void RenderToy::OnResize()
 	DX12App::OnResize();
 
 	mCamera->SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+	
+	static bool is_first = true;
+	if (!is_first)
+	{
+		GetGlobalParam().GetSsao()->OnResize(mClientWidth, mClientWidth);
+		GetGlobalParam().GetSsao()->RebuildDescriptors(mDepthStencilBuffer.Get());
+	}
+	is_first = false;
 }
 
 void RenderToy::LogicalFillPack()
