@@ -11,7 +11,7 @@
 - [x] SSAO
   - [x] Create SSAO/SSAOBlur/DrawNormals Shader and PSO
   - [x] Build Descriptors For SSAO
-  - [ ] Finish SSAOPass
+  - [x] Finish SSAOPass
 - [ ] Shadow Map 和 SSAO 的 OnResize 都还没处理
 - [ ] CSM + PCF
 - [ ] assimp 加载模型

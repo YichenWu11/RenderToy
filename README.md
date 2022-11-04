@@ -23,3 +23,4 @@
 * *Unicode字符集*
 * *DirectXTK12*
 * *ImGui*
+* *Tencent/rapidjson*
