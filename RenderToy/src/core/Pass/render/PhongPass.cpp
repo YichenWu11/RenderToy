@@ -2,6 +2,7 @@
 #include <Pass/logical/UpdatePass.h>
 #include <Utility/Macro.h>
 #include <memory>
+#include <imgui_impl_dx12.h>
 
 using namespace Chen::RToy;
 
@@ -78,6 +79,9 @@ void PhongPass::Tick()
 
     pack.mCmdList->SetPipelineState(GetRenderRsrcMngr().GetPSOMngr()->GetPipelineState("Transparent"));
     DrawObjects(ObjectLayer::Transparent);
+
+    // FIXME: render imgui in PhongPass
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), pack.mCmdList.Get());
 
     // *********************************
 

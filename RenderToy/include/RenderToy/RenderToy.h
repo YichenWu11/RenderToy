@@ -4,6 +4,7 @@
 #include <CDX12/FrameResource.h>
 #include <CDX12/Common/Camera.h>
 #include <IComponent.h>
+#include <imgui.h>
 
 using namespace Chen::CDX12;
 
@@ -19,11 +20,13 @@ namespace Chen::RToy {
         bool Initialize() override;
 
         void RegisterComponent(std::string name, std::unique_ptr<IComponent> component);
+        int Run() override;
 
     private:
         void OnResize() override;
         void LogicTick(const GameTimer& gt) override;
         void RenderTick(const GameTimer& gt) override;
+        LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
         // **********************************************************
         // KeyBoard and Mouse Control
@@ -35,6 +38,7 @@ namespace Chen::RToy {
 
         // **********************************************************
 
+        void Pick(int, int);
 
         // **********************************************************
         // Build FrameResource and Register Needed Resource

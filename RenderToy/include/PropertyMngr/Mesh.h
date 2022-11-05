@@ -30,6 +30,7 @@ namespace Chen::RToy {
         void SetBaseVertexLocation(UINT base)  { impl.BaseVertexLocation = base; SetDirty(); }
         void SetTopology(D3D12_PRIMITIVE_TOPOLOGY t) { impl.PrimitiveType = t; SetDirty(); }
         void SetBoundingBox(DirectX::BoundingBox bounds) { impl.Bounds = bounds; SetDirty(); }
+        void SetSubName(std::string n) { impl.subName = n; }
 
         void SetSubMesh(std::string meshName)
         {
@@ -38,6 +39,7 @@ namespace Chen::RToy {
             SetBaseVertexLocation(impl.pMesh->DrawArgs[meshName].BaseVertexLocation);
             // Topology : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST [Default]
             SetBoundingBox(impl.pMesh->DrawArgs[meshName].Bounds);  
+            SetSubName(meshName);
         }
         
         MeshGeometry* GetMeshGeo() { return impl.pMesh; }
@@ -47,6 +49,7 @@ namespace Chen::RToy {
         UINT GetBaseVertexLocation() { return impl.BaseVertexLocation; }
         D3D12_PRIMITIVE_TOPOLOGY GetTopology() { return impl.PrimitiveType; }
         DirectX::BoundingBox GetBoundingBox() { return impl.Bounds; }
+        std::string GetSubName() { return impl.subName; }
 
         std::any GetImpl() override { return impl; }
 
@@ -59,6 +62,7 @@ namespace Chen::RToy {
             int BaseVertexLocation = 0;
 	        D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST; // Primitive topology.
             DirectX::BoundingBox Bounds;
+            std::string subName;
         };
     private:
         Impl impl;

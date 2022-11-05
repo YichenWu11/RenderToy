@@ -1,6 +1,35 @@
 {
     "objects": [
         {
+            "name": "skyBox",
+            "matName": "sky",
+            "mesh": "sphere",
+            "layer": 2,
+            "scale":{
+                "x": 4000.0,
+                "y": 4000.0,
+                "z": 4000.0
+            },
+            "mat_scale":{
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "rotation":{
+                "axis":{
+                    "x": 0.0,
+                    "y": 1.0,
+                    "z": 0.0 
+                },
+                "angle": 0.0
+            },
+            "translate":{
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0 
+            }
+        },
+        {
             "name": "box1",
             "matName": "tile",
             "mesh": "box",
@@ -141,35 +170,6 @@
             },
             "translate":{
                 "x": -24.0,
-                "y": 0.0,
-                "z": 0.0 
-            }
-        },
-        {
-            "name": "skyBox",
-            "matName": "sky",
-            "mesh": "sphere",
-            "layer": 2,
-            "scale":{
-                "x": 4000.0,
-                "y": 4000.0,
-                "z": 4000.0
-            },
-            "mat_scale":{
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "rotation":{
-                "axis":{
-                    "x": 0.0,
-                    "y": 1.0,
-                    "z": 0.0 
-                },
-                "angle": 0.0
-            },
-            "translate":{
-                "x": 0.0,
                 "y": 0.0,
                 "z": 0.0 
             }

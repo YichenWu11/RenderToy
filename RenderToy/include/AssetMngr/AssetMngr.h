@@ -19,6 +19,8 @@ namespace Chen::RToy::Asset {
 
         void DebugOutputContents();
 
+        std::filesystem::path& GetRootPath() { return assetRootPath; }
+
     private:
         AssetMngr() = default;
         ~AssetMngr() = default;

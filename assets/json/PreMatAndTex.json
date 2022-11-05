@@ -94,6 +94,12 @@
             "path": "sky/snowcube1024.dds",
             "format": 0,
             "texDimension": 2
+        },
+        {
+            "name": "font",
+            "path": "sky/snowcube1024.dds",
+            "format": 0,
+            "texDimension": 2
         }
     ],
     "materials":[

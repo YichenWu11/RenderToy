@@ -84,7 +84,14 @@ bool RenderToy::Initialize()
 
 	GetObjectMngr().Init();
 	GetPropertyMngr().Init();
-	GetEditor().Init();
+
+	GetEditor().Init(
+		mhMainWnd, 
+		mDevice.Get(),
+		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetDescriptorHeap(),
+		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetCpuHandle(15),
+		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetGpuHandle(15));
+
 	GetAssetMngr().Init();
 	GetGlobalParam().Init(mDevice.Get(), mCmdList.Get(), mClientWidth, mClientHeight);
 
@@ -514,6 +521,7 @@ void RenderToy::Execute()
 
 void RenderToy::RenderTick(const GameTimer& gt)
 {
+	GetEditor().Tick();
 	Populate(gt);
 	Execute();
 }
@@ -542,7 +550,7 @@ void RenderToy::OnMouseDown(WPARAM btnState, int x, int y)
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 
-	// if ((btnState & MK_LBUTTON) != 0) Pick(x, y);
+	 if ((btnState & MK_LBUTTON) != 0) Pick(x, y);
 
 	SetCapture(mhMainWnd);
 }
@@ -567,4 +575,106 @@ void RenderToy::OnMouseMove(WPARAM btnState, int x, int y)
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
+}
+
+// Forward declare message handler from imgui_impl_win32.cpp
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+LRESULT RenderToy::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	// For ImGui
+	if (ImGui_ImplWin32_WndProcHandler(mhMainWnd, msg, wParam, lParam))
+		return true;
+
+	return DX12App::MsgProc(hwnd, msg, wParam, lParam);
+}
+
+int RenderToy::Run()
+{
+	MSG msg = { 0 };
+
+	mTimer.Reset();
+
+	while (msg.message != WM_QUIT)
+	{
+		// If there are Window messages then process them.
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		// Otherwise, do animation/game stuff.
+		else
+		{
+			mTimer.Tick();
+
+			if (!mAppPaused)
+			{
+				CalculateFrameStats();
+				LogicTick(mTimer);
+				RenderTick(mTimer);
+				if (GetEditor().IsExit()) break;
+			}
+			else
+			{
+				Sleep(100);
+			}
+		}
+	}
+	return (int)msg.wParam;
+}
+
+void RenderToy::Pick(int sx, int sy)
+{
+	XMFLOAT4X4 P = mCamera->GetProj4x4f();
+
+	// Compute picking ray in view space. (with Topleftx = 405.0f)
+	float vx = (+2.0f * sx / (mClientWidth/1.8f) - 1.0f - 810.f / (mClientWidth/1.8f)) / P(0, 0);
+	float vy = (-2.0f * sy / (mClientHeight/1.45f) + 1.0f) / P(1, 1);
+
+	// Ray definition in view space.
+	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
+
+	XMMATRIX V = mCamera->GetView();
+	XMMATRIX invView = XMMatrixInverse(get_rvalue_ptr(XMMatrixDeterminant(V)), V);
+
+	if (GetEditor().GetPickedID() != -1)
+		dynamic_cast<BasicObject*>(GetObjectMngr().GetObj(GetEditor().GetPickedID()))->SetInvisible();
+
+	for (int idx = 2; idx <= GetObjectMngr().GetBiggestID(); ++idx)
+	{
+		if (GetObjectMngr().GetObj(idx) != nullptr)
+		{
+			if (dynamic_cast<BasicObject*>(GetObjectMngr().GetObj(idx))->IsVisible())
+			{
+				rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+				rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
+
+				XMMATRIX trans = XMLoadFloat4x4(get_rvalue_ptr(GetTransformOfObjByID(idx)->GetTranslate()));
+				XMMATRIX scale = XMLoadFloat4x4(get_rvalue_ptr(GetTransformOfObjByID(idx)->GetScale()));
+				XMMATRIX rotation = XMLoadFloat4x4(get_rvalue_ptr(GetTransformOfObjByID(idx)->GetRotation()));
+
+				XMMATRIX W = scale * rotation * trans;
+				XMMATRIX invWorld = XMMatrixInverse(get_rvalue_ptr(XMMatrixDeterminant(W)), W);
+
+				// Tranform ray to vi space of Mesh.
+				XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
+
+				rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal);
+				rayDir = XMVector3TransformNormal(rayDir, toLocal);
+
+				// Make the ray direction unit length for the intersection tests.
+				rayDir = XMVector3Normalize(rayDir);
+
+				float tmin = 0.001f;
+				if (GetMeshOfObjByID(idx)->GetBoundingBox().Intersects(rayOrigin, rayDir, tmin))
+				{
+					if (GetEditor().GetPickedID() != -1)
+						dynamic_cast<BasicObject*>(GetObjectMngr().GetObj(GetEditor().GetPickedID()))->SetVisible();
+					GetEditor().SetPickedID(idx);
+				}
+			}
+		}
+	}
 }

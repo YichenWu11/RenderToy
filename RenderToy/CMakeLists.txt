@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.5)
 
 project(RenderToy_Core)
 
-add_definitions("-DUNICODE" "-D_UNICODE")
+add_definitions("-DUNICODE" "-D_UNICODE" "-DNOMINMAX")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS") 
 
 add_executable(${PROJECT_NAME} WIN32
@@ -57,6 +57,7 @@ message(STATUS ${PROJECT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Chen::CDX12
     PUBLIC Chen::CDP
+    PUBLIC imgui
     PUBLIC d3d12.lib
     PUBLIC dxgi.lib
     PUBLIC d3dcompiler.lib

@@ -1,7 +1,9 @@
 # RenderToy
 *Toy Renderer based on CDX12.*
 <br/>
-*Really Just a Toy for me to play some Graphics algorithm.*
+*Just a Toy for me to play some Graphics algorithm [DEV].*
+
+<img src="docs/images/show.png">
 
 ---
 ## ***Design***

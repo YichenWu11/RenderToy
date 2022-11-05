@@ -10,6 +10,7 @@
 #include <map>
 #include <unordered_map>
 #include <memory>
+#include <set>
 
 using namespace rapidjson;
 using namespace Chen::CDX12;
@@ -98,6 +99,7 @@ namespace Chen::RToy {
             {
                 mObjects[p2obj->GetID()] = p2obj;
                 name2ID[p2obj->GetObjName()] = p2obj->GetID();
+                nameList.emplace(p2obj->GetObjName());
                 biggestID = p2obj->GetID();
             }
         }
@@ -108,6 +110,7 @@ namespace Chen::RToy {
             {
                 name2ID.erase(name2ID.find(mObjects.find(id)->second->GetObjName()));
                 mObjects.erase(mObjects.find(id));
+                nameList.erase(nameList.find(mObjects.find(id)->second->GetObjName()));
             }
         }
 
@@ -125,6 +128,8 @@ namespace Chen::RToy {
             return (name2ID.find(name) != name2ID.end()) ? GetObj(name2ID[name]) : nullptr;
         }
 
+        std::set<std::string>& GetNameList() { return nameList; }
+
     private:
         ObjectMngr() = default;
         ~ObjectMngr() = default;
@@ -135,6 +140,7 @@ namespace Chen::RToy {
         */
         std::map<std::uint32_t, std::shared_ptr<IObject>> mObjects; 
         std::unordered_map<std::string, std::uint32_t> name2ID;
+        std::set<std::string> nameList;
         std::uint32_t biggestID {0};
     };
 }
