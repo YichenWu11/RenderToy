@@ -34,6 +34,7 @@ namespace Chen::RToy {
 
         void SetSubMesh(std::string meshName)
         {
+            if (impl.pMesh->DrawArgs.find(meshName) == impl.pMesh->DrawArgs.end()) return;
             SetIndexCount(impl.pMesh->DrawArgs[meshName].IndexCount);
             SetStartIndexLocation(impl.pMesh->DrawArgs[meshName].StartIndexLocation);
             SetBaseVertexLocation(impl.pMesh->DrawArgs[meshName].BaseVertexLocation);

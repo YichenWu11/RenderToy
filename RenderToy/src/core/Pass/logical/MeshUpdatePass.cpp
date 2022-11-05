@@ -10,12 +10,7 @@ using namespace Chen::RToy;
 
 MeshUpdatePass::MeshUpdatePass(std::string name) : IPass(name) 
 {
-    AddObject(GetObjectMngr().GetObj("box1"));
-    AddObject(GetObjectMngr().GetObj("box2"));
-    AddObject(GetObjectMngr().GetObj("box3"));
-    AddObject(GetObjectMngr().GetObj("sphere1"));
-    AddObject(GetObjectMngr().GetObj("ground"));
-    AddObject(GetObjectMngr().GetObj("skyBox"));
+
 }
 
 MeshUpdatePass::~MeshUpdatePass()

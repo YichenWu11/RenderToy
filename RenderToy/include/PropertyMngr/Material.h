@@ -36,6 +36,8 @@ namespace Chen::RToy {
 
         std::any GetImpl() override { return impl; }
 
+        BasicMaterial* GetPtrToMat() { return impl.material; }
+
         struct Impl
         {
             BasicMaterial* material;

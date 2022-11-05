@@ -136,6 +136,9 @@ void Editor::TickLeftSideBar()
 
 	ImGui::EndMainMenuBar();
 
+	static bool materialEdit = false;
+	static bool textureLoad = false;
+
 	{
 		ImGui::Begin("Materials And Objects", NULL, window_flags);
 
@@ -144,8 +147,29 @@ void Editor::TickLeftSideBar()
 		ImGui::SetWindowPos(ImVec2(0, 23), ImGuiCond_Always);
 		ImGui::SetWindowSize(ImVec2(405, 665));
 
+		static std::string info = "";
+
+		// Geos And Meshes
+		if (ImGui::CollapsingHeader("Geos And Meshes")) 
+		{
+			static auto& AllGeos = GetRenderRsrcMngr().GetMeshMngr()->GetAllGeos();
+			for (auto& geo : AllGeos)
+			{
+				if (ImGui::TreeNode(geo.first.c_str()))
+				{
+					static auto subNameList = geo.second->GetSubMeshNameList();
+					for (auto& sub : subNameList)
+					{
+						ImGui::BulletText(sub.c_str());
+					}
+					ImGui::TreePop();
+				}
+			}
+		}
+
 		// Materials
-		if (ImGui::CollapsingHeader("Materials")) {
+		if (ImGui::CollapsingHeader("Materials")) 
+		{
 			const std::vector<std::string>& matNameList = GetRenderRsrcMngr().GetMatMngr()->GetMatNameList();
 			for (auto& name : matNameList)
 			{
@@ -154,11 +178,32 @@ void Editor::TickLeftSideBar()
 
 				}
 			}
-			ImGui::Button("Edit Materials");
+			if (ImGui::Button("Edit Materials"))
+			{
+				materialEdit = true;
+			}
+		}
+
+		// Textures
+		if (ImGui::CollapsingHeader("Textures"))
+		{
+			const std::vector<std::string>& texNameList = GetRenderRsrcMngr().GetTexMngr()->GetTexNameList();
+			for (auto& name : texNameList)
+			{
+				if (ImGui::Selectable(name.c_str()))
+				{
+
+				}
+			}
+			if (ImGui::Button("Load Texture"))
+			{
+				textureLoad = true;
+			}
 		}
 
 		// Objects
-		if (ImGui::CollapsingHeader("Objects")) {
+		if (ImGui::CollapsingHeader("Objects")) 
+		{
 			const std::set<std::string>& objNameList = GetObjectMngr().GetNameList();
 			for (auto& name : objNameList)
 			{
@@ -167,10 +212,191 @@ void Editor::TickLeftSideBar()
 					SetPickedID(GetObjectMngr().GetObj(name)->GetID());
 				}
 			}
-			ImGui::Button("Add New Object");
-			ImGui::Button("Delete Picked Object");
+
+			if (ImGui::Button("Delete Picked Object"))
+			{
+				GetGlobalParam().GetRenderCom()->DelObjForAllPasses(
+					GetObjectMngr().GetObj(pickedID)->GetObjName()
+				);
+				GetGlobalParam().GetLogicalCom()->DelObjForAllPasses(
+					GetObjectMngr().GetObj(pickedID)->GetObjName()
+				);
+				GetObjectMngr().DelObject(pickedID);
+				pickedID = -1;
+			}
 		}
 
+		if (ImGui::CollapsingHeader("Add New Object"))
+		{
+			static std::string name = "newObj";
+			static std::string geoName = "shapeGeo";
+			static std::string subMeshName = "box";
+			static std::string matName = "tile";
+
+			static char cname[20] = "newObj";
+			static char cgeoName[20] = "shapeGeo";
+			static char csubMeshName[20] = "box";
+			static char cmatName[20] = "tile";
+
+			ImGui::InputText("Name", cname, 20);
+			ImGui::InputText("Geo", cgeoName, 20);
+			ImGui::InputText("SubMesh", csubMeshName, 20);
+			ImGui::InputText("Material", cmatName, 20);
+
+			static const char* layers[] = { "Opaque", "Transparent", "Sky" };
+			static int layer = 0;
+			ImGui::Combo("layer", &layer, layers, IM_ARRAYSIZE(layers));
+
+			if (ImGui::Button("Add"))
+			{
+				name = std::string(cname);
+				geoName = std::string(cgeoName);
+				subMeshName = std::string(csubMeshName);
+				matName = std::string(cmatName);
+
+				auto p2obj = std::make_shared<BasicObject>(name);
+				static DirectX::XMFLOAT4X4 scale;
+				static DirectX::XMFLOAT4X4 mat_scale;
+				DirectX::XMStoreFloat4x4(&scale, DirectX::XMMatrixScaling(6.0f, 6.0f, 6.0f));
+				DirectX::XMStoreFloat4x4(&mat_scale, DirectX::XMMatrixScaling(2.0f, 2.0f, 2.0f));
+				dynamic_cast<BasicObject*>(p2obj.get())->SetLayer(ObjectLayer(layer));
+				GetTransformOfObj(p2obj)->SetScale(scale);
+				
+				GetMeshOfObj(p2obj)->SetMeshGeo(geoName);
+
+				if (GetMeshOfObj(p2obj)->GetMeshGeo() == nullptr)
+				{
+					info = "Geo Input Error!!!";
+				}
+				else
+				{
+					GetMeshOfObj(p2obj)->SetSubMesh(subMeshName);
+					GetMaterialOfObj(p2obj)->SetMaterial(
+						RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial(matName));
+
+					if (GetMeshOfObj(p2obj)->GetIndexCount() == 0)
+					{
+						info = "SubMesh Input Error!!!";
+					}
+					else if (GetMaterialOfObj(p2obj)->GetPtrToMat() == nullptr)
+					{
+						info = "Material Input Error!!!";
+					}
+					else
+					{
+						GetMaterialOfObj(p2obj)->SetMatTransform(mat_scale);
+						GetObjectMngr().AddObject(p2obj);
+						GetGlobalParam().GetRenderCom()->AddObjForAllPasses(
+							GetObjectMngr().GetObj(name));
+						GetGlobalParam().GetLogicalCom()->AddObjForAllPasses(
+							GetObjectMngr().GetObj(name));
+						info = "";
+					}
+				}
+			}
+
+			if (info != "")
+				ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), info.c_str());
+		}
+
+		ImGui::Text("EnableMove: ");
+		ImGui::SameLine();
+		static std::string isMove;
+		isMove = (IsEnableMove()) ? "On" : "Off";
+		ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.0f), isMove.c_str());
+
+		if (ImGui::Button("Toggle EnableMove"))
+			ToggleEnableMove();
+
+		ImGui::End();
+	}
+
+	if (materialEdit)
+	{
+		ImGui::Begin("Material Edit");
+
+		ImGui::Text("Edit Material\n");
+
+		static auto& allMats = GetRenderRsrcMngr().GetMatMngr()->GetAllMats();
+
+		for (auto& material : allMats)
+		{
+			if (ImGui::CollapsingHeader(material.first.c_str()))
+			{
+				ImGui::DragFloat("DIFFUSE_R", &material.second->DiffuseAlbedo.x, 0.05f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("DIFFUSE_G", &material.second->DiffuseAlbedo.y, 0.05f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("DIFFUSE_B", &material.second->DiffuseAlbedo.z, 0.05f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("DIFFUSE_A", &material.second->DiffuseAlbedo.w, 0.05f, 0.0f, 1.0f, "%.2f");
+
+				ImGui::DragFloat("FresnelR0_R", &material.second->FresnelR0.x, 0.05f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("FresnelR0_G", &material.second->FresnelR0.y, 0.05f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("FresnelR0_B", &material.second->FresnelR0.z, 0.05f, 0.0f, 1.0f, "%.2f");
+
+				ImGui::DragFloat("roughness", &material.second->Roughness, 0.05f, 0.0f, 1.0f, "%.2f");
+			}
+		}
+
+		ImGui::Text("\nCreate Material\n");
+		
+		if (ImGui::CollapsingHeader("Create Material"))
+		{
+			static XMFLOAT4 albedo(1.0f, 1.0f, 1.0f, 1.0f);
+			static XMFLOAT3 fresnel(0.1f, 0.1f, 0.1f);
+			static float roughness = 0.8f;
+
+			static std::string name = "newMaterial";
+			static std::string texName;
+			static std::string normalName;
+
+			static char cname[20] = "newMaterial";
+			static char ctexName[20];
+			static char cnormalName[20];
+
+			ImGui::InputText("Name", cname, 20);
+			ImGui::InputText("DiffuseMap", ctexName, 20);
+			ImGui::InputText("NormalMap", cnormalName, 20);
+
+			ImGui::DragFloat("DIFFUSE_R", &albedo.x, 0.05f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("DIFFUSE_G", &albedo.y, 0.05f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("DIFFUSE_B", &albedo.z, 0.05f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("DIFFUSE_A", &albedo.w, 0.05f, 0.0f, 1.0f, "%.2f");
+
+			ImGui::DragFloat("FresnelR0_R", &fresnel.x, 0.05f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("FresnelR0_G", &fresnel.y, 0.05f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("FresnelR0_B", &fresnel.z, 0.05f, 0.0f, 1.0f, "%.2f");
+
+			ImGui::DragFloat("roughness", &roughness, 0.05f, 0.0f, 1.0f, "%.2f");
+
+			if (ImGui::Button("Create"))
+			{
+				name = std::string(cname);
+				texName = std::string(ctexName);
+				normalName = std::string(cnormalName);
+
+				static int nmap_idx;
+				nmap_idx = (normalName == "") ? -1 : GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(normalName);
+
+				GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+					name,
+					GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(texName),
+					albedo,
+					fresnel,
+					roughness,
+					nmap_idx);
+			}
+
+		}
+
+		ImGui::Text("\n");
+		if (ImGui::Button("Close")) materialEdit = false;
+		ImGui::End();
+	}
+
+	if (textureLoad)
+	{
+		ImGui::Begin("Load Texture");
+
+		if (ImGui::Button("Close")) textureLoad = false;
 		ImGui::End();
 	}
 }
@@ -227,6 +453,11 @@ void Editor::TickRightSideBar()
 		{
 			if (pickedID != -1)
 			{
+				ImGui::Text("Name: ");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.0f),
+					GetObjectMngr().GetObj(pickedID)->GetObjName().c_str());
+
 				if (ImGui::CollapsingHeader("[Mesh]"))
 				{
 					static std::string geoName = GetMeshOfObjByID(pickedID)->GetMeshGeo()->Name;

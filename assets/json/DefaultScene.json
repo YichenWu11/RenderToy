@@ -3,6 +3,7 @@
         {
             "name": "skyBox",
             "matName": "sky",
+            "geo": "shapeGeo",
             "mesh": "sphere",
             "layer": 2,
             "scale":{
@@ -32,6 +33,7 @@
         {
             "name": "box1",
             "matName": "tile",
+            "geo": "shapeGeo",
             "mesh": "box",
             "layer": 0,
             "scale":{
@@ -50,7 +52,7 @@
                     "y": 1.0,
                     "z": 1.0 
                 },
-                "angle": 45.0
+                "angle": 0.0
             },
             "translate":{
                 "x": 0.0,
@@ -61,6 +63,7 @@
         {
             "name": "sphere1",
             "matName": "matForSphere",
+            "geo": "shapeGeo",
             "mesh": "sphere",
             "layer": 0,
             "scale":{
@@ -90,6 +93,7 @@
         {
             "name": "ground",
             "matName": "bricksForGround",
+            "geo": "shapeGeo",
             "mesh": "grid",
             "layer": 0,
             "scale":{
@@ -119,6 +123,7 @@
         {
             "name": "box2",
             "matName": "mirror",
+            "geo": "shapeGeo",
             "mesh": "box",
             "layer": 0,
             "scale":{
@@ -148,6 +153,7 @@
         {
             "name": "box3",
             "matName": "glass",
+            "geo": "shapeGeo",
             "mesh": "box",
             "layer": 1,
             "scale":{

@@ -35,6 +35,9 @@ namespace Chen::RToy::Editor {
 
         bool IsExit() { return isExit; }
 
+        bool IsEnableMove() { return enableMove; }
+        void ToggleEnableMove() { enableMove = !enableMove; }
+
         int GetPickedID() { return pickedID; }
         void SetPickedID(int idx) { pickedID = idx; }
 
@@ -43,6 +46,7 @@ namespace Chen::RToy::Editor {
         ~Editor();
 
         bool isExit = false;
+        bool enableMove = true;
         ImGuiWindowFlags window_flags = 0;
         int pickedID = -1;
     };

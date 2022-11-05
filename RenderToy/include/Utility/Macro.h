@@ -26,6 +26,10 @@
 // ******************************************************************************
 // Get the pointer to specific property of a object
 
+#define GetTransformOfObj(ptr)        dynamic_cast<Chen::RToy::Transform*>(ptr->GetProperty("Transform"))
+#define GetMaterialOfObj(ptr)         dynamic_cast<Chen::RToy::Material*>(ptr->GetProperty("Material"))
+#define GetMeshOfObj(ptr)             dynamic_cast<Chen::RToy::Mesh*>(ptr->GetProperty("Mesh"))
+
 #define GetTransformOfObjByID(id)     dynamic_cast<Chen::RToy::Transform*>(GetObjectMngr().GetObj(id)->GetProperty("Transform"))
 #define GetMaterialOfObjByID(id)      dynamic_cast<Chen::RToy::Material*>(GetObjectMngr().GetObj(id)->GetProperty("Material"))
 #define GetMeshOfObjByID(id)          dynamic_cast<Chen::RToy::Mesh*>(GetObjectMngr().GetObj(id)->GetProperty("Mesh"))

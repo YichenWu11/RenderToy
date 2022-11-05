@@ -5,6 +5,7 @@
 #include <Pass/logical/shadow/ShadowMap.h>
 #include <Pass/logical/ssao/Ssao.h>
 #include <Pass/logical/UpdatePass.h>
+#include <IComponent.h>
 
 using namespace DirectX;
 
@@ -18,10 +19,12 @@ namespace Chen::RToy {
             return instance;
         }
 
-        void Init(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, UINT width, UINT height)
+        void Init(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, UINT width, UINT height, IComponent* r, IComponent* l)
         {
             mShadowMap = std::make_unique<ShadowMap>(device, 4096 * 4, 4096 * 4);
             mSsao = std::make_unique<Ssao>(device, cmdList, width, height);
+            renderCom = r;
+            logicalCom = l;
         }
 
         // ***************************************************************************************
@@ -39,6 +42,9 @@ namespace Chen::RToy {
 
         void SetMainPassData(UpdatePass::PassConstants m) { mMainPassCB = m; }
         UpdatePass::PassConstants GetMainPassData() { return mMainPassCB; }
+
+        IComponent* GetRenderCom() { return renderCom; }
+        IComponent* GetLogicalCom() { return logicalCom; }
 
         // ***************************************************************************************
 
@@ -68,5 +74,8 @@ namespace Chen::RToy {
         UpdatePass::PassConstants mMainPassCB;
 
         // ***************************************************************************************
+
+        Chen::RToy::IComponent* renderCom;
+        Chen::RToy::IComponent* logicalCom;
     };
 }

@@ -7,12 +7,7 @@ using namespace DirectX;
 
 UpdatePass::UpdatePass(std::string name) : IPass(name) 
 {
-    AddObject(GetObjectMngr().GetObj("box1"));
-	AddObject(GetObjectMngr().GetObj("box2"));
-	AddObject(GetObjectMngr().GetObj("box3"));
-    AddObject(GetObjectMngr().GetObj("sphere1"));
-	AddObject(GetObjectMngr().GetObj("ground"));
-	AddObject(GetObjectMngr().GetObj("skyBox"));
+
 }
 
 UpdatePass::~UpdatePass()
@@ -80,24 +75,24 @@ void UpdatePass::Tick()
 	for (auto &p2obj : mObjects)
 	{
 		// Update the transform property of all objects
-		if (p2obj.second->GetProperty("Material")->IsDirty())
-		{
-			auto objImpl = p2obj.second->GetPropertyImpl<Material>("Material");
-			Material::Impl new_impl(objImpl);
-			auto mat = new_impl.material;
+		// if (p2obj.second->GetProperty("Material")->IsDirty())
+		// {
+		auto objImpl = p2obj.second->GetPropertyImpl<Material>("Material");
+		Material::Impl new_impl(objImpl);
+		auto mat = new_impl.material;
 
-			BasicMaterialData matData;
-			XMMATRIX matTransform = XMLoadFloat4x4(&mat->MatTransform);
-			matData.DiffuseAlbedo = mat->DiffuseAlbedo;
-			matData.FresnelR0 = mat->FresnelR0;
-			matData.Roughness = mat->Roughness;
-			DirectX::XMStoreFloat4x4(&matData.MatTransform, DirectX::XMMatrixTranspose(matTransform));
-			matData.DiffuseMapIndex = mat->DiffuseSrvHeapIndex;
-			matData.NormalMapIndex = mat->NormalSrvHeapIndex;
+		BasicMaterialData matData;
+		XMMATRIX matTransform = XMLoadFloat4x4(&mat->MatTransform);
+		matData.DiffuseAlbedo = mat->DiffuseAlbedo;
+		matData.FresnelR0 = mat->FresnelR0;
+		matData.Roughness = mat->Roughness;
+		DirectX::XMStoreFloat4x4(&matData.MatTransform, DirectX::XMMatrixTranspose(matTransform));
+		matData.DiffuseMapIndex = mat->DiffuseSrvHeapIndex;
+		matData.NormalMapIndex = mat->NormalSrvHeapIndex;
 
-			pack.currFrameResource->GetResource<std::shared_ptr<Chen::CDX12::UploadBuffer<BasicMaterialData>>>(
-				"MaterialData")->CopyData(mat->MatIndex, matData);
-			p2obj.second->GetProperty("Material")->ClearOne();
-		}
+		pack.currFrameResource->GetResource<std::shared_ptr<Chen::CDX12::UploadBuffer<BasicMaterialData>>>(
+			"MaterialData")->CopyData(mat->MatIndex, matData);
+		p2obj.second->GetProperty("Material")->ClearOne();
+		// }
 	}
 }

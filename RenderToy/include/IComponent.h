@@ -39,6 +39,22 @@ namespace Chen::RToy {
             return (mPasses.find(name) != mPasses.end()) ? mPasses.at(name).get() : nullptr;
         }
 
+        void AddObjForAllPasses(IObject* p2obj)
+        {
+            for (auto& pass : mPasses)
+            {
+                pass.second->AddObject(p2obj);
+            }
+        }
+
+        void DelObjForAllPasses(std::string name)
+        {
+            for (auto& pass : mPasses)
+            {
+                pass.second->DelObject(name);
+            }
+        }
+
         virtual void FillPack(std::any pack) {}
 
         virtual void FillPassPack() {}

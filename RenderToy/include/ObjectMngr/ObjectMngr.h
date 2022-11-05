@@ -7,6 +7,7 @@
 #include <CDX12/Math/Quaternion.h>
 
 #include "./BasicObject.h"
+#include <AssetMngr/AssetMngr.h>
 #include <map>
 #include <unordered_map>
 #include <memory>
@@ -28,7 +29,7 @@ namespace Chen::RToy {
         void Init()
         {
             FILE* fp;
-            errno_t err = fopen_s(&fp, "../../assets/json/DefaultScene.json", "rb");
+            errno_t err = fopen_s(&fp, Asset::AssetMngr::GetInstance().GetScenePath().string().c_str(), "rb");
             if (err == 0) OutputDebugString(L"\n\nFile Open Error!!!\n\n");
 
             char readBuffer[65536];
@@ -46,12 +47,14 @@ namespace Chen::RToy {
             {
                 std::string name = objects[idx]["name"].GetString();
                 std::string matName = objects[idx]["matName"].GetString();
+                std::string geoName = objects[idx]["geo"].GetString();
                 std::string meshName = objects[idx]["mesh"].GetString();
                 AddObject(std::make_shared<BasicObject>(name));
                 // set material
                 dynamic_cast<Material*>(GetObj(name)->GetProperty("Material"))->SetMaterial(
                     RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial(matName));
                 // set mesh
+                dynamic_cast<Mesh*>(GetObj(name)->GetProperty("Mesh"))->SetMeshGeo(geoName);
                 dynamic_cast<Mesh*>(GetObj(name)->GetProperty("Mesh"))->SetSubMesh(meshName);
                 // set layer
                 dynamic_cast<BasicObject*>(GetObj(name))->SetLayer(ObjectLayer(objects[idx]["layer"].GetUint()));
@@ -109,8 +112,8 @@ namespace Chen::RToy {
             if (mObjects.find(id) != mObjects.end())
             {
                 name2ID.erase(name2ID.find(mObjects.find(id)->second->GetObjName()));
-                mObjects.erase(mObjects.find(id));
                 nameList.erase(nameList.find(mObjects.find(id)->second->GetObjName()));
+                mObjects.erase(mObjects.find(id));
             }
         }
 

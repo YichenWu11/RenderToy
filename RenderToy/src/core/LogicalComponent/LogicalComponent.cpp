@@ -5,6 +5,7 @@
 #include <Pass/logical/MatUpdatePass.h>
 #include <Pass/logical/ShadowPrePass.h>
 #include <Pass/logical/SsaoPrePass.h>
+#include <Utility/Macro.h>
 
 using namespace Chen::RToy;
 
@@ -25,22 +26,20 @@ LogicalComponent::~LogicalComponent()
 
 void LogicalComponent::Init(ID3D12Device* _device)
 {
-    mPasses[std::string("ShadowPrePass")]->Init(_device);
-    mPasses[std::string("SsaoPrePass")]->Init(_device);
-    mPasses[std::string("UpdatePass")]->Init(_device);
-    mPasses[std::string("TransUpdatePass")]->Init(_device);
-    mPasses[std::string("MeshUpdatePass")]->Init(_device);
-    mPasses[std::string("MatUpdatePass")]->Init(_device);
+    for (auto& pass : mPasses)
+    {
+        pass.second->Init(_device);
+    }
+
+    FillObjectsForPass();
 }
 
 void LogicalComponent::Tick()
 {
-    mPasses[std::string("ShadowPrePass")]->Tick();
-    mPasses[std::string("SsaoPrePass")]->Tick();
-    mPasses[std::string("UpdatePass")]->Tick();
-    mPasses[std::string("TransUpdatePass")]->Tick();
-    mPasses[std::string("MeshUpdatePass")]->Tick();
-    mPasses[std::string("MatUpdatePass")]->Tick();
+    for (auto& pass : mPasses)
+    {
+        pass.second->Tick();
+    }
 }
 
 void LogicalComponent::FillPassPack()
@@ -86,5 +85,11 @@ void LogicalComponent::FillPassPack()
 
 void LogicalComponent::FillObjectsForPass()
 {
-    
+    for (auto& pass : mPasses)
+    {
+        for (int idx = 1; idx <= GetObjectMngr().GetBiggestID(); ++idx)
+        {
+            pass.second->AddObject(GetObjectMngr().GetObj(idx));
+        }   
+    }
 }

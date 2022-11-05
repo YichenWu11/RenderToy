@@ -2,6 +2,7 @@
 #include <Pass/render/PhongPass.h>
 #include <Pass/render/ShadowPass.h>
 #include <Pass/render/SsaoPass.h>
+#include <Utility/Macro.h>
 
 using namespace Chen::RToy;
 
@@ -22,6 +23,8 @@ void RenderComponent::Init(ID3D12Device* _device)
     mPasses["ShadowPass"]->Init(_device);
     mPasses["SsaoPass"]->Init(_device);
     mPasses["PhongPass"]->Init(_device);
+
+    FillObjectsForPass();
 }
 
 void RenderComponent::Tick()
@@ -60,5 +63,11 @@ void RenderComponent::FillPassPack()
 
 void RenderComponent::FillObjectsForPass()
 {
-    
+    for (auto& pass : mPasses)
+    {
+        for (int idx = 1; idx <= GetObjectMngr().GetBiggestID(); ++idx)
+        {
+            pass.second->AddObject(GetObjectMngr().GetObj(idx));
+        }   
+    } 
 }

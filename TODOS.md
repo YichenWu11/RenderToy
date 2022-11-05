@@ -5,6 +5,10 @@
 - [x] Logical Part
 - [ ] AssetMngr
 - [ ] Editor (imgui)
+  - [ ] Add and Del Object
+  - [ ] Edit Material
+    - [ ] Load Texture
+  - [ ] Export and Import Scene Form/To json
 - [ ] Objects Sync Design and Implementation
 - [x] Normal map
 - [x] Shadow map

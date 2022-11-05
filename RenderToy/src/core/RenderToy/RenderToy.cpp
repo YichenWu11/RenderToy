@@ -82,6 +82,7 @@ bool RenderToy::Initialize()
 
 	PreBuildTexAndMatFromJson();
 
+	GetAssetMngr().Init();
 	GetObjectMngr().Init();
 	GetPropertyMngr().Init();
 
@@ -92,11 +93,16 @@ bool RenderToy::Initialize()
 		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetCpuHandle(15),
 		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetGpuHandle(15));
 
-	GetAssetMngr().Init();
-	GetGlobalParam().Init(mDevice.Get(), mCmdList.Get(), mClientWidth, mClientHeight);
-
 	RegisterComponent("RenderComponent", std::make_unique<RenderComponent>());
 	RegisterComponent("LogicalComponent", std::make_unique<LogicalComponent>());
+
+	GetGlobalParam().Init(
+		mDevice.Get(), 
+		mCmdList.Get(), 
+		mClientWidth, 
+		mClientHeight,
+		GetRenderComponent(),
+		GetLogicalComponent());
 
 	BuildShaders();  // before BuildPSOs();
 	BuildPSOs();
@@ -534,13 +540,15 @@ void RenderToy::OnKeyboardInput(const GameTimer& gt)
 	const float dt = gt.DeltaTime();
 
 	// adjust the camera position
-	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(15.0f * dt);
+	float step = (GetEditor().IsEnableMove()) ? 15.0f : 0.0f;
 
-	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-15.0f * dt);
+	if (GetAsyncKeyState('W') & 0x8000) mCamera->Walk(step * dt);
 
-	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-15.0f * dt);
+	if (GetAsyncKeyState('S') & 0x8000) mCamera->Walk(-step * dt);
 
-	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(15.0f * dt);
+	if (GetAsyncKeyState('A') & 0x8000) mCamera->Strafe(-step * dt);
+
+	if (GetAsyncKeyState('D') & 0x8000) mCamera->Strafe(step * dt);
 
 	mCamera->UpdateViewMatrix();
 }
@@ -565,8 +573,8 @@ void RenderToy::OnMouseMove(WPARAM btnState, int x, int y)
 	if ((btnState & MK_RBUTTON) != 0)
 	{
 		// Make each pixel correspond to a quarter of a degree.
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
+		float dx = (GetEditor().IsEnableMove()) ?  XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x)) : 0.0f;
+		float dy = (GetEditor().IsEnableMove()) ?  XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y)) : 0.0f;
 
 		// adjust the camera orientation
 		mCamera->Pitch(dy / mouseMoveSensitivity);

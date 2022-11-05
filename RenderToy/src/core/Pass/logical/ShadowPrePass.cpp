@@ -10,12 +10,6 @@ ShadowPrePass::ShadowPrePass(std::string name) : IPass(name)
 {
 	mSceneBounds.Center = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	mSceneBounds.Radius = sqrtf(70.0f * 70.0f + 70.0f * 70.0f);
-
-    AddObject(GetObjectMngr().GetObj("box1"));
-    AddObject(GetObjectMngr().GetObj("box2"));
-    AddObject(GetObjectMngr().GetObj("box3"));
-    AddObject(GetObjectMngr().GetObj("sphere1"));
-    AddObject(GetObjectMngr().GetObj("ground"));
 }
 
 ShadowPrePass::~ShadowPrePass()
