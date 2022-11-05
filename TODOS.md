@@ -3,13 +3,12 @@
 - [x] Init
 - [x] Render Part
 - [x] Logical Part
-- [ ] AssetMngr
+- [x] AssetMngr
 - [ ] Editor (imgui)
-  - [ ] Add and Del Object
-  - [ ] Edit Material
-    - [ ] Load Texture
+  - [x] Add and Del Object
+  - [x] Edit Material
+  - [ ] Load Texture
   - [ ] Export and Import Scene Form/To json
-- [ ] Objects Sync Design and Implementation
 - [x] Normal map
 - [x] Shadow map
 - [x] SSAO
@@ -20,7 +19,7 @@
 - [ ] CSM + PCF
 - [ ] assimp 加载模型
 - [x] 预加载纹理，模型等改为解析 json
-- [ ] Pick Object
-- [ ] Relf Implementation
+- [x] Pick Object
+- [ ] Reflection Implementation
 - [ ] PBR
 - [ ] NPR

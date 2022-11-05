@@ -3,7 +3,7 @@
 <br/>
 *Just a Toy for me to play some Graphics algorithm [DEV].*
 
-<img src="docs/images/show.png">
+<img src="docs/images/detail.png">
 
 ---
 ## ***Design***
