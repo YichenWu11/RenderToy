@@ -10,11 +10,15 @@ using namespace Chen::RToy::Editor;
 
 void Editor::Init(
 	HWND mhMainWnd, 
-	ID3D12Device* device,
+	ID3D12Device* _device,
 	ID3D12DescriptorHeap* heap,
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle,
-	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle)
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle,
+	ID3D12CommandQueue* queue)
 {
+	device = _device;
+	cmdQueue = queue;
+
     IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -395,6 +399,37 @@ void Editor::TickLeftSideBar()
 	if (textureLoad)
 	{
 		ImGui::Begin("Load Texture");
+
+		static std::string name;
+		static char cname[40];
+
+		static std::string path;
+		static char cpath[40];
+
+		ImGui::InputText("Name", cname, 40);
+		ImGui::InputText("Path", cpath, 40);
+
+		static const char* fileFormat[] = { "DDS", "WIC"};
+		static int formatIdx = 0;
+		ImGui::Combo("fileFormat", &formatIdx, fileFormat, IM_ARRAYSIZE(fileFormat));
+
+		static const char* texDimension[] = { "None", "Tex1D", "Tex2D", "Tex3D", "Cubemap", "Tex2DArray" };
+		static int dimensionIdx = 2;
+		ImGui::Combo("texDimension", &dimensionIdx, texDimension, IM_ARRAYSIZE(texDimension));
+
+		if (ImGui::Button("Load"))
+		{
+			name = std::string(cname);
+			path = std::string(cpath);
+
+			GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+				device,
+				cmdQueue,
+				AnsiToWString(path).c_str(),
+				name,
+				TextureMngr::TexFileFormat(formatIdx),
+				TextureDimension(dimensionIdx));
+		}
 
 		if (ImGui::Button("Close")) textureLoad = false;
 		ImGui::End();

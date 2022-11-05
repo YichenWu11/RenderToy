@@ -21,7 +21,7 @@ namespace Chen::RToy::Editor {
         Editor(const Editor&) = delete;
         Editor& operator=(const Editor&) = delete;
 
-        void Init(HWND, ID3D12Device*, ID3D12DescriptorHeap*, D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE);
+        void Init(HWND, ID3D12Device*, ID3D12DescriptorHeap*, D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE, ID3D12CommandQueue*);
 
         void CleanUp();
 
@@ -49,5 +49,8 @@ namespace Chen::RToy::Editor {
         bool enableMove = true;
         ImGuiWindowFlags window_flags = 0;
         int pickedID = -1;
+
+        ID3D12CommandQueue* cmdQueue;
+        ID3D12Device* device;
     };
 }

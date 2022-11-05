@@ -91,7 +91,8 @@ bool RenderToy::Initialize()
 		mDevice.Get(),
 		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetDescriptorHeap(),
 		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetCpuHandle(15),
-		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetGpuHandle(15));
+		GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetGpuHandle(15),
+		mCmdQueue.Get());
 
 	RegisterComponent("RenderComponent", std::make_unique<RenderComponent>());
 	RegisterComponent("LogicalComponent", std::make_unique<LogicalComponent>());
