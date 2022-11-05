@@ -453,29 +453,25 @@ void Editor::TickRightSideBar()
 		{
 			if (pickedID != -1)
 			{
-				ImGui::Text("Name: ");
+				ImGui::Text("Picked Object: ");
 				ImGui::SameLine();
 				ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.0f),
 					GetObjectMngr().GetObj(pickedID)->GetObjName().c_str());
 
 				if (ImGui::CollapsingHeader("[Mesh]"))
 				{
-					static std::string geoName = GetMeshOfObjByID(pickedID)->GetMeshGeo()->Name;
-					static std::string meshName = GetMeshOfObjByID(pickedID)->GetSubName();
-					static const char* geo = { geoName.c_str() };
-					static const char* mesh = { meshName.c_str() };
-					static int currGID = 0;
-					static int currMID = 0;
+					std::string geoName = "  " + GetMeshOfObjByID(pickedID)->GetMeshGeo()->Name;
+					std::string meshName = "  " + GetMeshOfObjByID(pickedID)->GetSubName();
 
 					if (ImGui::TreeNode("Geo"))
 					{
-						ImGui::Combo(" ", &currGID, geo, IM_ARRAYSIZE(geo));
+						ImGui::Text(geoName.c_str());
 						ImGui::TreePop();
 					}
 
 					if (ImGui::TreeNode("Mesh"))
 					{
-						ImGui::Combo(" ", &currMID, mesh, IM_ARRAYSIZE(mesh));
+						ImGui::Text(meshName.c_str());
 						ImGui::TreePop();
 					}
 				}
@@ -543,7 +539,7 @@ void Editor::TickRightSideBar()
 
 				if (ImGui::CollapsingHeader("[Material]"))
 				{
-					static Material* mat = GetMaterialOfObjByID(pickedID);
+					Material* mat = GetMaterialOfObjByID(pickedID);
 
 					if (ImGui::TreeNode("Name"))
 					{
@@ -553,7 +549,7 @@ void Editor::TickRightSideBar()
 
 					if (ImGui::TreeNode("Diffuse TexName"))
 					{
-						static std::string diffName = GetRenderRsrcMngr().GetTexMngr()->GetTexNameFromID(
+						std::string diffName = GetRenderRsrcMngr().GetTexMngr()->GetTexNameFromID(
 							mat->GetDiffuse());
 
 						ImGui::Text(diffName.c_str());
@@ -562,7 +558,7 @@ void Editor::TickRightSideBar()
 
 					if (ImGui::TreeNode("Normal TexName"))
 					{
-						static std::string normalName = GetRenderRsrcMngr().GetTexMngr()->GetTexNameFromID(
+						std::string normalName = GetRenderRsrcMngr().GetTexMngr()->GetTexNameFromID(
 							mat->GetNormal());
 
 						ImGui::Text(normalName.c_str());
@@ -571,14 +567,14 @@ void Editor::TickRightSideBar()
 
 					if (ImGui::TreeNode("DiffuseAlbedo"))
 					{
-						static XMFLOAT4 albedo = mat->GetAlbedo();
+						XMFLOAT4 albedo = mat->GetAlbedo();
 						ImGui::Text("R: %.2f\nG: %.2f\nB: %.2f\nA: %.2f", albedo.x, albedo.y, albedo.z, albedo.w);
 						ImGui::TreePop();
 					}
 
 					if (ImGui::TreeNode("FresnelR0"))
 					{
-						static XMFLOAT3 r0 = mat->GetFresnelR0();
+						XMFLOAT3 r0 = mat->GetFresnelR0();
 						ImGui::Text("R: %.2f\nG: %.2f\nB: %.2f", r0.x, r0.y, r0.z);
 						ImGui::TreePop();
 					}
@@ -591,7 +587,7 @@ void Editor::TickRightSideBar()
 
 					if (ImGui::TreeNode("MatTransform"))
 					{
-						static XMFLOAT4X4 mT = mat->GetMatTransform();
+						XMFLOAT4X4 mT = mat->GetMatTransform();
 						ImGui::Text("X: %.2f\nY: %.2f\nZ: %.2f", mT._11, mT._22, mT._33);
 						ImGui::TreePop();
 					}
