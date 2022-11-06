@@ -148,10 +148,17 @@ void Editor::TickLeftSideBar()
 
 		//ImGui::ShowDemoWindow();
 
-		ImGui::SetWindowPos(ImVec2(0, 23), ImGuiCond_Always);
-		ImGui::SetWindowSize(ImVec2(405, 665));
+		ImGui::SetWindowPos(ImVec2(0, ClientHeight * 0.025f), ImGuiCond_Always);
+		ImGui::SetWindowSize(ImVec2(ClientWidth * 0.1615f, ClientHeight * 0.725));
 
 		static std::string info = "";
+
+		static float fps = 0.0f;
+		static long long int fpsIdx = 0;
+		fpsIdx++;
+		if (fpsIdx % 50 == 0) fps = ImGui::GetIO().Framerate;
+
+		ImGui::Text("FPS: %d\n", int(fps));
 
 		// Geos And Meshes
 		if (ImGui::CollapsingHeader("Geos And Meshes")) 
@@ -278,7 +285,7 @@ void Editor::TickLeftSideBar()
 					GetMaterialOfObj(p2obj)->SetMaterial(
 						RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial(matName));
 
-					if (GetMeshOfObj(p2obj)->GetIndexCount() == 0)
+					if (GetMeshOfObj(p2obj)->GetMeshGeo()->DrawArgs.find(subMeshName) == GetMeshOfObj(p2obj)->GetMeshGeo()->DrawArgs.end())
 					{
 						info = "SubMesh Input Error!!!";
 					}
@@ -301,6 +308,11 @@ void Editor::TickLeftSideBar()
 
 			if (info != "")
 				ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), info.c_str());
+		}
+
+		if (ImGui::CollapsingHeader("Animation"))
+		{
+
 		}
 
 		ImGui::Text("EnableMove: ");
@@ -441,8 +453,8 @@ void Editor::TickBottomBar()
 	{
 		ImGui::Begin("Files", NULL, window_flags);
 
-		ImGui::SetWindowPos(ImVec2(0, 688), ImGuiCond_Always);
-		ImGui::SetWindowSize(ImVec2(1471, 342));
+		ImGui::SetWindowPos(ImVec2(0, ClientHeight * 0.75f), ImGuiCond_Always);
+		ImGui::SetWindowSize(ImVec2(ClientWidth * 0.7661f, ClientHeight * 0.28f));
 
 		if (ImGui::CollapsingHeader("Assets"))
 		{
@@ -482,8 +494,8 @@ void Editor::TickRightSideBar()
 	{
 		ImGui::Begin("Properties Details", NULL, window_flags);
 
-		ImGui::SetWindowPos(ImVec2(1471, 23), ImGuiCond_Always);
-		ImGui::SetWindowSize(ImVec2(450, 992));
+		ImGui::SetWindowPos(ImVec2(ClientWidth * 0.7661f, ClientHeight * 0.025f), ImGuiCond_Always);
+		ImGui::SetWindowSize(ImVec2(ClientWidth * 0.234375f, ClientHeight * 0.994f));
 
 		{
 			if (pickedID != -1)

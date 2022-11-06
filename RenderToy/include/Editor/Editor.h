@@ -41,6 +41,12 @@ namespace Chen::RToy::Editor {
         int GetPickedID() { return pickedID; }
         void SetPickedID(int idx) { pickedID = idx; }
 
+        void SetWidthAndHeight(int w, int h)
+        {
+            ClientWidth = w;
+            ClientHeight = h;
+        }
+
     private:
         Editor() = default;
         ~Editor();
@@ -52,5 +58,8 @@ namespace Chen::RToy::Editor {
 
         ID3D12CommandQueue* cmdQueue;
         ID3D12Device* device;
+
+        int ClientWidth = 0;
+        int ClientHeight = 0;
     };
 }

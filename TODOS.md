@@ -7,7 +7,7 @@
 - [ ] Editor (imgui)
   - [x] Add and Del Object
   - [x] Edit Material
-  - [ ] Load Texture
+  - [x] Load Texture
   - [ ] Export and Import Scene Form/To json
 - [x] Normal map
 - [x] Shadow map

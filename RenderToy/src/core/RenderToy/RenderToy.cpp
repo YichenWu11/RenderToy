@@ -440,12 +440,14 @@ void RenderToy::OnResize()
 {
 	DX12App::OnResize();
 
+	GetEditor().SetWidthAndHeight(mClientWidth, mClientHeight);
+
 	mCamera->SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 	
 	static bool is_first = true;
 	if (!is_first)
 	{
-		GetGlobalParam().GetSsao()->OnResize(mClientWidth, mClientWidth);
+		GetGlobalParam().GetSsao()->OnResize(mClientWidth, mClientHeight);
 		GetGlobalParam().GetSsao()->RebuildDescriptors(mDepthStencilBuffer.Get());
 	}
 	is_first = false;
@@ -635,11 +637,13 @@ int RenderToy::Run()
 
 void RenderToy::Pick(int sx, int sy)
 {
+	if (sx <= 320 || sx >= 1470) return;
+
 	XMFLOAT4X4 P = mCamera->GetProj4x4f();
 
-	// Compute picking ray in view space. (with Topleftx = 405.0f)
-	float vx = (+2.0f * sx / (mClientWidth/1.8f) - 1.0f - 810.f / (mClientWidth/1.8f)) / P(0, 0);
-	float vy = (-2.0f * sy / (mClientHeight/1.45f) + 1.0f) / P(1, 1);
+	// Compute picking ray in view space. (with Topleftx = 310.0f)
+	float vx = (+2.0f * sx / (mClientWidth/1.653f) - 1.0f - 620.0f / (mClientWidth/1.653f)) / P(0, 0);
+	float vy = (-2.0f * sy / (mClientHeight/1.335f) + 1.0f) / P(1, 1);
 
 	// Ray definition in view space.
 	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
