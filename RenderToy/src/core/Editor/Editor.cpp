@@ -30,7 +30,10 @@ void Editor::Init(
 	style.FramePadding = ImVec2(8.0, 2.0);
 	ImGui::StyleColorsDark();
     
-	io.Fonts->AddFontFromFileTTF("../../assets/resource/PilotEditorFont.TTF",
+	std::filesystem::path fontPath =
+		Asset::AssetMngr::GetInstance().GetRootPath() / "resource/PilotEditorFont.TTF";
+
+	io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(),
 		22,
 		nullptr,
 		nullptr);
@@ -226,14 +229,17 @@ void Editor::TickLeftSideBar()
 
 			if (ImGui::Button("Delete Picked Object"))
 			{
-				GetGlobalParam().GetRenderCom()->DelObjForAllPasses(
-					GetObjectMngr().GetObj(pickedID)->GetObjName()
-				);
-				GetGlobalParam().GetLogicalCom()->DelObjForAllPasses(
-					GetObjectMngr().GetObj(pickedID)->GetObjName()
-				);
-				GetObjectMngr().DelObject(pickedID);
-				pickedID = -1;
+				if (pickedID != -1)
+				{
+					GetGlobalParam().GetRenderCom()->DelObjForAllPasses(
+						GetObjectMngr().GetObj(pickedID)->GetObjName()
+					);
+					GetGlobalParam().GetLogicalCom()->DelObjForAllPasses(
+						GetObjectMngr().GetObj(pickedID)->GetObjName()
+					);
+					GetObjectMngr().DelObject(pickedID);
+					pickedID = -1;
+				}
 			}
 		}
 
@@ -416,7 +422,7 @@ void Editor::TickLeftSideBar()
 		static char cname[40];
 
 		static std::string path;
-		static char cpath[40];
+		static char cpath[40] = "../../assets/";
 
 		ImGui::InputText("Name", cname, 40);
 		ImGui::InputText("Path", cpath, 40);

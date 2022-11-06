@@ -146,39 +146,44 @@ void RenderToy::BuildShaders()
         ),	
     };
 
+	std::filesystem::path shaderPath
+		= GetAssetMngr().GetShaderPath() / "Phong/PhongShading.hlsl";
+
 	// with a rootsig built together
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"IShader", 
 		rootProperties, 
-		L"..\\..\\shaders\\Phong\\PhongShading.hlsl",
-		L"..\\..\\shaders\\Phong\\PhongShading.hlsl");
+		AnsiToWString(shaderPath.string()).c_str(),
+		AnsiToWString(shaderPath.string()).c_str());
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->mInputLayout = DefaultInputLayout;
 
+	shaderPath = GetAssetMngr().GetShaderPath() / "Phong/Sky.hlsl";
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"SkyShader", 
 		rootProperties, 
-		L"..\\..\\shaders\\Phong\\Sky.hlsl",
-		L"..\\..\\shaders\\Phong\\Sky.hlsl");
+		AnsiToWString(shaderPath.string()).c_str(),
+		AnsiToWString(shaderPath.string()).c_str());
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->mInputLayout = DefaultInputLayout;
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->depthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	// For Shadow Map
+	shaderPath = GetAssetMngr().GetShaderPath() / "Phong/Shadows.hlsl";
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"ShadowShader", 
 		rootProperties, 
-		L"..\\..\\shaders\\Phong\\Shadows.hlsl",
-		L"..\\..\\shaders\\Phong\\Shadows.hlsl");
+		AnsiToWString(shaderPath.string()).c_str(),
+		AnsiToWString(shaderPath.string()).c_str());
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("ShadowShader")->mInputLayout = DefaultInputLayout;
 
 	// ********************************************************************************************************
 	// For SSAO
-
+	shaderPath = GetAssetMngr().GetShaderPath() / "Phong/DrawNormals.hlsl";
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"DrawNormalsShader",
 		rootProperties,
-		L"..\\..\\shaders\\Phong\\DrawNormals.hlsl",
-		L"..\\..\\shaders\\Phong\\DrawNormals.hlsl");
+		AnsiToWString(shaderPath.string()).c_str(),
+		AnsiToWString(shaderPath.string()).c_str());
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("DrawNormalsShader")->mInputLayout = DefaultInputLayout;
 
 	ComPtr<ID3D12RootSignature> mSsaoRootSignature = nullptr;
@@ -245,24 +250,25 @@ void RenderToy::BuildShaders()
 		),
 	};
 
+	shaderPath = GetAssetMngr().GetShaderPath() / "Phong/Ssao.hlsl";
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"SsaoShader", 
 		ssaoRootProperties,
 		std::move(mSsaoRootSignature),
-		L"..\\..\\shaders\\Phong\\Ssao.hlsl",
-		L"..\\..\\shaders\\Phong\\Ssao.hlsl");
+		AnsiToWString(shaderPath.string()).c_str(),
+		AnsiToWString(shaderPath.string()).c_str());
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->mInputLayout =
 		std::vector<D3D12_INPUT_ELEMENT_DESC>();
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthEnable = false;
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	
-
+	shaderPath = GetAssetMngr().GetShaderPath() / "Phong/SsaoBlur.hlsl";
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
 		"SsaoBlurShader",
 		ssaoRootProperties,
 		std::move(mSsaoBlurRootSignature),
-		L"..\\..\\shaders\\Phong\\SsaoBlur.hlsl",
-		L"..\\..\\shaders\\Phong\\SsaoBlur.hlsl");
+		AnsiToWString(shaderPath.string()).c_str(),
+		AnsiToWString(shaderPath.string()).c_str());
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->mInputLayout =
 		std::vector<D3D12_INPUT_ELEMENT_DESC>();
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->depthStencilState.DepthEnable = false;
@@ -333,8 +339,11 @@ void RenderToy::BuildPSOs()
 
 void RenderToy::PreBuildTexAndMatFromJson()
 {
+	std::filesystem::path filePath =
+		GetAssetMngr().GetRootPath() / "json/PreMatAndTex.json";
+
 	FILE* fp;
-	errno_t err = fopen_s(&fp, "../../assets/json/PreMatAndTex.json", "rb");
+	errno_t err = fopen_s(&fp, filePath.string().c_str(), "rb");
 	if (err == 0) OutputDebugString(L"\n\nFile Open Error!!!\n\n");
 
 	char readBuffer[65536];
