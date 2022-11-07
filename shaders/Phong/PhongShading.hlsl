@@ -107,6 +107,7 @@ float4 PS(VertexOut pin) : SV_Target
     litColor = ColorGrading(litColor);
 #endif
 
+    // return float4(ambientAccess, ambientAccess, ambientAccess, 1.0f);
     return litColor;
     // return float4(shadowFactor.rrr, 1.0f);
 }

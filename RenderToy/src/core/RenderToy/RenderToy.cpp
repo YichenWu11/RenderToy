@@ -261,6 +261,8 @@ void RenderToy::BuildShaders()
 		std::vector<D3D12_INPUT_ELEMENT_DESC>();
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthEnable = false;
 	GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+
+	auto ssao = GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader");
 	
 	shaderPath = GetAssetMngr().GetShaderPath() / "Phong/SsaoBlur.hlsl";
 	GetRenderRsrcMngr().GetShaderMngr()->CreateShader(
@@ -280,21 +282,23 @@ void RenderToy::BuildShaders()
 void RenderToy::BuildPSOs()
 {
 	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
-		"Base", 
-		mDevice.Get(),
-		GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader"),
-		1,
-		mBackBufferFormat,
-		mDepthStencilFormat);
-
-	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
-		"Transparent", 
+		"Transparent",
 		mDevice.Get(),
 		GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader"),
 		1,
 		mBackBufferFormat,
 		mDepthStencilFormat,
 		true);
+
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->depthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
+	GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
+		"Base", 
+		mDevice.Get(),
+		GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader"),
+		1,
+		mBackBufferFormat,
+		mDepthStencilFormat);
 
 	GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
 		"Sky", 
@@ -456,8 +460,8 @@ void RenderToy::OnResize()
 	static bool is_first = true;
 	if (!is_first)
 	{
-		GetGlobalParam().GetSsao()->OnResize(mClientWidth, mClientHeight);
-		GetGlobalParam().GetSsao()->RebuildDescriptors(mDepthStencilBuffer.Get());
+		//GetGlobalParam().GetSsao()->OnResize(mClientWidth, mClientHeight);
+		//GetGlobalParam().GetSsao()->RebuildDescriptors(mDepthStencilBuffer.Get());
 	}
 	is_first = false;
 }
@@ -651,8 +655,11 @@ void RenderToy::Pick(int sx, int sy)
 	XMFLOAT4X4 P = mCamera->GetProj4x4f();
 
 	// Compute picking ray in view space. (with Topleftx = 310.0f)
-	float vx = (+2.0f * sx / (mClientWidth/1.653f) - 1.0f - 620.0f / (mClientWidth/1.653f)) / P(0, 0);
-	float vy = (-2.0f * sy / (mClientHeight/1.335f) + 1.0f) / P(1, 1);
+	//float vx = (+2.0f * sx / (mClientWidth/1.653f) - 1.0f - 620.0f / (mClientWidth/1.653f)) / P(0, 0);
+	//float vy = (-2.0f * sy / (mClientHeight/1.335f) + 1.0f) / P(1, 1);
+
+	float vx = (+2.0f * sx / (mClientWidth) - 1.0f / (mClientWidth)) / P(0, 0);
+	float vy = (-2.0f * sy / (mClientHeight) + 1.0f) / P(1, 1);
 
 	// Ray definition in view space.
 	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);

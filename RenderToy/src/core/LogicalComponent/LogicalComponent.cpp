@@ -10,10 +10,10 @@
 using namespace Chen::RToy;
 
 LogicalComponent::LogicalComponent()
-{
-    AddPass(std::move(std::make_unique<ShadowPrePass>()));  
-    AddPass(std::move(std::make_unique<SsaoPrePass>()));  
+{  
+    AddPass(std::move(std::make_unique<ShadowPrePass>()));
     AddPass(std::move(std::make_unique<UpdatePass>()));  
+    AddPass(std::move(std::make_unique<SsaoPrePass>()));
     AddPass(std::move(std::make_unique<TransUpdatePass>()));
     AddPass(std::move(std::make_unique<MeshUpdatePass>()));
     AddPass(std::move(std::make_unique<MatUpdatePass>()));

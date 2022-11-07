@@ -1,8 +1,9 @@
 #include <Pass/render/PhongPass.h>
 #include <Pass/logical/UpdatePass.h>
+#include <imgui_impl_dx12.h>
+#include <CDX12/Metalib.h>
 #include <Utility/Macro.h>
 #include <memory>
-#include <imgui_impl_dx12.h>
 
 using namespace Chen::RToy;
 
@@ -32,15 +33,13 @@ void PhongPass::Tick()
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     
     pack.mCmdList.ClearRenderTargetView(pack.currBackBufferView, DirectX::Colors::DarkGray);
-    pack.mCmdList.ClearDepthStencilView(pack.depthStencilView);
+    //pack.mCmdList.ClearDepthStencilView(pack.depthStencilView);
 
     pack.mCmdList.OMSetRenderTarget(pack.currBackBufferView, pack.depthStencilView);
 
     /*
         // Render
     */
-    pack.mCmdList->SetPipelineState(GetRenderRsrcMngr().GetPSOMngr()->GetPipelineState("Base"));
-
     pack.mCmdList.SetDescriptorHeaps(GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetDescriptorHeap());
 
     pack.mCmdList->SetGraphicsRootSignature(
@@ -67,6 +66,7 @@ void PhongPass::Tick()
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->SetResource(
         "CubeMap", pack.mCmdList.Get(), cubeTexDescriptor);
 
+    pack.mCmdList->SetPipelineState(GetRenderRsrcMngr().GetPSOMngr()->GetPipelineState("Base"));
     DrawObjects();
 
     pack.mCmdList->SetPipelineState(GetRenderRsrcMngr().GetPSOMngr()->GetPipelineState("Sky"));
