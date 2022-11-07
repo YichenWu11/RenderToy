@@ -658,8 +658,8 @@ void RenderToy::Pick(int sx, int sy)
 	//float vx = (+2.0f * sx / (mClientWidth/1.653f) - 1.0f - 620.0f / (mClientWidth/1.653f)) / P(0, 0);
 	//float vy = (-2.0f * sy / (mClientHeight/1.335f) + 1.0f) / P(1, 1);
 
-	float vx = (+2.0f * sx / (mClientWidth) - 1.0f / (mClientWidth)) / P(0, 0);
-	float vy = (-2.0f * sy / (mClientHeight) + 1.0f) / P(1, 1);
+	float vx = (+2.0f * sx / mClientWidth - 1.0f) / P(0, 0);
+	float vy = (-2.0f * sy / mClientHeight + 1.0f) / P(1, 1);
 
 	// Ray definition in view space.
 	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
