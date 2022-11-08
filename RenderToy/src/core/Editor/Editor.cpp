@@ -167,11 +167,14 @@ void Editor::TickLeftSideBar()
 		if (ImGui::CollapsingHeader("Geos And Meshes")) 
 		{
 			static auto& AllGeos = GetRenderRsrcMngr().GetMeshMngr()->GetAllGeos();
+
 			for (auto& geo : AllGeos)
 			{
 				if (ImGui::TreeNode(geo.first.c_str()))
 				{
-					static auto subNameList = geo.second->GetSubMeshNameList();
+					static std::vector<std::string> subNameList;
+					subNameList = std::vector<std::string>();
+					subNameList = geo.second->GetSubMeshNameList();
 					for (auto& sub : subNameList)
 					{
 						ImGui::BulletText(sub.c_str());
@@ -285,6 +288,10 @@ void Editor::TickLeftSideBar()
 				{
 					info = "Geo Input Error!!!";
 				}
+				else if (name.empty())
+				{
+					info = "Name Can not be null!!!";
+				}
 				else
 				{
 					GetMeshOfObj(p2obj)->SetSubMesh(subMeshName);
@@ -355,6 +362,10 @@ void Editor::TickLeftSideBar()
 				ImGui::DragFloat("FresnelR0_B", &material.second->FresnelR0.z, 0.05f, 0.0f, 1.0f, "%.2f");
 
 				ImGui::DragFloat("roughness", &material.second->Roughness, 0.05f, 0.0f, 1.0f, "%.2f");
+
+				ImGui::DragFloat("MAT_SCALE_X", &material.second->MatTransform._11, 0.05f, 0.0f, 300.0f, "%.2f");
+				ImGui::DragFloat("MAT_SCALE_Y", &material.second->MatTransform._22, 0.05f, 0.0f, 300.0f, "%.2f");
+				ImGui::DragFloat("MAT_SCALE_Z", &material.second->MatTransform._33, 0.05f, 0.0f, 300.0f, "%.2f");
 			}
 		}
 
@@ -563,9 +574,9 @@ void Editor::TickRightSideBar()
 						scale.y = GetTransformOfObjByID(pickedID)->GetScale()._22;
 						scale.z = GetTransformOfObjByID(pickedID)->GetScale()._33;
 
-						ImGui::DragFloat("X", &scale.x, 0.1f, 0.1f, 50.0f, "%.2f");
-						ImGui::DragFloat("Y", &scale.y, 0.1f, 0.1f, 50.0f, "%.2f");
-						ImGui::DragFloat("Z", &scale.z, 0.1f, 0.1f, 50.0f, "%.2f");
+						ImGui::DragFloat("X", &scale.x, 0.1f, 0.1f, 300.0f, "%.2f");
+						ImGui::DragFloat("Y", &scale.y, 0.1f, 0.1f, 300.0f, "%.2f");
+						ImGui::DragFloat("Z", &scale.z, 0.1f, 0.1f, 300.0f, "%.2f");
 
 						XMStoreFloat4x4(&s, XMMatrixScaling(scale.x, scale.y, scale.z));
 						GetTransformOfObjByID(pickedID)->SetScale(s);

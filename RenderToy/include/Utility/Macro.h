@@ -26,16 +26,16 @@
 // ******************************************************************************
 // Get the pointer to specific property of a object
 
-#define GetTransformOfObj(ptr)        dynamic_cast<Chen::RToy::Transform*>(ptr->GetProperty("Transform"))
-#define GetMaterialOfObj(ptr)         dynamic_cast<Chen::RToy::Material*>(ptr->GetProperty("Material"))
-#define GetMeshOfObj(ptr)             dynamic_cast<Chen::RToy::Mesh*>(ptr->GetProperty("Mesh"))
+#define GetTransformOfObj(ptr)        static_cast<Chen::RToy::Transform*>(ptr->GetProperty("Transform"))
+#define GetMaterialOfObj(ptr)         static_cast<Chen::RToy::Material*>(ptr->GetProperty("Material"))
+#define GetMeshOfObj(ptr)             static_cast<Chen::RToy::Mesh*>(ptr->GetProperty("Mesh"))
 
-#define GetTransformOfObjByID(id)     dynamic_cast<Chen::RToy::Transform*>(GetObjectMngr().GetObj(id)->GetProperty("Transform"))
-#define GetMaterialOfObjByID(id)      dynamic_cast<Chen::RToy::Material*>(GetObjectMngr().GetObj(id)->GetProperty("Material"))
-#define GetMeshOfObjByID(id)          dynamic_cast<Chen::RToy::Mesh*>(GetObjectMngr().GetObj(id)->GetProperty("Mesh"))
+#define GetTransformOfObjByID(id)     static_cast<Chen::RToy::Transform*>(GetObjectMngr().GetObj(id)->GetProperty("Transform"))
+#define GetMaterialOfObjByID(id)      static_cast<Chen::RToy::Material*>(GetObjectMngr().GetObj(id)->GetProperty("Material"))
+#define GetMeshOfObjByID(id)          static_cast<Chen::RToy::Mesh*>(GetObjectMngr().GetObj(id)->GetProperty("Mesh"))
 
-#define GetTransformOfObjByName(name) dynamic_cast<Chen::RToy::Transform*>(GetObjectMngr().GetObj(name)->GetProperty("Transform"))
-#define GetMaterialOfObjByName(name)  dynamic_cast<Chen::RToy::Material*>(GetObjectMngr().GetObj(name)->GetProperty("Material"))
-#define GetMeshOfObjByName(name)      dynamic_cast<Chen::RToy::Mesh*>(GetObjectMngr().GetObj(name)->GetProperty("Mesh"))
+#define GetTransformOfObjByName(name) static_cast<Chen::RToy::Transform*>(GetObjectMngr().GetObj(name)->GetProperty("Transform"))
+#define GetMaterialOfObjByName(name)  static_cast<Chen::RToy::Material*>(GetObjectMngr().GetObj(name)->GetProperty("Material"))
+#define GetMeshOfObjByName(name)      static_cast<Chen::RToy::Mesh*>(GetObjectMngr().GetObj(name)->GetProperty("Mesh"))
 
 // ******************************************************************************

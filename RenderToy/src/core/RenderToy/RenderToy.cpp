@@ -80,6 +80,9 @@ bool RenderToy::Initialize()
 	*/
 	GetRenderRsrcMngr().Init(mDevice.Get(), mCmdList.Get());
 
+	// GetRenderRsrcMngr().GetMeshMngr()->BuildOBJModelGeometryFromFile("../../../assets/models/obj/Marry.obj", "Marry");
+	// GetRenderRsrcMngr().GetMeshMngr()->BuildTXTModelGeometryFromFile("../../../assets/models/txt/marry.txt", "Marry", "Marry", true, true);
+
 	PreBuildTexAndMatFromJson();
 
 	GetAssetMngr().Init();
@@ -460,8 +463,8 @@ void RenderToy::OnResize()
 	static bool is_first = true;
 	if (!is_first)
 	{
-		//GetGlobalParam().GetSsao()->OnResize(mClientWidth, mClientHeight);
-		//GetGlobalParam().GetSsao()->RebuildDescriptors(mDepthStencilBuffer.Get());
+		GetGlobalParam().GetSsao()->OnResize(mClientWidth, mClientHeight);
+		GetGlobalParam().GetSsao()->RebuildDescriptors(mDepthStencilBuffer.Get());
 	}
 	is_first = false;
 }

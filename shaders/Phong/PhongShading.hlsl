@@ -92,6 +92,10 @@ float4 PS(VertexOut pin) : SV_Target
     float4 directLight = ComputeLighting(gLights, mat, pin.PosW,
         bumpedNormalW, toEyeW, shadowFactor);
 
+#ifdef COLOR_GRADING
+    directLight = ColorGrading(directLight);
+#endif
+
     float4 litColor = directLight + ambient;
 
 	// Add in specular reflections.
@@ -102,10 +106,6 @@ float4 PS(VertexOut pin) : SV_Target
 	
     // Common convention to take alpha from diffuse albedo.
     litColor.a = saturate(diffuseAlbedo.a + 0.4f);
-
-#ifdef COLOR_GRADING
-    litColor = ColorGrading(litColor);
-#endif
 
     // return float4(ambientAccess, ambientAccess, ambientAccess, 1.0f);
     return litColor;

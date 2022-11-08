@@ -36,7 +36,7 @@ namespace Chen::RToy {
             float TotalTime = 0.0f;
             float DeltaTime = 0.0f;
 
-            DirectX::XMFLOAT4 AmbientLight = { 0.4f, 0.4f, 0.6f, 1.0f };
+            DirectX::XMFLOAT4 AmbientLight = { 0.2f, 0.2f, 0.3f, 1.0f };
 
             Chen::CDX12::Light Lights[MaxLightNum];
         };

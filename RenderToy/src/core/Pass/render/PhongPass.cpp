@@ -99,7 +99,7 @@ void PhongPass::DrawObjects(ObjectLayer layer)
 
     for (auto& obj : mObjects)
     {
-        if (dynamic_cast<BasicObject*>(obj.second)->GetLayer() == layer)
+        if (static_cast<BasicObject*>(obj.second)->GetLayer() == layer)
         {
             auto mesh = obj.second->GetPropertyImpl<Mesh>("Mesh");
             pack.mCmdList->IASetVertexBuffers(0, 1, get_rvalue_ptr(mesh.pMesh->VertexBufferView()));

@@ -49,7 +49,7 @@
         },
         {
             "name": "cubeMap",
-            "path": "sky/snowcube1024.dds",
+            "path": "sky/desertcube1024.dds",
             "format": 0,
             "texDimension": 4
         },

@@ -60,7 +60,7 @@ void UpdatePass::Tick()
 	passCB.DeltaTime = pack.p2timer->DeltaTime();
 
 	passCB.Lights[0].Direction = GetGlobalParam().GetMainLightDir();
-	passCB.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
+	passCB.Lights[0].Strength = { 0.8f, 0.8f, 0.8f };
 	passCB.Lights[1].Direction = DirectX::XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
 	passCB.Lights[1].Strength = { 0.1f, 0.1f, 0.1f };
 	passCB.Lights[2].Direction = DirectX::XMFLOAT3(0.0f, -0.707f, -0.707f);

@@ -3,12 +3,14 @@
 #include <CDX12/Common/DX12App.h>
 #include <CDX12/FrameResource.h>
 #include <CDX12/Common/Camera.h>
+
 #include <IComponent.h>
 #include <imgui.h>
 
 using namespace Chen::CDX12;
 
 namespace Chen::RToy {
+
     class RenderToy final : public DX12App
     {
     public:

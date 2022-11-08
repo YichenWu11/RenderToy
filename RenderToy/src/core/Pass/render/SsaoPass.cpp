@@ -92,7 +92,7 @@ void SsaoPass::DrawObjects()
 
     for (auto& obj : mObjects)
     {
-        if (dynamic_cast<BasicObject*>(obj.second)->GetLayer() == ObjectLayer::Opaque)
+        if (static_cast<BasicObject*>(obj.second)->GetLayer() == ObjectLayer::Opaque)
         {
             auto mesh = obj.second->GetPropertyImpl<Mesh>("Mesh");
             pack.mCmdList->IASetVertexBuffers(0, 1, get_rvalue_ptr(mesh.pMesh->VertexBufferView()));
