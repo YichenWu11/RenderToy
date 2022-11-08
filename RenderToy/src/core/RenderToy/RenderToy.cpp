@@ -24,6 +24,10 @@ using namespace Chen::RToy;
 
 using namespace rapidjson;
 
+// https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
+#define RT_XSTR(s) RT_STR(s)
+#define RT_STR(s) #s
+
 // *********************************************************
 // Constant
 
@@ -78,6 +82,7 @@ bool RenderToy::Initialize()
 	/*
 		Init
 	*/
+	GetAssetMngr().Init(std::filesystem::path(RT_XSTR(RT_ROOT_DIR)));
 	GetRenderRsrcMngr().Init(mDevice.Get(), mCmdList.Get());
 
 	// GetRenderRsrcMngr().GetMeshMngr()->BuildOBJModelGeometryFromFile("../../../assets/models/obj/Marry.obj", "Marry");
@@ -85,7 +90,6 @@ bool RenderToy::Initialize()
 
 	PreBuildTexAndMatFromJson();
 
-	GetAssetMngr().Init();
 	GetObjectMngr().Init();
 	GetPropertyMngr().Init();
 

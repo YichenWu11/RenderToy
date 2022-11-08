@@ -288,6 +288,10 @@ void Editor::TickLeftSideBar()
 				{
 					info = "Geo Input Error!!!";
 				}
+				else if (GetObjectMngr().GetObj(name) != nullptr)
+				{	
+					info = "Object with this name has\nexisted!!!";
+				}
 				else if (name.empty())
 				{
 					info = "Name Can not be null!!!";
@@ -373,6 +377,8 @@ void Editor::TickLeftSideBar()
 		
 		if (ImGui::CollapsingHeader("Create Material"))
 		{
+			static std::string info = "";
+
 			static XMFLOAT4 albedo(1.0f, 1.0f, 1.0f, 1.0f);
 			static XMFLOAT3 fresnel(0.1f, 0.1f, 0.1f);
 			static float roughness = 0.8f;
@@ -405,19 +411,26 @@ void Editor::TickLeftSideBar()
 				name = std::string(cname);
 				texName = std::string(ctexName);
 				normalName = std::string(cnormalName);
+				if (GetRenderRsrcMngr().GetMatMngr()->GetMaterial(name) != nullptr)
+				{
+					info = "Material with this name has existed!!!";
+				}
+				else
+				{
+					static int nmap_idx;
+					nmap_idx = (normalName == "") ? -1 : GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(normalName);
 
-				static int nmap_idx;
-				nmap_idx = (normalName == "") ? -1 : GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(normalName);
-
-				GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-					name,
-					GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(texName),
-					albedo,
-					fresnel,
-					roughness,
-					nmap_idx);
+					GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+						name,
+						GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(texName),
+						albedo,
+						fresnel,
+						roughness,
+						nmap_idx);
+					info = "";
+				}
 			}
-
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.c_str());
 		}
 
 		ImGui::Text("\n");
@@ -432,11 +445,21 @@ void Editor::TickLeftSideBar()
 		static std::string name;
 		static char cname[40];
 
+		static std::string assetRoot = Asset::AssetMngr::GetInstance().GetRootPath().string();
 		static std::string path;
-		static char cpath[40] = "../../assets/";
+		static char cpath[128];
+
+		static bool isInit = false;
+		if (!isInit)
+		{
+			memset(cname, 0, 40);
+			memset(cpath, 0, 128);
+		}
+		isInit = true;
 
 		ImGui::InputText("Name", cname, 40);
-		ImGui::InputText("Path", cpath, 40);
+		ImGui::Text(assetRoot.c_str());
+		ImGui::InputText("Path", cpath, 128);
 
 		static const char* fileFormat[] = { "DDS", "WIC"};
 		static int formatIdx = 0;
@@ -446,21 +469,33 @@ void Editor::TickLeftSideBar()
 		static int dimensionIdx = 2;
 		ImGui::Combo("texDimension", &dimensionIdx, texDimension, IM_ARRAYSIZE(texDimension));
 
+		static std::string info = "";
+
 		if (ImGui::Button("Load"))
 		{
 			name = std::string(cname);
-			path = std::string(cpath);
+			path = assetRoot + std::string(cpath);
 
-			GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-				device,
-				cmdQueue,
-				AnsiToWString(path).c_str(),
-				name,
-				TextureMngr::TexFileFormat(formatIdx),
-				TextureDimension(dimensionIdx));
+			if (GetRenderRsrcMngr().GetTexMngr()->GetTexture(name) != nullptr)
+			{
+				info = "Texture with this name has existed!!!";
+			}
+			else
+			{
+				GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+					device,
+					cmdQueue,
+					AnsiToWString(path).c_str(),
+					name,
+					TextureMngr::TexFileFormat(formatIdx),
+					TextureDimension(dimensionIdx));
+				info = "";
+			}
 		}
 
 		if (ImGui::Button("Close")) textureLoad = false;
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.c_str());
+
 		ImGui::End();
 	}
 }

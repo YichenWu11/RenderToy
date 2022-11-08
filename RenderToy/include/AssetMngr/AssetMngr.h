@@ -12,9 +12,11 @@ namespace Chen::RToy::Asset {
             return instance;
         }
 
-        void Init()
+        void Init(std::filesystem::path rootPath)
         {
-            
+            assetRootPath = rootPath / "assets";
+            shaderPath = rootPath / "shaders";
+            defaultScenePath = rootPath / "assets/json/DefaultScene.json";
         }
 
         void DebugOutputContents();
@@ -24,12 +26,7 @@ namespace Chen::RToy::Asset {
         std::filesystem::path& GetScenePath() { return defaultScenePath; }
 
     private:
-        AssetMngr()
-        {
-            assetRootPath = std::filesystem::path("E:/GitProject/Mine/RenderToy/assets");
-            shaderPath = std::filesystem::path("E:/GitProject/Mine/RenderToy/shaders");
-            defaultScenePath = std::filesystem::path("E:/GitProject/Mine/RenderToy/assets/json/DefaultScene.json");
-        }
+        AssetMngr() = default;
 
         ~AssetMngr() = default;
 
