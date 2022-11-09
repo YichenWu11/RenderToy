@@ -20,7 +20,7 @@
 ## ***Set up***
 
 * *C++20*
-* *MSVC only*
+* *Clang/MSVC*
 * *CMake*
 * *Unicode字符集*
 * *DirectXTK12*

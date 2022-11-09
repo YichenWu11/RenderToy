@@ -11,6 +11,7 @@
 #endif
 
 // #define COLOR_GRADING
+// #define CARTOON
 
 #include "./LightUtil.hlsl"
 

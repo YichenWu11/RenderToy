@@ -35,12 +35,30 @@ float3 SchlickFresnel(float3 R0, float3 normal, float3 lightVec)
     return reflectPercent;
 }
 
+float ComputeKd(float kd) 
+{
+    if (kd <= 0.0f) return 0.4f;
+    else if (kd > 0.0f && kd <= 0.5f) return 0.6f;
+    else return 1.0f;
+}
+
+float ComputeKs(float ks) 
+{
+    if (ks > 0.0f && ks <= 0.1f) return 0.0f;
+    else if (ks > 0.1f && ks <= 0.8f) return 0.5f;
+    else return 0.8f;
+}
+
 float3 BlinnPhong(float3 lightStrength, float3 lightVec, float3 normal, float3 toEye, Material mat)
 {
     const float m = mat.Shininess * 256.0f;
     float3 halfVec = normalize(toEye + lightVec);
 
+#ifdef CARTOON
+    float roughnessFactor = (m + 8.0f)*ComputeKs(pow(max(dot(halfVec, normal), 0.0f), m)) / 8.0f;
+#else
     float roughnessFactor = (m + 8.0f)*pow(max(dot(halfVec, normal), 0.0f), m) / 8.0f;
+#endif
     float3 fresnelFactor = SchlickFresnel(mat.FresnelR0, halfVec, lightVec);
 
     float3 specAlbedo = fresnelFactor*roughnessFactor;
@@ -61,7 +79,11 @@ float3 ComputeDirectionalLight(Light L, Material mat, float3 normal, float3 toEy
     float3 lightVec = -L.Direction;
 
     // Scale light down by Lambert's cosine law.
+#ifdef CARTOON
+    float ndotl = ComputeKd(max(dot(lightVec, normal), 0.0f));
+#else
     float ndotl = max(dot(lightVec, normal), 0.0f);
+#endif
     float3 lightStrength = L.Strength * ndotl;
 
     return BlinnPhong(lightStrength, lightVec, normal, toEye, mat);
@@ -86,7 +108,11 @@ float3 ComputePointLight(Light L, Material mat, float3 pos, float3 normal, float
     lightVec /= d;
 
     // Scale light down by Lambert's cosine law.
+#ifdef CARTOON
+    float ndotl = ComputeKd(max(dot(lightVec, normal), 0.0f));
+#else
     float ndotl = max(dot(lightVec, normal), 0.0f);
+#endif
     float3 lightStrength = L.Strength * ndotl;
 
     // Attenuate light by distance.
@@ -115,7 +141,11 @@ float3 ComputeSpotLight(Light L, Material mat, float3 pos, float3 normal, float3
     lightVec /= d;
 
     // Scale light down by Lambert's cosine law.
+#ifdef CARTOON
+    float ndotl = ComputeKd(max(dot(lightVec, normal), 0.0f));
+#else
     float ndotl = max(dot(lightVec, normal), 0.0f);
+#endif
     float3 lightStrength = L.Strength * ndotl;
 
     // Attenuate light by distance.
