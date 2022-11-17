@@ -179,6 +179,36 @@
                 "y": 0.0,
                 "z": 0.0 
             }
+        },
+        {
+            "name": "Marry",
+            "matName": "Marry",
+            "geo": "Marry",
+            "mesh": "Marry",
+            "layer": 0,
+            "scale":{
+                "x": 6.0,
+                "y": 6.0,
+                "z": 6.0
+            },
+            "mat_scale":{
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "rotation":{
+                "axis":{
+                    "x": 0.0,
+                    "y": 1.0,
+                    "z": 0.0 
+                },
+                "angle": 2.9
+            },
+            "translate":{
+                "x": -24.0,
+                "y": -9.7,
+                "z": 40.0 
+            }
         }
     ]
 }

@@ -79,7 +79,12 @@ float4 PS(VertexOut pin) : SV_Target
     float ambientAccess = gSsaoMap.Sample(gsamLinearClamp, pin.SsaoPosH.xy, 0.0f).r;
 
     // Light terms.
+#ifdef SSAO
     float4 ambient = ambientAccess*gAmbientLight*diffuseAlbedo;
+#else
+    float4 ambient = gAmbientLight*diffuseAlbedo;
+
+#endif
 
     // Only the first light casts a shadow.
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);

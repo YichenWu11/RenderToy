@@ -1,5 +1,7 @@
 #include <RenderToy/RenderToy.h>
 
+#define WIN32_LEAN_AND_MEAN
+
 using namespace Chen;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,

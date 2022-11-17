@@ -21,8 +21,8 @@ namespace Chen::RToy {
 
         bool Initialize() override;
 
-        void RegisterComponent(std::string name, std::unique_ptr<IComponent> component);
-        int Run() override;
+        void RegisterComponent(const std::string& name, std::unique_ptr<IComponent> component);
+        int  Run() override;
 
     private:
         void OnResize() override;

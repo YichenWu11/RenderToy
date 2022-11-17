@@ -12,6 +12,7 @@
 
 // #define COLOR_GRADING
 // #define CARTOON
+// #define SSAO
 
 #include "./LightUtil.hlsl"
 
@@ -138,6 +139,7 @@ float CalcShadowFactor(float4 shadowPosH)
     }
     
     return percentLit / 9.0f;
+    // return gShadowMap.SampleCmpLevelZero(gsamShadow, shadowPosH.xy, depth).r;
 }
 
 //---------------------------------------------------------------------------------------

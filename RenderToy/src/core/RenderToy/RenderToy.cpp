@@ -60,7 +60,7 @@ RenderToy::RenderToy(HINSTANCE hInstance) : DX12App(hInstance)
 
 RenderToy::~RenderToy() {}
 
-void RenderToy::RegisterComponent(std::string name, std::unique_ptr<IComponent> component)
+void RenderToy::RegisterComponent(const std::string& name, std::unique_ptr<IComponent> component)
 {
 	if (mComponents.find(name) == mComponents.end()) 
 	{
@@ -85,8 +85,10 @@ bool RenderToy::Initialize()
 	GetAssetMngr().Init(std::filesystem::path(RT_XSTR(RT_ROOT_DIR)));
 	GetRenderRsrcMngr().Init(mDevice.Get(), mCmdList.Get());
 
-	// GetRenderRsrcMngr().GetMeshMngr()->BuildOBJModelGeometryFromFile("../../../assets/models/obj/Marry.obj", "Marry");
-	// GetRenderRsrcMngr().GetMeshMngr()->BuildTXTModelGeometryFromFile("../../../assets/models/txt/marry.txt", "Marry", "Marry", true, true);
+	// GetRenderRsrcMngr().GetMeshMngr()->BuildOBJModelGeometryFromFile((GetAssetMngr().GetRootPath() / "models/obj/Marry.obj").string().c_str(), "Marry");
+	GetRenderRsrcMngr().GetMeshMngr()->BuildTXTModelGeometryFromFile(
+		(GetAssetMngr().GetRootPath() / "models/txt/marry.txt").string().c_str(), 
+		"Marry", "Marry", true, true);
 
 	PreBuildTexAndMatFromJson();
 
