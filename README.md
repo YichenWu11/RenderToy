@@ -2,7 +2,7 @@
 *Toy Renderer based on CDX12.*
 <br/>
 
-<img src="docs/images/detail.png">
+<img src="docs/images/show0.png">
 
 ---
 ## ***Design***

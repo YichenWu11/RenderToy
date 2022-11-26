@@ -67,6 +67,7 @@ void UpdatePass::Tick()
 	passCB.Lights[2].Strength  = { 0.1f, 0.1f, 0.1f };
 
 	passCB.MainLightPosW       = DirectX::XMFLOAT3(-12.0f, 9.0f, -90.0f); 
+	// passCB.MainLightPosW       = DirectX::XMFLOAT3(0.0f, 24.8f, -43.0f); 
 	passCB.MainLightExtent     = 4.0f;
 
     pack.currFrameResource->GetResource<std::shared_ptr<Chen::CDX12::UploadBuffer<PassConstants>>>(
