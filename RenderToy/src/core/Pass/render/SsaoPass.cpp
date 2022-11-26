@@ -28,6 +28,7 @@ void SsaoPass::Tick()
     DrawNormalsAndDepth();
     pack.mCmdList->SetGraphicsRootSignature(GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->RootSig());
     // FIXME: Blur results in the instability of fps
+	// GetGlobalParam().GetSsao()->ComputeSsao(pack.mCmdList.Get(), pack.currFrameResource, 3);
 	GetGlobalParam().GetSsao()->ComputeSsao(pack.mCmdList.Get(), pack.currFrameResource, 0);
 }
 

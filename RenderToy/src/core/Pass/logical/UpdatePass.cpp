@@ -52,7 +52,7 @@ void UpdatePass::Tick()
 	DirectX::XMStoreFloat4x4(&passCB.ViewProjTex, DirectX::XMMatrixTranspose(viewProjTex));
 	DirectX::XMStoreFloat4x4(&passCB.ShadowTransform, DirectX::XMMatrixTranspose(shadowTransform));
 	passCB.EyePosW = pack.p2camera->GetPosition3f();
-	passCB.RenderTargetSize = DirectX::XMFLOAT2(pack.width, pack.height);
+	passCB.RenderTargetSize = DirectX::XMFLOAT2((float)(pack.width), (float)(pack.height));
 	passCB.InvRenderTargetSize = DirectX::XMFLOAT2(1.0f / pack.width, 1.0f / pack.height);
 	passCB.NearZ = 1.0f;
 	passCB.FarZ = 1000.0f;
@@ -60,11 +60,14 @@ void UpdatePass::Tick()
 	passCB.DeltaTime = pack.p2timer->DeltaTime();
 
 	passCB.Lights[0].Direction = GetGlobalParam().GetMainLightDir();
-	passCB.Lights[0].Strength = { 0.8f, 0.8f, 0.8f };
+	passCB.Lights[0].Strength  = { 0.8f, 0.8f, 0.8f };
 	passCB.Lights[1].Direction = DirectX::XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
-	passCB.Lights[1].Strength = { 0.1f, 0.1f, 0.1f };
+	passCB.Lights[1].Strength  = { 0.1f, 0.1f, 0.1f };
 	passCB.Lights[2].Direction = DirectX::XMFLOAT3(0.0f, -0.707f, -0.707f);
-	passCB.Lights[2].Strength = { 0.1f, 0.1f, 0.1f };
+	passCB.Lights[2].Strength  = { 0.1f, 0.1f, 0.1f };
+
+	passCB.MainLightPosW       = DirectX::XMFLOAT3(-12.0f, 9.0f, -90.0f); 
+	passCB.MainLightExtent     = 4.0f;
 
     pack.currFrameResource->GetResource<std::shared_ptr<Chen::CDX12::UploadBuffer<PassConstants>>>(
         "PassCB")->CopyData(0, passCB);

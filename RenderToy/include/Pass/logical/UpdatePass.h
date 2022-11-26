@@ -39,6 +39,8 @@ namespace Chen::RToy {
             DirectX::XMFLOAT4 AmbientLight = { 0.2f, 0.2f, 0.3f, 1.0f };
 
             Chen::CDX12::Light Lights[MaxLightNum];
+            DirectX::XMFLOAT3  MainLightPosW;
+            float MainLightExtent = 0.0f;
         };
 
         struct PassPack

@@ -28,6 +28,7 @@ VertexOut VS(VertexIn vin)
 	
     // Transform to world space.
     float4x4 gWorld = mul(gRotation, mul(gScale, gTranslate));
+ 
     float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
     vout.PosW = posW.xyz;
 
@@ -88,7 +89,12 @@ float4 PS(VertexOut pin) : SV_Target
 
     // Only the first light casts a shadow.
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
-    shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
+    // shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
+
+    shadowFactor[0] = CalcShadowFactorPCSS(
+        pin.ShadowPosH,
+        pin.PosW,
+        CalcBlockerSearchSize(pin.PosW));
 
     float shininess = (1.0f - roughness);
     if (normalMapIndex != -1) shininess *= normalMapSample.a;
