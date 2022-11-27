@@ -7,7 +7,6 @@ struct VertexIn
 	float2 TexC     : TEXCOORD;
 	float3 TangentU : TANGENT;
 };
-
 struct VertexOut
 {
 	float4 PosH       : SV_POSITION;
@@ -84,17 +83,18 @@ float4 PS(VertexOut pin) : SV_Target
     float4 ambient = ambientAccess*gAmbientLight*diffuseAlbedo;
 #else
     float4 ambient = gAmbientLight*diffuseAlbedo;
-
 #endif
 
     // Only the first light casts a shadow.
     float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
-    // shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
-
+#ifdef PCSS
     shadowFactor[0] = CalcShadowFactorPCSS(
         pin.ShadowPosH,
         pin.PosW,
         CalcBlockerSearchSize(pin.PosW));
+#else   
+    shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
+#endif
 
     float shininess = (1.0f - roughness);
     if (normalMapIndex != -1) shininess *= normalMapSample.a;

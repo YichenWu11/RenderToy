@@ -2,11 +2,13 @@ cmake_minimum_required (VERSION 3.5)
 
 project(RenderToy_Core)
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS") 
+if(MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS") 
+endif()
 
 file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/core/*.cpp include/*.h)
 
-add_executable(${PROJECT_NAME} ${srcs})
+add_executable(${PROJECT_NAME} WIN32 ${srcs})
 
 # win32 gui program
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -28,6 +30,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC Chen::CDX12
     PUBLIC Chen::CDP
     PUBLIC imgui
+    PUBLIC rapidjson
     PUBLIC d3d12.lib
     PUBLIC dxgi.lib
     PUBLIC d3dcompiler.lib

@@ -1,5 +1,7 @@
 project (imgui)
 
+# message(STATUS ${PROJECT_SOURCE_DIR})
+
 add_library(${PROJECT_NAME} 
     src/imgui.cpp
     src/imgui_demo.cpp

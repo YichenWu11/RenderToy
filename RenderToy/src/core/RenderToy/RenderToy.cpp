@@ -415,7 +415,7 @@ void RenderToy::PreBuildTexAndMatFromJson()
 				materials[idx]["fresnelR0"]["x"].GetFloat(), 
 				materials[idx]["fresnelR0"]["y"].GetFloat(), 
 				materials[idx]["fresnelR0"]["z"].GetFloat()),
-			materials[idx]["roughness"].GetFloat(), nmapIndex);
+			materials[idx]["roughness"].GetFloat(), static_cast<int>(nmapIndex));
 	}
 
 	fclose(fp);
