@@ -2,13 +2,15 @@
 
 #include <IProperty.h>
 
+#include <utility>
+
 using namespace Chen::CDX12::Math;
 
 namespace Chen::RToy {
     class Transform : public IProperty
     {
     public:
-        Transform(std::string n = std::string("Transform")) : IProperty(n) {}
+        Transform(std::string n = "Transform") : IProperty(std::move(n)) {}
         ~Transform() = default;
         
         void SetRotation(DirectX::XMFLOAT4X4 r)  { impl.Rotation = r; SetDirty(); }

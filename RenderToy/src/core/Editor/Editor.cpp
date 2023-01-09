@@ -1,6 +1,6 @@
+#include <AssetMngr/AssetMngr.h>
 #include <Editor/Editor.h>
 #include <Utility/Macro.h>
-#include <AssetMngr/AssetMngr.h>
 
 using namespace std::filesystem;
 using namespace DirectX;
@@ -8,713 +8,664 @@ using namespace DirectX;
 using namespace Chen;
 using namespace Chen::RToy::Editor;
 
-void Editor::Init(
-	HWND mhMainWnd, 
-	ID3D12Device* _device,
-	ID3D12DescriptorHeap* heap,
-	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle,
-	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle,
-	ID3D12CommandQueue* queue)
-{
-	device = _device;
-	cmdQueue = queue;
+void Editor::Init(HWND mhMainWnd, ID3D12Device* _device,
+                  ID3D12DescriptorHeap* heap,
+                  D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle,
+                  D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle,
+                  ID3D12CommandQueue* queue) {
+    device = _device;
+    cmdQueue = queue;
 
     IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGuiStyle& style = ImGui::GetStyle();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    ImGuiStyle& style = ImGui::GetStyle();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-	style.FrameRounding = 8.0f;
-	style.WindowPadding = ImVec2(8.0, 2.0);
-	style.FramePadding = ImVec2(8.0, 2.0);
-	ImGui::StyleColorsDark();
-    
-	std::filesystem::path fontPath =
-		Asset::AssetMngr::GetInstance().GetRootPath() / "resource/PilotEditorFont.TTF";
+    style.FrameRounding = 8.0f;
+    style.WindowPadding = ImVec2(8.0, 2.0);
+    style.FramePadding = ImVec2(8.0, 2.0);
+    ImGui::StyleColorsDark();
 
-	io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(),
-		22,
-		nullptr,
-		nullptr);
-	io.Fonts->Build();
+    std::filesystem::path fontPath =
+        Asset::AssetMngr::GetInstance().GetRootPath() / "resource/PilotEditorFont.TTF";
 
-	ImGui_ImplWin32_Init(mhMainWnd);
-	ImGui_ImplDX12_Init(device, 3,
-		DXGI_FORMAT_R8G8B8A8_UNORM, heap,
-		cpuHandle,
-		gpuHandle);
+    io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22, nullptr, nullptr);
+    io.Fonts->Build();
 
-	ImVec4* colors = style.Colors;
-	colors[ImGuiCol_Text] = ImVec4(0.792f, 0.792f, 0.792f, 1.00f);
-	colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-	colors[ImGuiCol_WindowBg] = ImVec4(0.109f, 0.109f, 0.109f, 1.00f);
-	colors[ImGuiCol_ChildBg] = ImVec4(0.109f, 0.109f, 0.109f, 0.00f);
-	colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-	colors[ImGuiCol_Border] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-	colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-	colors[ImGuiCol_FrameBg] = ImVec4(0.21f, 0.21f, 0.21f, 0.5411f);
-	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.294f, 0.294f, 0.294f, 0.40f);
-	colors[ImGuiCol_FrameBgActive] = ImVec4(0.294f, 0.294f, 0.294f, 0.67f);
-	colors[ImGuiCol_TitleBg] = ImVec4(0.297f, 0.156f, 0.25f, 1.00f);
-	colors[ImGuiCol_TitleBgActive] = ImVec4(0.397f, 0.156f, 0.25f, 1.00f);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
-	colors[ImGuiCol_MenuBarBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-	colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
-	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-	colors[ImGuiCol_CheckMark] = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
-	colors[ImGuiCol_SliderGrab] = colors[ImGuiCol_CheckMark];
-	colors[ImGuiCol_SliderGrabActive] = ImVec4(0.3647f, 0.0392f, 0.2588f, 0.50f);
-	colors[ImGuiCol_Button] = ImVec4(0.0117f, 0.0117f, 0.0117f, 1.00f);
-	colors[ImGuiCol_ButtonHovered] = ImVec4(0.5235f, 0.0235f, 0.0235f, 1.00f);
-	colors[ImGuiCol_ButtonActive] = ImVec4(0.0353f, 0.0196f, 0.0235f, 1.00f);
-	colors[ImGuiCol_Header] = ImVec4(0.1137f, 0.0235f, 0.0745f, 0.588f);
-	colors[ImGuiCol_HeaderHovered] = ImVec4(5.0f / 255.0f, 5.0f / 255.0f, 5.0f / 255.0f, 1.00f);
-	colors[ImGuiCol_HeaderActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-	colors[ImGuiCol_Separator] = ImVec4(0.0f, 0.0f, 0.0f, 0.50f);
-	colors[ImGuiCol_SeparatorHovered] = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
-	colors[ImGuiCol_SeparatorActive] = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
-	colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
-	colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-	colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-	colors[ImGuiCol_Tab] = ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 1.00f);
-	colors[ImGuiCol_TabHovered] = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 150.0f / 255.0f);
-	colors[ImGuiCol_TabActive] = ImVec4(47.0f / 255.0f, 6.0f / 255.0f, 29.0f / 255.0f, 1.0f);
-	colors[ImGuiCol_TabUnfocused] = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 25.0f / 255.0f);
-	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 200.0f / 255.0f);
-	colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-	colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-	colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-	colors[ImGuiCol_TableHeaderBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-	colors[ImGuiCol_TableBorderStrong] = ImVec4(2.0f / 255.0f, 2.0f / 255.0f, 2.0f / 255.0f, 1.0f);
-	colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
-	colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-	colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
-	colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-	colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-	colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    ImGui_ImplWin32_Init(mhMainWnd);
+    ImGui_ImplDX12_Init(device, 3, DXGI_FORMAT_R8G8B8A8_UNORM, heap, cpuHandle,
+                        gpuHandle);
 
-	//window_flags |= ImGuiWindowFlags_NoTitleBar;
-	//window_flags |= ImGuiWindowFlags_NoScrollbar;
-	//window_flags |= ImGuiWindowFlags_MenuBar;
-	window_flags |= ImGuiWindowFlags_NoMove;
-	window_flags |= ImGuiWindowFlags_NoResize;
-	//window_flags |= ImGuiWindowFlags_NoCollapse;
-	//window_flags |= ImGuiWindowFlags_NoNav;
-	//window_flags |= ImGuiWindowFlags_NoBackground;
-	//window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
-	//window_flags |= ImGuiWindowFlags_UnsavedDocument;
+    ImVec4* colors = style.Colors;
+    colors[ImGuiCol_Text] = ImVec4(0.792f, 0.792f, 0.792f, 1.00f);
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+    colors[ImGuiCol_WindowBg] = ImVec4(0.109f, 0.109f, 0.109f, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.109f, 0.109f, 0.109f, 0.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+    colors[ImGuiCol_Border] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.21f, 0.21f, 0.21f, 0.5411f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.294f, 0.294f, 0.294f, 0.40f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.294f, 0.294f, 0.294f, 0.67f);
+    colors[ImGuiCol_TitleBg] = ImVec4(0.297f, 0.156f, 0.25f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.397f, 0.156f, 0.25f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
+    colors[ImGuiCol_MenuBarBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_CheckMark] =
+        ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
+    colors[ImGuiCol_SliderGrab] = colors[ImGuiCol_CheckMark];
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.3647f, 0.0392f, 0.2588f, 0.50f);
+    colors[ImGuiCol_Button] = ImVec4(0.0117f, 0.0117f, 0.0117f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.5235f, 0.0235f, 0.0235f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.0353f, 0.0196f, 0.0235f, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(0.1137f, 0.0235f, 0.0745f, 0.588f);
+    colors[ImGuiCol_HeaderHovered] =
+        ImVec4(5.0f / 255.0f, 5.0f / 255.0f, 5.0f / 255.0f, 1.00f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+    colors[ImGuiCol_Separator] = ImVec4(0.0f, 0.0f, 0.0f, 0.50f);
+    colors[ImGuiCol_SeparatorHovered] =
+        ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
+    colors[ImGuiCol_SeparatorActive] =
+        ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
+    colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+    colors[ImGuiCol_Tab] =
+        ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 1.00f);
+    colors[ImGuiCol_TabHovered] =
+        ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 150.0f / 255.0f);
+    colors[ImGuiCol_TabActive] =
+        ImVec4(47.0f / 255.0f, 6.0f / 255.0f, 29.0f / 255.0f, 1.0f);
+    colors[ImGuiCol_TabUnfocused] =
+        ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 25.0f / 255.0f);
+    colors[ImGuiCol_TabUnfocusedActive] =
+        ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 200.0f / 255.0f);
+    colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+    colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+    colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+    colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+    colors[ImGuiCol_TableHeaderBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+    colors[ImGuiCol_TableBorderStrong] =
+        ImVec4(2.0f / 255.0f, 2.0f / 255.0f, 2.0f / 255.0f, 1.0f);
+    colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
+    colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+    colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+    colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+    colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+    colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+
+    // window_flags |= ImGuiWindowFlags_NoTitleBar;
+    // window_flags |= ImGuiWindowFlags_NoScrollbar;
+    // window_flags |= ImGuiWindowFlags_MenuBar;
+    window_flags |= ImGuiWindowFlags_NoMove;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    // window_flags |= ImGuiWindowFlags_NoCollapse;
+    // window_flags |= ImGuiWindowFlags_NoNav;
+    // window_flags |= ImGuiWindowFlags_NoBackground;
+    // window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+    // window_flags |= ImGuiWindowFlags_UnsavedDocument;
 }
 
-void Editor::CleanUp()
-{
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+void Editor::CleanUp() {
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
 }
 
-void Editor::TickLeftSideBar()
-{
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::BeginMainMenuBar();
+void Editor::TickLeftSideBar() {
+    ImGui::SetNextWindowBgAlpha(1.0f);
+    ImGui::BeginMainMenuBar();
 
-	if (ImGui::BeginMenu("Menu"))
-	{
-		if (ImGui::MenuItem("Export Scene"))
-		{
+    if (ImGui::BeginMenu("Menu")) {
+        if (ImGui::MenuItem("Export Scene")) {
+        }
+        if (ImGui::MenuItem("Load Scene")) {
+        }
+        if (ImGui::MenuItem("Exit")) {
+            isExit = true;
+        }
+        ImGui::EndMenu();
+    }
 
-		}
-		if (ImGui::MenuItem("Load Scene")) 
-		{
+    ImGui::EndMainMenuBar();
 
-		}
-		if (ImGui::MenuItem("Exit"))
-		{
-			isExit = true;
-		}
-		ImGui::EndMenu();
-	}
+    static bool materialEdit = false;
+    static bool textureLoad = false;
 
-	ImGui::EndMainMenuBar();
+    {
+        ImGui::Begin("Materials And Objects", NULL, window_flags);
 
-	static bool materialEdit = false;
-	static bool textureLoad = false;
+        // ImGui::ShowDemoWindow();
 
-	{
-		ImGui::Begin("Materials And Objects", NULL, window_flags);
+        ImGui::SetWindowPos(ImVec2(0, ClientHeight * 0.025f), ImGuiCond_Always);
+        ImGui::SetWindowSize(ImVec2(ClientWidth * 0.1615f, ClientHeight * 0.725));
 
-		//ImGui::ShowDemoWindow();
+        static std::string info = "";
 
-		ImGui::SetWindowPos(ImVec2(0, ClientHeight * 0.025f), ImGuiCond_Always);
-		ImGui::SetWindowSize(ImVec2(ClientWidth * 0.1615f, ClientHeight * 0.725));
+        static float fps = 0.0f;
+        static long long int fpsIdx = 0;
+        fpsIdx++;
+        if (fpsIdx % 50 == 0)
+            fps = ImGui::GetIO().Framerate;
 
-		static std::string info = "";
+        ImGui::Text("FPS: %d\n", int(fps));
 
-		static float fps = 0.0f;
-		static long long int fpsIdx = 0;
-		fpsIdx++;
-		if (fpsIdx % 50 == 0) fps = ImGui::GetIO().Framerate;
+        // Geos And Meshes
+        if (ImGui::CollapsingHeader("Geos And Meshes")) {
+            static auto& AllGeos = GetRenderRsrcMngr().GetMeshMngr()->GetAllGeos();
 
-		ImGui::Text("FPS: %d\n", int(fps));
+            for (auto& geo : AllGeos) {
+                if (ImGui::TreeNode(geo.first.c_str())) {
+                    static std::vector<std::string> subNameList;
+                    subNameList = std::vector<std::string>();
+                    subNameList = geo.second->GetSubMeshNameList();
+                    for (auto& sub : subNameList) {
+                        ImGui::BulletText(sub.c_str());
+                    }
+                    ImGui::TreePop();
+                }
+            }
+        }
 
-		// Geos And Meshes
-		if (ImGui::CollapsingHeader("Geos And Meshes")) 
-		{
-			static auto& AllGeos = GetRenderRsrcMngr().GetMeshMngr()->GetAllGeos();
+        // Materials
+        if (ImGui::CollapsingHeader("Materials")) {
+            const std::vector<std::string>& matNameList =
+                GetRenderRsrcMngr().GetMatMngr()->GetMatNameList();
+            for (auto& name : matNameList) {
+                if (ImGui::Selectable(name.c_str())) {
+                }
+            }
+            if (ImGui::Button("Edit Materials")) {
+                materialEdit = true;
+            }
+        }
 
-			for (auto& geo : AllGeos)
-			{
-				if (ImGui::TreeNode(geo.first.c_str()))
-				{
-					static std::vector<std::string> subNameList;
-					subNameList = std::vector<std::string>();
-					subNameList = geo.second->GetSubMeshNameList();
-					for (auto& sub : subNameList)
-					{
-						ImGui::BulletText(sub.c_str());
-					}
-					ImGui::TreePop();
-				}
-			}
-		}
+        // Textures
+        if (ImGui::CollapsingHeader("Textures")) {
+            const std::vector<std::string>& texNameList =
+                GetRenderRsrcMngr().GetTexMngr()->GetTexNameList();
+            for (auto& name : texNameList) {
+                if (ImGui::Selectable(name.c_str())) {
+                }
+            }
+            if (ImGui::Button("Load Texture")) {
+                textureLoad = true;
+            }
+        }
 
-		// Materials
-		if (ImGui::CollapsingHeader("Materials")) 
-		{
-			const std::vector<std::string>& matNameList = GetRenderRsrcMngr().GetMatMngr()->GetMatNameList();
-			for (auto& name : matNameList)
-			{
-				if (ImGui::Selectable(name.c_str()))
-				{
+        // Objects
+        if (ImGui::CollapsingHeader("Objects")) {
+            const std::set<std::string>& objNameList = GetObjectMngr().GetNameList();
+            for (auto& name : objNameList) {
+                if (ImGui::Selectable(name.c_str())) {
+                    SetPickedID(GetObjectMngr().GetObj(name)->GetID());
+                }
+            }
 
-				}
-			}
-			if (ImGui::Button("Edit Materials"))
-			{
-				materialEdit = true;
-			}
-		}
+            if (ImGui::Button("Delete Picked Object")) {
+                if (pickedID != -1) {
+                    GetGlobalParam().GetRenderCom()->DelObjForAllPasses(
+                        GetObjectMngr().GetObj(pickedID)->GetObjName());
+                    GetGlobalParam().GetLogicalCom()->DelObjForAllPasses(
+                        GetObjectMngr().GetObj(pickedID)->GetObjName());
+                    GetObjectMngr().DelObject(pickedID);
+                    pickedID = -1;
+                }
+            }
+        }
 
-		// Textures
-		if (ImGui::CollapsingHeader("Textures"))
-		{
-			const std::vector<std::string>& texNameList = GetRenderRsrcMngr().GetTexMngr()->GetTexNameList();
-			for (auto& name : texNameList)
-			{
-				if (ImGui::Selectable(name.c_str()))
-				{
+        if (ImGui::CollapsingHeader("Add New Object")) {
+            static std::string name = "newObj";
+            static std::string geoName = "shapeGeo";
+            static std::string subMeshName = "box";
+            static std::string matName = "tile";
 
-				}
-			}
-			if (ImGui::Button("Load Texture"))
-			{
-				textureLoad = true;
-			}
-		}
+            static char cname[20] = "newObj";
+            static char cgeoName[20] = "shapeGeo";
+            static char csubMeshName[20] = "box";
+            static char cmatName[20] = "tile";
 
-		// Objects
-		if (ImGui::CollapsingHeader("Objects")) 
-		{
-			const std::set<std::string>& objNameList = GetObjectMngr().GetNameList();
-			for (auto& name : objNameList)
-			{
-				if (ImGui::Selectable(name.c_str()))
-				{
-					SetPickedID(GetObjectMngr().GetObj(name)->GetID());
-				}
-			}
+            ImGui::InputText("Name", cname, 20);
+            ImGui::InputText("Geo", cgeoName, 20);
+            ImGui::InputText("SubMesh", csubMeshName, 20);
+            ImGui::InputText("Material", cmatName, 20);
 
-			if (ImGui::Button("Delete Picked Object"))
-			{
-				if (pickedID != -1)
-				{
-					GetGlobalParam().GetRenderCom()->DelObjForAllPasses(
-						GetObjectMngr().GetObj(pickedID)->GetObjName()
-					);
-					GetGlobalParam().GetLogicalCom()->DelObjForAllPasses(
-						GetObjectMngr().GetObj(pickedID)->GetObjName()
-					);
-					GetObjectMngr().DelObject(pickedID);
-					pickedID = -1;
-				}
-			}
-		}
+            static const char* layers[] = {"Opaque", "Transparent", "Sky"};
+            static int layer = 0;
+            ImGui::Combo("layer", &layer, layers, IM_ARRAYSIZE(layers));
 
-		if (ImGui::CollapsingHeader("Add New Object"))
-		{
-			static std::string name = "newObj";
-			static std::string geoName = "shapeGeo";
-			static std::string subMeshName = "box";
-			static std::string matName = "tile";
+            if (ImGui::Button("Add")) {
+                name = std::string(cname);
+                geoName = std::string(cgeoName);
+                subMeshName = std::string(csubMeshName);
+                matName = std::string(cmatName);
 
-			static char cname[20] = "newObj";
-			static char cgeoName[20] = "shapeGeo";
-			static char csubMeshName[20] = "box";
-			static char cmatName[20] = "tile";
+                auto p2obj = std::make_shared<BasicObject>(name);
+                static DirectX::XMFLOAT4X4 scale;
+                static DirectX::XMFLOAT4X4 mat_scale;
+                DirectX::XMStoreFloat4x4(&scale,
+                                         DirectX::XMMatrixScaling(6.0f, 6.0f, 6.0f));
+                DirectX::XMStoreFloat4x4(&mat_scale,
+                                         DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f));
+                dynamic_cast<BasicObject*>(p2obj.get())->SetLayer(ObjectLayer(layer));
+                GetTransformOfObj(p2obj)->SetScale(scale);
 
-			ImGui::InputText("Name", cname, 20);
-			ImGui::InputText("Geo", cgeoName, 20);
-			ImGui::InputText("SubMesh", csubMeshName, 20);
-			ImGui::InputText("Material", cmatName, 20);
+                GetMeshOfObj(p2obj)->SetMeshGeo(geoName);
 
-			static const char* layers[] = { "Opaque", "Transparent", "Sky" };
-			static int layer = 0;
-			ImGui::Combo("layer", &layer, layers, IM_ARRAYSIZE(layers));
+                if (GetMeshOfObj(p2obj)->GetMeshGeo() == nullptr) {
+                    info = "Geo Input Error!!!";
+                }
+                else if (GetObjectMngr().GetObj(name) != nullptr) {
+                    info = "Object with this name has\nexisted!!!";
+                }
+                else if (name.empty()) {
+                    info = "Name Can not be null!!!";
+                }
+                else {
+                    GetMeshOfObj(p2obj)->SetSubMesh(subMeshName);
+                    GetMaterialOfObj(p2obj)->SetMaterial(
+                        RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial(
+                            matName));
 
-			if (ImGui::Button("Add"))
-			{
-				name = std::string(cname);
-				geoName = std::string(cgeoName);
-				subMeshName = std::string(csubMeshName);
-				matName = std::string(cmatName);
+                    if (GetMeshOfObj(p2obj)->GetMeshGeo()->DrawArgs.find(subMeshName) == GetMeshOfObj(p2obj)->GetMeshGeo()->DrawArgs.end()) {
+                        info = "SubMesh Input Error!!!";
+                    }
+                    else if (GetMaterialOfObj(p2obj)->GetPtrToMat() == nullptr) {
+                        info = "Material Input Error!!!";
+                    }
+                    else {
+                        GetMaterialOfObj(p2obj)->SetMatTransform(mat_scale);
+                        GetObjectMngr().AddObject(p2obj);
+                        GetGlobalParam().GetRenderCom()->AddObjForAllPasses(
+                            GetObjectMngr().GetObj(name));
+                        GetGlobalParam().GetLogicalCom()->AddObjForAllPasses(
+                            GetObjectMngr().GetObj(name));
+                        info = "";
+                    }
+                }
+            }
 
-				auto p2obj = std::make_shared<BasicObject>(name);
-				static DirectX::XMFLOAT4X4 scale;
-				static DirectX::XMFLOAT4X4 mat_scale;
-				DirectX::XMStoreFloat4x4(&scale, DirectX::XMMatrixScaling(6.0f, 6.0f, 6.0f));
-				DirectX::XMStoreFloat4x4(&mat_scale, DirectX::XMMatrixScaling(2.0f, 2.0f, 2.0f));
-				dynamic_cast<BasicObject*>(p2obj.get())->SetLayer(ObjectLayer(layer));
-				GetTransformOfObj(p2obj)->SetScale(scale);
-				
-				GetMeshOfObj(p2obj)->SetMeshGeo(geoName);
+            if (info != "")
+                ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), info.c_str());
+        }
 
-				if (GetMeshOfObj(p2obj)->GetMeshGeo() == nullptr)
-				{
-					info = "Geo Input Error!!!";
-				}
-				else if (GetObjectMngr().GetObj(name) != nullptr)
-				{	
-					info = "Object with this name has\nexisted!!!";
-				}
-				else if (name.empty())
-				{
-					info = "Name Can not be null!!!";
-				}
-				else
-				{
-					GetMeshOfObj(p2obj)->SetSubMesh(subMeshName);
-					GetMaterialOfObj(p2obj)->SetMaterial(
-						RenderResourceMngr::GetInstance().GetMatMngr()->GetMaterial(matName));
+        if (ImGui::CollapsingHeader("Animation")) {
+        }
 
-					if (GetMeshOfObj(p2obj)->GetMeshGeo()->DrawArgs.find(subMeshName) == GetMeshOfObj(p2obj)->GetMeshGeo()->DrawArgs.end())
-					{
-						info = "SubMesh Input Error!!!";
-					}
-					else if (GetMaterialOfObj(p2obj)->GetPtrToMat() == nullptr)
-					{
-						info = "Material Input Error!!!";
-					}
-					else
-					{
-						GetMaterialOfObj(p2obj)->SetMatTransform(mat_scale);
-						GetObjectMngr().AddObject(p2obj);
-						GetGlobalParam().GetRenderCom()->AddObjForAllPasses(
-							GetObjectMngr().GetObj(name));
-						GetGlobalParam().GetLogicalCom()->AddObjForAllPasses(
-							GetObjectMngr().GetObj(name));
-						info = "";
-					}
-				}
-			}
+        ImGui::Text("EnableMove: ");
+        ImGui::SameLine();
+        static std::string isMove;
+        isMove = (IsEnableMove()) ? "On" : "Off";
+        ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.0f), isMove.c_str());
 
-			if (info != "")
-				ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), info.c_str());
-		}
+        if (ImGui::Button("Toggle EnableMove"))
+            ToggleEnableMove();
 
-		if (ImGui::CollapsingHeader("Animation"))
-		{
+        ImGui::End();
+    }
 
-		}
+    if (materialEdit) {
+        ImGui::Begin("Material Edit");
 
-		ImGui::Text("EnableMove: ");
-		ImGui::SameLine();
-		static std::string isMove;
-		isMove = (IsEnableMove()) ? "On" : "Off";
-		ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.0f), isMove.c_str());
+        ImGui::Text("Edit Material\n");
 
-		if (ImGui::Button("Toggle EnableMove"))
-			ToggleEnableMove();
+        static auto& allMats = GetRenderRsrcMngr().GetMatMngr()->GetAllMats();
 
-		ImGui::End();
-	}
+        for (auto& material : allMats) {
+            if (ImGui::CollapsingHeader(material.first.c_str())) {
+                ImGui::DragFloat("DIFFUSE_R", &material.second->DiffuseAlbedo.x, 0.05f,
+                                 0.0f, 1.0f, "%.2f");
+                ImGui::DragFloat("DIFFUSE_G", &material.second->DiffuseAlbedo.y, 0.05f,
+                                 0.0f, 1.0f, "%.2f");
+                ImGui::DragFloat("DIFFUSE_B", &material.second->DiffuseAlbedo.z, 0.05f,
+                                 0.0f, 1.0f, "%.2f");
+                ImGui::DragFloat("DIFFUSE_A", &material.second->DiffuseAlbedo.w, 0.05f,
+                                 0.0f, 1.0f, "%.2f");
 
-	if (materialEdit)
-	{
-		ImGui::Begin("Material Edit");
+                ImGui::DragFloat("FresnelR0_R", &material.second->FresnelR0.x, 0.05f,
+                                 0.0f, 1.0f, "%.2f");
+                ImGui::DragFloat("FresnelR0_G", &material.second->FresnelR0.y, 0.05f,
+                                 0.0f, 1.0f, "%.2f");
+                ImGui::DragFloat("FresnelR0_B", &material.second->FresnelR0.z, 0.05f,
+                                 0.0f, 1.0f, "%.2f");
 
-		ImGui::Text("Edit Material\n");
+                ImGui::DragFloat("roughness", &material.second->Roughness, 0.05f, 0.0f,
+                                 1.0f, "%.2f");
 
-		static auto& allMats = GetRenderRsrcMngr().GetMatMngr()->GetAllMats();
+                ImGui::DragFloat("MAT_SCALE_X", &material.second->MatTransform._11,
+                                 0.05f, 0.0f, 300.0f, "%.2f");
+                ImGui::DragFloat("MAT_SCALE_Y", &material.second->MatTransform._22,
+                                 0.05f, 0.0f, 300.0f, "%.2f");
+                ImGui::DragFloat("MAT_SCALE_Z", &material.second->MatTransform._33,
+                                 0.05f, 0.0f, 300.0f, "%.2f");
+            }
+        }
 
-		for (auto& material : allMats)
-		{
-			if (ImGui::CollapsingHeader(material.first.c_str()))
-			{
-				ImGui::DragFloat("DIFFUSE_R", &material.second->DiffuseAlbedo.x, 0.05f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("DIFFUSE_G", &material.second->DiffuseAlbedo.y, 0.05f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("DIFFUSE_B", &material.second->DiffuseAlbedo.z, 0.05f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("DIFFUSE_A", &material.second->DiffuseAlbedo.w, 0.05f, 0.0f, 1.0f, "%.2f");
+        ImGui::Text("\nCreate Material\n");
 
-				ImGui::DragFloat("FresnelR0_R", &material.second->FresnelR0.x, 0.05f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("FresnelR0_G", &material.second->FresnelR0.y, 0.05f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("FresnelR0_B", &material.second->FresnelR0.z, 0.05f, 0.0f, 1.0f, "%.2f");
+        if (ImGui::CollapsingHeader("Create Material")) {
+            static std::string info = "";
 
-				ImGui::DragFloat("roughness", &material.second->Roughness, 0.05f, 0.0f, 1.0f, "%.2f");
+            static XMFLOAT4 albedo(1.0f, 1.0f, 1.0f, 1.0f);
+            static XMFLOAT3 fresnel(0.1f, 0.1f, 0.1f);
+            static float roughness = 0.8f;
 
-				ImGui::DragFloat("MAT_SCALE_X", &material.second->MatTransform._11, 0.05f, 0.0f, 300.0f, "%.2f");
-				ImGui::DragFloat("MAT_SCALE_Y", &material.second->MatTransform._22, 0.05f, 0.0f, 300.0f, "%.2f");
-				ImGui::DragFloat("MAT_SCALE_Z", &material.second->MatTransform._33, 0.05f, 0.0f, 300.0f, "%.2f");
-			}
-		}
+            static std::string name = "newMaterial";
+            static std::string texName;
+            static std::string normalName;
 
-		ImGui::Text("\nCreate Material\n");
-		
-		if (ImGui::CollapsingHeader("Create Material"))
-		{
-			static std::string info = "";
+            static char cname[20] = "newMaterial";
+            static char ctexName[20];
+            static char cnormalName[20];
 
-			static XMFLOAT4 albedo(1.0f, 1.0f, 1.0f, 1.0f);
-			static XMFLOAT3 fresnel(0.1f, 0.1f, 0.1f);
-			static float roughness = 0.8f;
+            ImGui::InputText("Name", cname, 20);
+            ImGui::InputText("DiffuseMap", ctexName, 20);
+            ImGui::InputText("NormalMap", cnormalName, 20);
 
-			static std::string name = "newMaterial";
-			static std::string texName;
-			static std::string normalName;
+            ImGui::DragFloat("DIFFUSE_R", &albedo.x, 0.05f, 0.0f, 1.0f, "%.2f");
+            ImGui::DragFloat("DIFFUSE_G", &albedo.y, 0.05f, 0.0f, 1.0f, "%.2f");
+            ImGui::DragFloat("DIFFUSE_B", &albedo.z, 0.05f, 0.0f, 1.0f, "%.2f");
+            ImGui::DragFloat("DIFFUSE_A", &albedo.w, 0.05f, 0.0f, 1.0f, "%.2f");
 
-			static char cname[20] = "newMaterial";
-			static char ctexName[20];
-			static char cnormalName[20];
+            ImGui::DragFloat("FresnelR0_R", &fresnel.x, 0.05f, 0.0f, 1.0f, "%.2f");
+            ImGui::DragFloat("FresnelR0_G", &fresnel.y, 0.05f, 0.0f, 1.0f, "%.2f");
+            ImGui::DragFloat("FresnelR0_B", &fresnel.z, 0.05f, 0.0f, 1.0f, "%.2f");
 
-			ImGui::InputText("Name", cname, 20);
-			ImGui::InputText("DiffuseMap", ctexName, 20);
-			ImGui::InputText("NormalMap", cnormalName, 20);
+            ImGui::DragFloat("roughness", &roughness, 0.05f, 0.0f, 1.0f, "%.2f");
 
-			ImGui::DragFloat("DIFFUSE_R", &albedo.x, 0.05f, 0.0f, 1.0f, "%.2f");
-			ImGui::DragFloat("DIFFUSE_G", &albedo.y, 0.05f, 0.0f, 1.0f, "%.2f");
-			ImGui::DragFloat("DIFFUSE_B", &albedo.z, 0.05f, 0.0f, 1.0f, "%.2f");
-			ImGui::DragFloat("DIFFUSE_A", &albedo.w, 0.05f, 0.0f, 1.0f, "%.2f");
+            if (ImGui::Button("Create")) {
+                name = std::string(cname);
+                texName = std::string(ctexName);
+                normalName = std::string(cnormalName);
+                if (GetRenderRsrcMngr().GetMatMngr()->GetMaterial(name) != nullptr) {
+                    info = "Material with this name has existed!!!";
+                }
+                else {
+                    static int nmap_idx;
+                    nmap_idx = (normalName == "") ? -1 : GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(normalName);
 
-			ImGui::DragFloat("FresnelR0_R", &fresnel.x, 0.05f, 0.0f, 1.0f, "%.2f");
-			ImGui::DragFloat("FresnelR0_G", &fresnel.y, 0.05f, 0.0f, 1.0f, "%.2f");
-			ImGui::DragFloat("FresnelR0_B", &fresnel.z, 0.05f, 0.0f, 1.0f, "%.2f");
+                    GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
+                        name, GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(texName),
+                        albedo, fresnel, roughness, nmap_idx);
+                    info = "";
+                }
+            }
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.c_str());
+        }
 
-			ImGui::DragFloat("roughness", &roughness, 0.05f, 0.0f, 1.0f, "%.2f");
+        ImGui::Text("\n");
+        if (ImGui::Button("Close"))
+            materialEdit = false;
+        ImGui::End();
+    }
 
-			if (ImGui::Button("Create"))
-			{
-				name = std::string(cname);
-				texName = std::string(ctexName);
-				normalName = std::string(cnormalName);
-				if (GetRenderRsrcMngr().GetMatMngr()->GetMaterial(name) != nullptr)
-				{
-					info = "Material with this name has existed!!!";
-				}
-				else
-				{
-					static int nmap_idx;
-					nmap_idx = (normalName == "") ? -1 : GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(normalName);
+    if (textureLoad) {
+        ImGui::Begin("Load Texture");
 
-					GetRenderRsrcMngr().GetMatMngr()->CreateMaterial(
-						name,
-						GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(texName),
-						albedo,
-						fresnel,
-						roughness,
-						nmap_idx);
-					info = "";
-				}
-			}
-			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.c_str());
-		}
+        static std::string name;
+        static char cname[40];
 
-		ImGui::Text("\n");
-		if (ImGui::Button("Close")) materialEdit = false;
-		ImGui::End();
-	}
+        static std::string assetRoot =
+            Asset::AssetMngr::GetInstance().GetRootPath().string();
+        static std::string path;
+        static char cpath[128];
 
-	if (textureLoad)
-	{
-		ImGui::Begin("Load Texture");
+        static bool isInit = false;
+        if (!isInit) {
+            memset(cname, 0, 40);
+            memset(cpath, 0, 128);
+        }
+        isInit = true;
 
-		static std::string name;
-		static char cname[40];
+        ImGui::InputText("Name", cname, 40);
+        ImGui::Text(assetRoot.c_str());
+        ImGui::InputText("Path", cpath, 128);
 
-		static std::string assetRoot = Asset::AssetMngr::GetInstance().GetRootPath().string();
-		static std::string path;
-		static char cpath[128];
+        static const char* fileFormat[] = {"DDS", "WIC"};
+        static int formatIdx = 0;
+        ImGui::Combo("fileFormat", &formatIdx, fileFormat,
+                     IM_ARRAYSIZE(fileFormat));
 
-		static bool isInit = false;
-		if (!isInit)
-		{
-			memset(cname, 0, 40);
-			memset(cpath, 0, 128);
-		}
-		isInit = true;
+        static const char* texDimension[] = {"None", "Tex1D", "Tex2D",
+                                             "Tex3D", "Cubemap", "Tex2DArray"};
+        static int dimensionIdx = 2;
+        ImGui::Combo("texDimension", &dimensionIdx, texDimension,
+                     IM_ARRAYSIZE(texDimension));
 
-		ImGui::InputText("Name", cname, 40);
-		ImGui::Text(assetRoot.c_str());
-		ImGui::InputText("Path", cpath, 128);
+        static std::string info = "";
 
-		static const char* fileFormat[] = { "DDS", "WIC"};
-		static int formatIdx = 0;
-		ImGui::Combo("fileFormat", &formatIdx, fileFormat, IM_ARRAYSIZE(fileFormat));
+        if (ImGui::Button("Load")) {
+            name = std::string(cname);
+            path = assetRoot + std::string(cpath);
 
-		static const char* texDimension[] = { "None", "Tex1D", "Tex2D", "Tex3D", "Cubemap", "Tex2DArray" };
-		static int dimensionIdx = 2;
-		ImGui::Combo("texDimension", &dimensionIdx, texDimension, IM_ARRAYSIZE(texDimension));
+            if (GetRenderRsrcMngr().GetTexMngr()->GetTexture(name) != nullptr) {
+                info = "Texture with this name has existed!!!";
+            }
+            else {
+                GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
+                    device, cmdQueue, AnsiToWString(path).c_str(), name,
+                    TextureMngr::TexFileFormat(formatIdx),
+                    TextureDimension(dimensionIdx));
+                info = "";
+            }
+        }
 
-		static std::string info = "";
+        if (ImGui::Button("Close"))
+            textureLoad = false;
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.c_str());
 
-		if (ImGui::Button("Load"))
-		{
-			name = std::string(cname);
-			path = assetRoot + std::string(cpath);
-
-			if (GetRenderRsrcMngr().GetTexMngr()->GetTexture(name) != nullptr)
-			{
-				info = "Texture with this name has existed!!!";
-			}
-			else
-			{
-				GetRenderRsrcMngr().GetTexMngr()->CreateTextureFromFile(
-					device,
-					cmdQueue,
-					AnsiToWString(path).c_str(),
-					name,
-					TextureMngr::TexFileFormat(formatIdx),
-					TextureDimension(dimensionIdx));
-				info = "";
-			}
-		}
-
-		if (ImGui::Button("Close")) textureLoad = false;
-		ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.c_str());
-
-		ImGui::End();
-	}
+        ImGui::End();
+    }
 }
 
-void Editor::TickBottomBar()
-{
-	{
-		ImGui::Begin("Files", NULL, window_flags);
+void Editor::TickBottomBar() {
+    {
+        ImGui::Begin("Files", NULL, window_flags);
 
-		ImGui::SetWindowPos(ImVec2(0, ClientHeight * 0.75f), ImGuiCond_Always);
-		ImGui::SetWindowSize(ImVec2(ClientWidth * 0.7661f, ClientHeight * 0.28f));
+        ImGui::SetWindowPos(ImVec2(0, ClientHeight * 0.75f), ImGuiCond_Always);
+        ImGui::SetWindowSize(ImVec2(ClientWidth * 0.7661f, ClientHeight * 0.28f));
 
-		if (ImGui::CollapsingHeader("Assets"))
-		{
-			ShowDirContent(Asset::AssetMngr::GetInstance().GetRootPath());
-		}
+        if (ImGui::CollapsingHeader("Assets")) {
+            ShowDirContent(Asset::AssetMngr::GetInstance().GetRootPath());
+        }
 
-		ImGui::End();
-	}
+        ImGui::End();
+    }
 }
 
-void Editor::ShowDirContent(std::filesystem::path path)
-{
-	directory_iterator list(path);
-	for (auto& it : list) {
-		if (it.status().type() == file_type::directory)
-		{
-			std::string dirName = it.path().filename().string();
-			if (ImGui::TreeNode(dirName.c_str()))
-			{
-				ShowDirContent(it.path());
-				ImGui::TreePop();
-			}
-		}
-		else
-		{
-			std::string name = "    " + it.path().filename().string();
-			if (ImGui::Selectable(name.c_str()))
-			{
-
-			}
-		}
-	}
+void Editor::ShowDirContent(std::filesystem::path path) {
+    directory_iterator list(path);
+    for (auto& it : list) {
+        if (it.status().type() == file_type::directory) {
+            std::string dirName = it.path().filename().string();
+            if (ImGui::TreeNode(dirName.c_str())) {
+                ShowDirContent(it.path());
+                ImGui::TreePop();
+            }
+        }
+        else {
+            std::string name = "    " + it.path().filename().string();
+            if (ImGui::Selectable(name.c_str())) {
+            }
+        }
+    }
 }
 
-void Editor::TickRightSideBar()
-{
-	{
-		ImGui::Begin("Properties Details", NULL, window_flags);
+void Editor::TickRightSideBar() {
+    {
+        ImGui::Begin("Properties Details", NULL, window_flags);
 
-		ImGui::SetWindowPos(ImVec2(ClientWidth * 0.7661f, ClientHeight * 0.025f), ImGuiCond_Always);
-		ImGui::SetWindowSize(ImVec2(ClientWidth * 0.234375f, ClientHeight * 0.994f));
+        ImGui::SetWindowPos(ImVec2(ClientWidth * 0.7661f, ClientHeight * 0.025f),
+                            ImGuiCond_Always);
+        ImGui::SetWindowSize(
+            ImVec2(ClientWidth * 0.234375f, ClientHeight * 0.994f));
 
-		{
-			if (pickedID != -1)
-			{
-				ImGui::Text("Picked Object: ");
-				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.0f),
-					GetObjectMngr().GetObj(pickedID)->GetObjName().c_str());
+        {
+            if (pickedID != -1) {
+                ImGui::Text("Picked Object: ");
+                ImGui::SameLine();
+                ImGui::TextColored(
+                    ImVec4(0.9f, 0.2f, 0.2f, 1.0f),
+                    GetObjectMngr().GetObj(pickedID)->GetObjName().c_str());
 
-				if (ImGui::CollapsingHeader("[Mesh]"))
-				{
-					std::string geoName = "  " + GetMeshOfObjByID(pickedID)->GetMeshGeo()->Name;
-					std::string meshName = "  " + GetMeshOfObjByID(pickedID)->GetSubName();
+                if (ImGui::CollapsingHeader("[Mesh]")) {
+                    std::string geoName =
+                        "  " + GetMeshOfObjByID(pickedID)->GetMeshGeo()->Name;
+                    std::string meshName =
+                        "  " + GetMeshOfObjByID(pickedID)->GetSubName();
 
-					if (ImGui::TreeNode("Geo"))
-					{
-						ImGui::Text(geoName.c_str());
-						ImGui::TreePop();
-					}
+                    if (ImGui::TreeNode("Geo")) {
+                        ImGui::Text("%s", geoName.c_str());
+                        ImGui::TreePop();
+                    }
 
-					if (ImGui::TreeNode("Mesh"))
-					{
-						ImGui::Text(meshName.c_str());
-						ImGui::TreePop();
-					}
-				}
+                    if (ImGui::TreeNode("Mesh")) {
+                        ImGui::Text("%s", meshName.c_str());
+                        ImGui::TreePop();
+                    }
+                }
 
-				if (ImGui::CollapsingHeader("[Transform]"))
-				{
-					static DirectX::XMFLOAT4X4 r;
-					static DirectX::XMFLOAT4X4 s;
-					static DirectX::XMFLOAT4X4 t;
+                if (ImGui::CollapsingHeader("[Transform]")) {
+                    static DirectX::XMFLOAT4X4 r;
+                    static DirectX::XMFLOAT4X4 s;
+                    static DirectX::XMFLOAT4X4 t;
 
-					static DirectX::XMFLOAT3 scale(1.0f, 1.0f, 1.0f);
-					static DirectX::XMFLOAT3 trans(0.0f, 0.0f, 0.0f);
+                    static DirectX::XMFLOAT3 scale(1.0f, 1.0f, 1.0f);
+                    static DirectX::XMFLOAT3 trans(0.0f, 0.0f, 0.0f);
 
-					static DirectX::XMFLOAT3 axis(0.0f, 1.0f, 0.0f);
-					static float angle = 0.0f;
+                    static DirectX::XMFLOAT3 axis(0.0f, 1.0f, 0.0f);
+                    static float angle = 0.0f;
 
-					if (ImGui::TreeNode("Rotation"))
-					{
-						ImGui::DragFloat("AXIS_X", &axis.x, 0.1f, -1.0f, 1.0f, "%.2f");
-						ImGui::DragFloat("AXIS_Y", &axis.y, 0.1f, -1.0f, 1.0f, "%.2f");
-						ImGui::DragFloat("AXIS_Z", &axis.z, 0.1f, -1.0f, 1.0f, "%.2f");
-						ImGui::DragFloat("ANGLE", &angle, 0.1f, 0.0f, 360.0f, "%.2f");
+                    if (ImGui::TreeNode("Rotation")) {
+                        ImGui::DragFloat("AXIS_X", &axis.x, 0.1f, -1.0f, 1.0f, "%.2f");
+                        ImGui::DragFloat("AXIS_Y", &axis.y, 0.1f, -1.0f, 1.0f, "%.2f");
+                        ImGui::DragFloat("AXIS_Z", &axis.z, 0.1f, -1.0f, 1.0f, "%.2f");
+                        ImGui::DragFloat("ANGLE", &angle, 1.0f, -36000.0f, 36000.0f,
+                                         "%.2f");
 
-						XMMATRIX R = DirectX::XMMatrixRotationQuaternion(
-							Math::Quaternion(DirectX::XMLoadFloat3(&axis), angle));
+                        // TODO: Compute Quaternion from Rotation Matrix
 
-						XMStoreFloat4x4(&r, R);
-						GetTransformOfObjByID(pickedID)->SetRotation(r);
+                        XMMATRIX R = DirectX::XMMatrixRotationQuaternion(
+                            Math::Quaternion(DirectX::XMLoadFloat3(&axis),
+                                             DirectX::XMConvertToRadians(angle)));
 
-						ImGui::TreePop();
-					}
+                        XMStoreFloat4x4(&r, R);
+                        GetTransformOfObjByID(pickedID)->SetRotation(r);
 
-					if (ImGui::TreeNode("Scale"))
-					{
-						scale.x = GetTransformOfObjByID(pickedID)->GetScale()._11;
-						scale.y = GetTransformOfObjByID(pickedID)->GetScale()._22;
-						scale.z = GetTransformOfObjByID(pickedID)->GetScale()._33;
+                        ImGui::TreePop();
+                    }
 
-						ImGui::DragFloat("X", &scale.x, 0.1f, 0.1f, 300.0f, "%.2f");
-						ImGui::DragFloat("Y", &scale.y, 0.1f, 0.1f, 300.0f, "%.2f");
-						ImGui::DragFloat("Z", &scale.z, 0.1f, 0.1f, 300.0f, "%.2f");
+                    if (ImGui::TreeNode("Scale")) {
+                        scale.x = GetTransformOfObjByID(pickedID)->GetScale()._11;
+                        scale.y = GetTransformOfObjByID(pickedID)->GetScale()._22;
+                        scale.z = GetTransformOfObjByID(pickedID)->GetScale()._33;
 
-						XMStoreFloat4x4(&s, XMMatrixScaling(scale.x, scale.y, scale.z));
-						GetTransformOfObjByID(pickedID)->SetScale(s);
+                        ImGui::DragFloat("X", &scale.x, 0.1f, 0.1f, 300.0f, "%.2f");
+                        ImGui::DragFloat("Y", &scale.y, 0.1f, 0.1f, 300.0f, "%.2f");
+                        ImGui::DragFloat("Z", &scale.z, 0.1f, 0.1f, 300.0f, "%.2f");
 
-						ImGui::TreePop();
-					}
+                        XMStoreFloat4x4(&s, XMMatrixScaling(scale.x, scale.y, scale.z));
+                        GetTransformOfObjByID(pickedID)->SetScale(s);
 
-					if (ImGui::TreeNode("Translate"))
-					{
-						trans.x = GetTransformOfObjByID(pickedID)->GetTranslate()._41;
-						trans.y = GetTransformOfObjByID(pickedID)->GetTranslate()._42;
-						trans.z = GetTransformOfObjByID(pickedID)->GetTranslate()._43;
+                        ImGui::TreePop();
+                    }
 
-						ImGui::DragFloat("X", &trans.x, 0.1f, 0.0f, 0.0f, "%.2f");
-						ImGui::DragFloat("Y", &trans.y, 0.1f, 0.0f, 0.0f, "%.2f");
-						ImGui::DragFloat("Z", &trans.z, 0.1f, 0.0f, 0.0f, "%.2f");
+                    if (ImGui::TreeNode("Translate")) {
+                        trans.x = GetTransformOfObjByID(pickedID)->GetTranslate()._41;
+                        trans.y = GetTransformOfObjByID(pickedID)->GetTranslate()._42;
+                        trans.z = GetTransformOfObjByID(pickedID)->GetTranslate()._43;
 
-						XMStoreFloat4x4(&t, XMMatrixTranslation(trans.x, trans.y, trans.z));
-						GetTransformOfObjByID(pickedID)->SetTranslate(t);
+                        ImGui::DragFloat("X", &trans.x, 0.1f, 0.0f, 0.0f, "%.2f");
+                        ImGui::DragFloat("Y", &trans.y, 0.1f, 0.0f, 0.0f, "%.2f");
+                        ImGui::DragFloat("Z", &trans.z, 0.1f, 0.0f, 0.0f, "%.2f");
 
-						ImGui::TreePop();
-					}
-				}
+                        XMStoreFloat4x4(&t, XMMatrixTranslation(trans.x, trans.y, trans.z));
+                        GetTransformOfObjByID(pickedID)->SetTranslate(t);
 
-				if (ImGui::CollapsingHeader("[Material]"))
-				{
-					Material* mat = GetMaterialOfObjByID(pickedID);
+                        ImGui::TreePop();
+                    }
+                }
 
-					if (ImGui::TreeNode("Name"))
-					{
-						ImGui::Text(mat->GetMatName().c_str());
-						ImGui::TreePop();
-					}
+                if (ImGui::CollapsingHeader("[Material]")) {
+                    Material* mat = GetMaterialOfObjByID(pickedID);
 
-					if (ImGui::TreeNode("Diffuse TexName"))
-					{
-						std::string diffName = GetRenderRsrcMngr().GetTexMngr()->GetTexNameFromID(
-							mat->GetDiffuse());
+                    if (ImGui::TreeNode("Name")) {
+                        ImGui::Text(mat->GetMatName().c_str());
+                        ImGui::TreePop();
+                    }
 
-						ImGui::Text(diffName.c_str());
-						ImGui::TreePop();
-					}
+                    if (ImGui::TreeNode("Diffuse TexName")) {
+                        std::string diffName =
+                            GetRenderRsrcMngr().GetTexMngr()->GetTexNameFromID(
+                                mat->GetDiffuse());
 
-					if (ImGui::TreeNode("Normal TexName"))
-					{
-						std::string normalName = GetRenderRsrcMngr().GetTexMngr()->GetTexNameFromID(
-							mat->GetNormal());
+                        ImGui::Text(diffName.c_str());
+                        ImGui::TreePop();
+                    }
 
-						ImGui::Text(normalName.c_str());
-						ImGui::TreePop();
-					}
+                    if (ImGui::TreeNode("Normal TexName")) {
+                        std::string normalName =
+                            GetRenderRsrcMngr().GetTexMngr()->GetTexNameFromID(
+                                mat->GetNormal());
 
-					if (ImGui::TreeNode("DiffuseAlbedo"))
-					{
-						XMFLOAT4 albedo = mat->GetAlbedo();
-						ImGui::Text("R: %.2f\nG: %.2f\nB: %.2f\nA: %.2f", albedo.x, albedo.y, albedo.z, albedo.w);
-						ImGui::TreePop();
-					}
+                        ImGui::Text(normalName.c_str());
+                        ImGui::TreePop();
+                    }
 
-					if (ImGui::TreeNode("FresnelR0"))
-					{
-						XMFLOAT3 r0 = mat->GetFresnelR0();
-						ImGui::Text("R: %.2f\nG: %.2f\nB: %.2f", r0.x, r0.y, r0.z);
-						ImGui::TreePop();
-					}
+                    if (ImGui::TreeNode("DiffuseAlbedo")) {
+                        XMFLOAT4 albedo = mat->GetAlbedo();
+                        ImGui::Text("R: %.2f\nG: %.2f\nB: %.2f\nA: %.2f", albedo.x,
+                                    albedo.y, albedo.z, albedo.w);
+                        ImGui::TreePop();
+                    }
 
-					if (ImGui::TreeNode("Roughness"))
-					{
-						ImGui::Text("Roughness: %.2f", mat->GetRoughness());
-						ImGui::TreePop();
-					}
+                    if (ImGui::TreeNode("FresnelR0")) {
+                        XMFLOAT3 r0 = mat->GetFresnelR0();
+                        ImGui::Text("R: %.2f\nG: %.2f\nB: %.2f", r0.x, r0.y, r0.z);
+                        ImGui::TreePop();
+                    }
 
-					if (ImGui::TreeNode("MatTransform"))
-					{
-						XMFLOAT4X4 mT = mat->GetMatTransform();
-						ImGui::Text("X: %.2f\nY: %.2f\nZ: %.2f", mT._11, mT._22, mT._33);
-						ImGui::TreePop();
-					}
+                    if (ImGui::TreeNode("Roughness")) {
+                        ImGui::Text("Roughness: %.2f", mat->GetRoughness());
+                        ImGui::TreePop();
+                    }
 
-				}
-			}
-		}
+                    if (ImGui::TreeNode("MatTransform")) {
+                        XMFLOAT4X4 mT = mat->GetMatTransform();
+                        ImGui::Text("X: %.2f\nY: %.2f\nZ: %.2f", mT._11, mT._22, mT._33);
+                        ImGui::TreePop();
+                    }
+                }
+            }
+        }
 
-		ImGui::End();
-	}
+        ImGui::End();
+    }
 }
 
-void Editor::Tick()
-{
-	// TODO: Adaptive width and height
+void Editor::Tick() {
+    // TODO: Adaptive width and height
 
-	ImGui_ImplDX12_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+    ImGui_ImplDX12_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
 
-	TickLeftSideBar();
-	TickBottomBar();
-	TickRightSideBar();
+    TickLeftSideBar();
+    TickBottomBar();
+    TickRightSideBar();
 
-	ImGui::Render();
+    ImGui::Render();
 }
 
-Editor::~Editor()
-{
-	CleanUp();
+Editor::~Editor() {
+    CleanUp();
 }

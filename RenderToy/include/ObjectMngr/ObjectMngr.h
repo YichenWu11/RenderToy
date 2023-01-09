@@ -86,7 +86,7 @@ namespace Chen::RToy {
                 DirectX::XMStoreFloat4x4(&rotation, DirectX::XMMatrixRotationQuaternion(
                     Math::Quaternion(
                         DirectX::XMLoadFloat3(&axis),
-                        objects[idx]["rotation"]["angle"].GetFloat())));
+                        DirectX::XMConvertToRadians(objects[idx]["rotation"]["angle"].GetFloat()))));
                 
                 dynamic_cast<Transform*>(GetObj(name)->GetProperty("Transform"))->SetScale(scale);
                 dynamic_cast<Transform*>(GetObj(name)->GetProperty("Transform"))->SetTranslate(trans);

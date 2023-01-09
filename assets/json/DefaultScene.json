@@ -6,28 +6,28 @@
             "geo": "shapeGeo",
             "mesh": "sphere",
             "layer": 2,
-            "scale":{
+            "scale": {
                 "x": 4000.0,
                 "y": 4000.0,
                 "z": 4000.0
             },
-            "mat_scale":{
+            "mat_scale": {
                 "x": 1.0,
                 "y": 1.0,
                 "z": 1.0
             },
-            "rotation":{
-                "axis":{
+            "rotation": {
+                "axis": {
                     "x": 0.0,
                     "y": 1.0,
-                    "z": 0.0 
+                    "z": 0.0
                 },
                 "angle": 0.0
             },
-            "translate":{
+            "translate": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.0 
+                "z": 0.0
             }
         },
         {
@@ -36,28 +36,28 @@
             "geo": "shapeGeo",
             "mesh": "box",
             "layer": 0,
-            "scale":{
+            "scale": {
                 "x": 6.0,
                 "y": 6.0,
                 "z": 6.0
             },
-            "mat_scale":{
+            "mat_scale": {
                 "x": 1.0,
                 "y": 1.0,
                 "z": 1.0
             },
-            "rotation":{
-                "axis":{
+            "rotation": {
+                "axis": {
                     "x": 0.0,
                     "y": 1.0,
-                    "z": 1.0 
+                    "z": 1.0
                 },
                 "angle": 0.0
             },
-            "translate":{
+            "translate": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.0 
+                "z": 0.0
             }
         },
         {
@@ -66,28 +66,28 @@
             "geo": "shapeGeo",
             "mesh": "sphere",
             "layer": 0,
-            "scale":{
+            "scale": {
                 "x": 8.0,
                 "y": 8.0,
                 "z": 8.0
             },
-            "mat_scale":{
+            "mat_scale": {
                 "x": 2.0,
                 "y": 2.0,
                 "z": 2.0
             },
-            "rotation":{
-                "axis":{
+            "rotation": {
+                "axis": {
                     "x": 0.0,
                     "y": 1.0,
-                    "z": 0.0 
+                    "z": 0.0
                 },
                 "angle": 0.0
             },
-            "translate":{
+            "translate": {
                 "x": 14.0,
                 "y": 0.0,
-                "z": 0.0 
+                "z": 0.0
             }
         },
         {
@@ -96,28 +96,28 @@
             "geo": "shapeGeo",
             "mesh": "grid",
             "layer": 0,
-            "scale":{
+            "scale": {
                 "x": 5.0,
                 "y": 5.0,
                 "z": 5.0
             },
-            "mat_scale":{
+            "mat_scale": {
                 "x": 5.0,
                 "y": 5.0,
                 "z": 5.0
             },
-            "rotation":{
-                "axis":{
+            "rotation": {
+                "axis": {
                     "x": 0.0,
                     "y": 1.0,
-                    "z": 0.0 
+                    "z": 0.0
                 },
                 "angle": 0.0
             },
-            "translate":{
+            "translate": {
                 "x": 0.0,
                 "y": -10.0,
-                "z": 0.0 
+                "z": 0.0
             }
         },
         {
@@ -126,28 +126,28 @@
             "geo": "shapeGeo",
             "mesh": "box",
             "layer": 0,
-            "scale":{
+            "scale": {
                 "x": 6.0,
                 "y": 6.0,
                 "z": 6.0
             },
-            "mat_scale":{
+            "mat_scale": {
                 "x": 1.0,
                 "y": 1.0,
                 "z": 1.0
             },
-            "rotation":{
-                "axis":{
+            "rotation": {
+                "axis": {
                     "x": 0.0,
                     "y": 1.0,
-                    "z": 0.0 
+                    "z": 0.0
                 },
                 "angle": 0.0
             },
-            "translate":{
+            "translate": {
                 "x": -12.0,
                 "y": 0.0,
-                "z": 0.0 
+                "z": 0.0
             }
         },
         {
@@ -156,58 +156,118 @@
             "geo": "shapeGeo",
             "mesh": "box",
             "layer": 1,
-            "scale":{
+            "scale": {
                 "x": 6.0,
                 "y": 6.0,
                 "z": 6.0
             },
-            "mat_scale":{
+            "mat_scale": {
                 "x": 1.0,
                 "y": 1.0,
                 "z": 1.0
             },
-            "rotation":{
-                "axis":{
+            "rotation": {
+                "axis": {
                     "x": 0.0,
                     "y": 1.0,
-                    "z": 0.0 
+                    "z": 0.0
                 },
                 "angle": 0.0
             },
-            "translate":{
+            "translate": {
                 "x": -24.0,
                 "y": 0.0,
-                "z": 0.0 
+                "z": 0.0
             }
         },
         {
             "name": "Marry",
             "matName": "Marry",
             "geo": "Marry",
-            "mesh": "Marry",
+            "mesh": "Body",
             "layer": 0,
-            "scale":{
+            "scale": {
                 "x": 6.0,
                 "y": 6.0,
                 "z": 6.0
             },
-            "mat_scale":{
+            "mat_scale": {
                 "x": 1.0,
                 "y": 1.0,
                 "z": 1.0
             },
-            "rotation":{
-                "axis":{
+            "rotation": {
+                "axis": {
                     "x": 0.0,
                     "y": 1.0,
-                    "z": 0.0 
+                    "z": 0.0
                 },
-                "angle": 2.9
+                "angle": 180.0
             },
-            "translate":{
+            "translate": {
                 "x": -24.0,
                 "y": -9.7,
-                "z": 40.0 
+                "z": 40.0
+            }
+        },
+        {
+            "name": "Marry_Text",
+            "matName": "Marry",
+            "geo": "Marry",
+            "mesh": "Text",
+            "layer": 0,
+            "scale": {
+                "x": 6.0,
+                "y": 6.0,
+                "z": 6.0
+            },
+            "mat_scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "rotation": {
+                "axis": {
+                    "x": 0.0,
+                    "y": 1.0,
+                    "z": 0.0
+                },
+                "angle": 180.0
+            },
+            "translate": {
+                "x": -24.0,
+                "y": -9.7,
+                "z": 40.0
+            }
+        },
+        {
+            "name": "Test_Plane",
+            "matName": "glass",
+            "geo": "Plane",
+            "mesh": "Cube",
+            "layer": 0,
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "mat_scale": {
+                "x": 4.0,
+                "y": 4.0,
+                "z": 4.0
+            },
+            "rotation": {
+                "axis": {
+                    "x": 0.0,
+                    "y": 1.0,
+                    "z": 0.0
+                },
+                "angle": 180.0
+            },
+            "translate": {
+                "x": 24.0,
+                "y": -3.5,
+                "z": 40.0
             }
         }
     ]
