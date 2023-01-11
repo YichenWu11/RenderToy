@@ -8,13 +8,13 @@
 #include <LogicalComponent/LogicalComponent.h>
 #include <RenderComponent/RenderComponent.h>
 
-#include <Editor/Editor.h>
 #include <AssetMngr/AssetMngr.h>
+#include <Editor/Editor.h>
 #include <ObjectMngr/BasicObject.h>
 
-#include <Pass/render/PhongPass.h>
-#include <Pass/logical/UpdatePass.h>
 #include <Pass/logical/SsaoPrePass.h>
+#include <Pass/logical/UpdatePass.h>
+#include <Pass/render/PhongPass.h>
 
 #include <Utility/Macro.h>
 
@@ -47,7 +47,7 @@ const int gNumFrameResources = 3;
 RenderToy::RenderToy(HINSTANCE hInstance) :
     DX12App(hInstance) {
     mMainWndCaption = L"RenderToy";
-    mCamera = std::make_unique<Camera>();
+    mCamera         = std::make_unique<Camera>();
     DefaultInputLayout =
         {
             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -176,8 +176,8 @@ void RenderToy::BuildShaders() {
         rootProperties,
         AnsiToWString(shaderPath.string()).c_str(),
         AnsiToWString(shaderPath.string()).c_str());
-    GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->mInputLayout = DefaultInputLayout;
-    GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+    GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->mInputLayout                = DefaultInputLayout;
+    GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->rasterizerState.CullMode    = D3D12_CULL_MODE_NONE;
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("SkyShader")->depthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
     // For Shadow Map
@@ -199,7 +199,7 @@ void RenderToy::BuildShaders() {
         AnsiToWString(shaderPath.string()).c_str());
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("DrawNormalsShader")->mInputLayout = DefaultInputLayout;
 
-    ComPtr<ID3D12RootSignature> mSsaoRootSignature = nullptr;
+    ComPtr<ID3D12RootSignature> mSsaoRootSignature     = nullptr;
     ComPtr<ID3D12RootSignature> mSsaoBlurRootSignature = nullptr;
 
     CD3DX12_DESCRIPTOR_RANGE texTable0;
@@ -226,9 +226,9 @@ void RenderToy::BuildShaders() {
 
     // create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
     ComPtr<ID3DBlob> serializedRootSig = nullptr;
-    ComPtr<ID3DBlob> errorBlob = nullptr;
-    HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-                                             serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+    ComPtr<ID3DBlob> errorBlob         = nullptr;
+    HRESULT          hr                = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+                                                                     serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
 
     if (errorBlob != nullptr) {
         ::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
@@ -269,7 +269,7 @@ void RenderToy::BuildShaders() {
         AnsiToWString(shaderPath.string()).c_str());
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->mInputLayout =
         std::vector<D3D12_INPUT_ELEMENT_DESC>();
-    GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthEnable = false;
+    GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthEnable    = false;
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader")->depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 
     auto ssao = GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoShader");
@@ -283,7 +283,7 @@ void RenderToy::BuildShaders() {
         AnsiToWString(shaderPath.string()).c_str());
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->mInputLayout =
         std::vector<D3D12_INPUT_ELEMENT_DESC>();
-    GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->depthStencilState.DepthEnable = false;
+    GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->depthStencilState.DepthEnable    = false;
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("SsaoBlurShader")->depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 
     // ********************************************************************************************************
@@ -299,7 +299,7 @@ void RenderToy::BuildPSOs() {
         mDepthStencilFormat,
         true);
 
-    GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->depthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
+    GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_EQUAL;
     GetRenderRsrcMngr().GetShaderMngr()->GetShader("IShader")->depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
     GetRenderRsrcMngr().GetPSOMngr()->CreatePipelineState(
         "Base",
@@ -354,11 +354,11 @@ void RenderToy::PreBuildTexAndMatFromJson() {
     std::filesystem::path filePath =
         GetAssetMngr().GetRootPath() / "json/PreMatAndTex.json";
 
-    FILE* fp;
+    FILE*   fp;
     errno_t err = fopen_s(&fp, filePath.string().c_str(), "rb");
     if (err == 0) OutputDebugString(L"\n\nFile Open Error!!!\n\n");
 
-    char readBuffer[65536];
+    char           readBuffer[65536];
     FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 
     Document document;
@@ -367,7 +367,7 @@ void RenderToy::PreBuildTexAndMatFromJson() {
     assert(document.HasMember("textures"));
     assert(document.HasMember("materials"));
 
-    const Value& textures = document["textures"];
+    const Value& textures  = document["textures"];
     const Value& materials = document["materials"];
 
     assert(textures.IsArray());
@@ -393,9 +393,9 @@ void RenderToy::PreBuildTexAndMatFromJson() {
     GetRenderRsrcMngr().GetTexMngr()->SetNullCubeIdx(document["ssaoStartIndex"].GetInt() + 5);
 
     for (SizeType idx = 0; idx < materials.Size(); ++idx) {
-        std::string name = materials[idx]["name"].GetString();
-        std::string texName = materials[idx]["texName"].GetString();
-        int nmapIndex = -1;
+        std::string name      = materials[idx]["name"].GetString();
+        std::string texName   = materials[idx]["texName"].GetString();
+        int         nmapIndex = -1;
         if (!materials[idx]["normalName"].IsNull())
             nmapIndex = GetRenderRsrcMngr().GetTexMngr()->GetTextureIndex(
                 materials[idx]["normalName"].GetString());
@@ -473,17 +473,17 @@ void RenderToy::LogicalFillPack() {
     // Fill the ComPack of LogicalComponent
     */
     pack.currFrameResource = mCurrFrameResource;
-    pack.p2camera = mCamera.get();
-    pack.p2timer = &mTimer;
-    pack.width = mClientWidth;
-    pack.height = mClientHeight;
-    pack.mCmdList = mCmdList;
+    pack.p2camera          = mCamera.get();
+    pack.p2timer           = &mTimer;
+    pack.width             = mClientWidth;
+    pack.height            = mClientHeight;
+    pack.mCmdList          = mCmdList;
     // for shadowMap
     pack.shadowDsv = dsvCpuDH.GetCpuHandle(1);
     // for ssao
     pack.mDepthStencilBuffer = mDepthStencilBuffer.Get();
-    pack.rtvHandle = rtvCpuDH.GetCpuHandle(SwapChainBufferCount);
-    pack.rtvDescriptorSize = rtvCpuDH.GetDescriptorSize();
+    pack.rtvHandle           = rtvCpuDH.GetCpuHandle(SwapChainBufferCount);
+    pack.rtvDescriptorSize   = rtvCpuDH.GetDescriptorSize();
 
     GetLogicalComponent()->FillPack(pack);
 }
@@ -493,13 +493,13 @@ void RenderToy::RenderFillPack() {
     /*
     // Fill the ComPack of RenderComponent
     */
-    pack.mCmdList = mCmdList;
-    pack.currFrameResource = mCurrFrameResource;
-    pack.currBackBuffer = CurrentBackBuffer();
+    pack.mCmdList           = mCmdList;
+    pack.currFrameResource  = mCurrFrameResource;
+    pack.currBackBuffer     = CurrentBackBuffer();
     pack.currBackBufferView = CurrentBackBufferView();
-    pack.depthStencilView = DepthStencilView();
-    pack.mScissorRect = mScissorRect;
-    pack.mScreenViewport = mScreenViewport;
+    pack.depthStencilView   = DepthStencilView();
+    pack.mScissorRect       = mScissorRect;
+    pack.mScreenViewport    = mScreenViewport;
     // for shadowMap
     pack.shadowDsv = dsvCpuDH.GetCpuHandle(1);
 
@@ -645,9 +645,9 @@ void RenderToy::Pick(int sx, int sy) {
 
     // Ray definition in view space.
     XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-    XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
+    XMVECTOR rayDir    = XMVectorSet(vx, vy, 1.0f, 0.0f);
 
-    XMMATRIX V = mCamera->GetView();
+    XMMATRIX V       = mCamera->GetView();
     XMMATRIX invView = XMMatrixInverse(get_rvalue_ptr(XMMatrixDeterminant(V)), V);
 
     if (GetEditor().GetPickedID() != -1)
@@ -657,20 +657,20 @@ void RenderToy::Pick(int sx, int sy) {
         if (GetObjectMngr().GetObj(idx) != nullptr) {
             if (dynamic_cast<BasicObject*>(GetObjectMngr().GetObj(idx))->IsVisible()) {
                 rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-                rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
+                rayDir    = XMVectorSet(vx, vy, 1.0f, 0.0f);
 
-                XMMATRIX trans = XMLoadFloat4x4(get_rvalue_ptr(GetTransformOfObjByID(idx)->GetTranslate()));
-                XMMATRIX scale = XMLoadFloat4x4(get_rvalue_ptr(GetTransformOfObjByID(idx)->GetScale()));
+                XMMATRIX trans    = XMLoadFloat4x4(get_rvalue_ptr(GetTransformOfObjByID(idx)->GetTranslate()));
+                XMMATRIX scale    = XMLoadFloat4x4(get_rvalue_ptr(GetTransformOfObjByID(idx)->GetScale()));
                 XMMATRIX rotation = XMLoadFloat4x4(get_rvalue_ptr(GetTransformOfObjByID(idx)->GetRotation()));
 
-                XMMATRIX W = scale * rotation * trans;
+                XMMATRIX W        = scale * rotation * trans;
                 XMMATRIX invWorld = XMMatrixInverse(get_rvalue_ptr(XMMatrixDeterminant(W)), W);
 
                 // Tranform ray to vi space of Mesh.
                 XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
 
                 rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal);
-                rayDir = XMVector3TransformNormal(rayDir, toLocal);
+                rayDir    = XMVector3TransformNormal(rayDir, toLocal);
 
                 // Make the ray direction unit length for the intersection tests.
                 rayDir = XMVector3Normalize(rayDir);

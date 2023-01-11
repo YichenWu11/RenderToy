@@ -2,3 +2,5 @@ build
 .cache
 .vscode
 .VSCodeCounter
+
+bin/Debug/RenderToy_Core.pdb

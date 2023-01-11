@@ -9,11 +9,11 @@ using namespace Chen;
 using namespace Chen::RToy::Editor;
 
 void Editor::Init(HWND mhMainWnd, ID3D12Device* _device,
-                  ID3D12DescriptorHeap* heap,
+                  ID3D12DescriptorHeap*       heap,
                   D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle,
                   D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle,
-                  ID3D12CommandQueue* queue) {
-    device = _device;
+                  ID3D12CommandQueue*         queue) {
+    device   = _device;
     cmdQueue = queue;
 
     IMGUI_CHECKVERSION();
@@ -25,7 +25,7 @@ void Editor::Init(HWND mhMainWnd, ID3D12Device* _device,
 
     style.FrameRounding = 8.0f;
     style.WindowPadding = ImVec2(8.0, 2.0);
-    style.FramePadding = ImVec2(8.0, 2.0);
+    style.FramePadding  = ImVec2(8.0, 2.0);
     ImGui::StyleColorsDark();
 
     std::filesystem::path fontPath =
@@ -38,44 +38,44 @@ void Editor::Init(HWND mhMainWnd, ID3D12Device* _device,
     ImGui_ImplDX12_Init(device, 3, DXGI_FORMAT_R8G8B8A8_UNORM, heap, cpuHandle,
                         gpuHandle);
 
-    ImVec4* colors = style.Colors;
-    colors[ImGuiCol_Text] = ImVec4(0.792f, 0.792f, 0.792f, 1.00f);
-    colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-    colors[ImGuiCol_WindowBg] = ImVec4(0.109f, 0.109f, 0.109f, 1.00f);
-    colors[ImGuiCol_ChildBg] = ImVec4(0.109f, 0.109f, 0.109f, 0.00f);
-    colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-    colors[ImGuiCol_Border] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_FrameBg] = ImVec4(0.21f, 0.21f, 0.21f, 0.5411f);
-    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.294f, 0.294f, 0.294f, 0.40f);
-    colors[ImGuiCol_FrameBgActive] = ImVec4(0.294f, 0.294f, 0.294f, 0.67f);
-    colors[ImGuiCol_TitleBg] = ImVec4(0.297f, 0.156f, 0.25f, 1.00f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(0.397f, 0.156f, 0.25f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
-    colors[ImGuiCol_MenuBarBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+    ImVec4* colors                        = style.Colors;
+    colors[ImGuiCol_Text]                 = ImVec4(0.792f, 0.792f, 0.792f, 1.00f);
+    colors[ImGuiCol_TextDisabled]         = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+    colors[ImGuiCol_WindowBg]             = ImVec4(0.109f, 0.109f, 0.109f, 1.00f);
+    colors[ImGuiCol_ChildBg]              = ImVec4(0.109f, 0.109f, 0.109f, 0.00f);
+    colors[ImGuiCol_PopupBg]              = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+    colors[ImGuiCol_Border]               = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    colors[ImGuiCol_BorderShadow]         = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_FrameBg]              = ImVec4(0.21f, 0.21f, 0.21f, 0.5411f);
+    colors[ImGuiCol_FrameBgHovered]       = ImVec4(0.294f, 0.294f, 0.294f, 0.40f);
+    colors[ImGuiCol_FrameBgActive]        = ImVec4(0.294f, 0.294f, 0.294f, 0.67f);
+    colors[ImGuiCol_TitleBg]              = ImVec4(0.297f, 0.156f, 0.25f, 1.00f);
+    colors[ImGuiCol_TitleBgActive]        = ImVec4(0.397f, 0.156f, 0.25f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed]     = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
+    colors[ImGuiCol_MenuBarBg]            = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+    colors[ImGuiCol_ScrollbarBg]          = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+    colors[ImGuiCol_ScrollbarGrab]        = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
     colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabActive]  = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
     colors[ImGuiCol_CheckMark] =
         ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
-    colors[ImGuiCol_SliderGrab] = colors[ImGuiCol_CheckMark];
+    colors[ImGuiCol_SliderGrab]       = colors[ImGuiCol_CheckMark];
     colors[ImGuiCol_SliderGrabActive] = ImVec4(0.3647f, 0.0392f, 0.2588f, 0.50f);
-    colors[ImGuiCol_Button] = ImVec4(0.0117f, 0.0117f, 0.0117f, 1.00f);
-    colors[ImGuiCol_ButtonHovered] = ImVec4(0.5235f, 0.0235f, 0.0235f, 1.00f);
-    colors[ImGuiCol_ButtonActive] = ImVec4(0.0353f, 0.0196f, 0.0235f, 1.00f);
-    colors[ImGuiCol_Header] = ImVec4(0.1137f, 0.0235f, 0.0745f, 0.588f);
+    colors[ImGuiCol_Button]           = ImVec4(0.0117f, 0.0117f, 0.0117f, 1.00f);
+    colors[ImGuiCol_ButtonHovered]    = ImVec4(0.5235f, 0.0235f, 0.0235f, 1.00f);
+    colors[ImGuiCol_ButtonActive]     = ImVec4(0.0353f, 0.0196f, 0.0235f, 1.00f);
+    colors[ImGuiCol_Header]           = ImVec4(0.1137f, 0.0235f, 0.0745f, 0.588f);
     colors[ImGuiCol_HeaderHovered] =
         ImVec4(5.0f / 255.0f, 5.0f / 255.0f, 5.0f / 255.0f, 1.00f);
     colors[ImGuiCol_HeaderActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-    colors[ImGuiCol_Separator] = ImVec4(0.0f, 0.0f, 0.0f, 0.50f);
+    colors[ImGuiCol_Separator]    = ImVec4(0.0f, 0.0f, 0.0f, 0.50f);
     colors[ImGuiCol_SeparatorHovered] =
         ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
     colors[ImGuiCol_SeparatorActive] =
         ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
-    colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
+    colors[ImGuiCol_ResizeGrip]        = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
     colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+    colors[ImGuiCol_ResizeGripActive]  = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
     colors[ImGuiCol_Tab] =
         ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 1.00f);
     colors[ImGuiCol_TabHovered] =
@@ -86,22 +86,22 @@ void Editor::Init(HWND mhMainWnd, ID3D12Device* _device,
         ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 25.0f / 255.0f);
     colors[ImGuiCol_TabUnfocusedActive] =
         ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 200.0f / 255.0f);
-    colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-    colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-    colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+    colors[ImGuiCol_PlotLines]            = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+    colors[ImGuiCol_PlotLinesHovered]     = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+    colors[ImGuiCol_PlotHistogram]        = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
     colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-    colors[ImGuiCol_TableHeaderBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+    colors[ImGuiCol_TableHeaderBg]        = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
     colors[ImGuiCol_TableBorderStrong] =
         ImVec4(2.0f / 255.0f, 2.0f / 255.0f, 2.0f / 255.0f, 1.0f);
-    colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
-    colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
-    colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-    colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-    colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+    colors[ImGuiCol_TableBorderLight]      = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
+    colors[ImGuiCol_TableRowBg]            = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_TableRowBgAlt]         = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+    colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+    colors[ImGuiCol_DragDropTarget]        = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+    colors[ImGuiCol_NavHighlight]          = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
     colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-    colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+    colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
     // window_flags |= ImGuiWindowFlags_NoTitleBar;
     // window_flags |= ImGuiWindowFlags_NoScrollbar;
@@ -139,7 +139,7 @@ void Editor::TickLeftSideBar() {
     ImGui::EndMainMenuBar();
 
     static bool materialEdit = false;
-    static bool textureLoad = false;
+    static bool textureLoad  = false;
 
     {
         ImGui::Begin("Materials And Objects", NULL, window_flags);
@@ -151,7 +151,7 @@ void Editor::TickLeftSideBar() {
 
         static std::string info = "";
 
-        static float fps = 0.0f;
+        static float         fps    = 0.0f;
         static long long int fpsIdx = 0;
         fpsIdx++;
         if (fpsIdx % 50 == 0)
@@ -224,15 +224,15 @@ void Editor::TickLeftSideBar() {
         }
 
         if (ImGui::CollapsingHeader("Add New Object")) {
-            static std::string name = "newObj";
-            static std::string geoName = "shapeGeo";
+            static std::string name        = "newObj";
+            static std::string geoName     = "shapeGeo";
             static std::string subMeshName = "box";
-            static std::string matName = "tile";
+            static std::string matName     = "tile";
 
-            static char cname[20] = "newObj";
-            static char cgeoName[20] = "shapeGeo";
+            static char cname[20]        = "newObj";
+            static char cgeoName[20]     = "shapeGeo";
             static char csubMeshName[20] = "box";
-            static char cmatName[20] = "tile";
+            static char cmatName[20]     = "tile";
 
             ImGui::InputText("Name", cname, 20);
             ImGui::InputText("Geo", cgeoName, 20);
@@ -240,16 +240,16 @@ void Editor::TickLeftSideBar() {
             ImGui::InputText("Material", cmatName, 20);
 
             static const char* layers[] = {"Opaque", "Transparent", "Sky"};
-            static int layer = 0;
+            static int         layer    = 0;
             ImGui::Combo("layer", &layer, layers, IM_ARRAYSIZE(layers));
 
             if (ImGui::Button("Add")) {
-                name = std::string(cname);
-                geoName = std::string(cgeoName);
+                name        = std::string(cname);
+                geoName     = std::string(cgeoName);
                 subMeshName = std::string(csubMeshName);
-                matName = std::string(cmatName);
+                matName     = std::string(cmatName);
 
-                auto p2obj = std::make_shared<BasicObject>(name);
+                auto                       p2obj = std::make_shared<BasicObject>(name);
                 static DirectX::XMFLOAT4X4 scale;
                 static DirectX::XMFLOAT4X4 mat_scale;
                 DirectX::XMStoreFloat4x4(&scale,
@@ -357,7 +357,7 @@ void Editor::TickLeftSideBar() {
 
             static XMFLOAT4 albedo(1.0f, 1.0f, 1.0f, 1.0f);
             static XMFLOAT3 fresnel(0.1f, 0.1f, 0.1f);
-            static float roughness = 0.8f;
+            static float    roughness = 0.8f;
 
             static std::string name = "newMaterial";
             static std::string texName;
@@ -383,8 +383,8 @@ void Editor::TickLeftSideBar() {
             ImGui::DragFloat("roughness", &roughness, 0.05f, 0.0f, 1.0f, "%.2f");
 
             if (ImGui::Button("Create")) {
-                name = std::string(cname);
-                texName = std::string(ctexName);
+                name       = std::string(cname);
+                texName    = std::string(ctexName);
                 normalName = std::string(cnormalName);
                 if (GetRenderRsrcMngr().GetMatMngr()->GetMaterial(name) != nullptr) {
                     info = "Material with this name has existed!!!";
@@ -412,12 +412,12 @@ void Editor::TickLeftSideBar() {
         ImGui::Begin("Load Texture");
 
         static std::string name;
-        static char cname[40];
+        static char        cname[40];
 
         static std::string assetRoot =
             Asset::AssetMngr::GetInstance().GetRootPath().string();
         static std::string path;
-        static char cpath[128];
+        static char        cpath[128];
 
         static bool isInit = false;
         if (!isInit) {
@@ -431,13 +431,13 @@ void Editor::TickLeftSideBar() {
         ImGui::InputText("Path", cpath, 128);
 
         static const char* fileFormat[] = {"DDS", "WIC"};
-        static int formatIdx = 0;
+        static int         formatIdx    = 0;
         ImGui::Combo("fileFormat", &formatIdx, fileFormat,
                      IM_ARRAYSIZE(fileFormat));
 
         static const char* texDimension[] = {"None", "Tex1D", "Tex2D",
                                              "Tex3D", "Cubemap", "Tex2DArray"};
-        static int dimensionIdx = 2;
+        static int         dimensionIdx   = 2;
         ImGui::Combo("texDimension", &dimensionIdx, texDimension,
                      IM_ARRAYSIZE(texDimension));
 
@@ -543,7 +543,7 @@ void Editor::TickRightSideBar() {
                     static DirectX::XMFLOAT3 trans(0.0f, 0.0f, 0.0f);
 
                     static DirectX::XMFLOAT3 axis(0.0f, 1.0f, 0.0f);
-                    static float angle = 0.0f;
+                    static float             angle = 0.0f;
 
                     if (ImGui::TreeNode("Rotation")) {
                         ImGui::DragFloat("AXIS_X", &axis.x, 0.1f, -1.0f, 1.0f, "%.2f");
