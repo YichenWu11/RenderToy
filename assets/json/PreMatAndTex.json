@@ -158,7 +158,7 @@
                 "z": 0.2
             },
             "roughness": 0.8,
-            "normalName": "tile_nmap"
+            "normalName": null
         },
         {
             "name": "mirror",

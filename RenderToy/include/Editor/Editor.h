@@ -1,24 +1,21 @@
 #pragma once
 
 #include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
+#include <filesystem>
 #include <imgui.h>
 #include <imgui_impl_dx12.h>
 #include <imgui_impl_win32.h>
 #include <imgui_internal.h>
-#include <filesystem>
-
 
 namespace Chen::RToy::Editor {
-    class Editor
-    {
+    class Editor {
     public:
-        static Editor& GetInstance()
-        {
+        static Editor& GetInstance() {
             static Editor instance;
             return instance;
         }
 
-        Editor(const Editor&) = delete;
+        Editor(const Editor&)            = delete;
         Editor& operator=(const Editor&) = delete;
 
         void Init(HWND, ID3D12Device*, ID3D12DescriptorHeap*, D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE, ID3D12CommandQueue*);
@@ -38,12 +35,11 @@ namespace Chen::RToy::Editor {
         bool IsEnableMove() { return enableMove; }
         void ToggleEnableMove() { enableMove = !enableMove; }
 
-        int GetPickedID() { return pickedID; }
+        int  GetPickedID() { return pickedID; }
         void SetPickedID(int idx) { pickedID = idx; }
 
-        void SetWidthAndHeight(int w, int h)
-        {
-            ClientWidth = w;
+        void SetWidthAndHeight(int w, int h) {
+            ClientWidth  = w;
             ClientHeight = h;
         }
 
@@ -51,15 +47,15 @@ namespace Chen::RToy::Editor {
         Editor() = default;
         ~Editor();
 
-        bool isExit = false;
-        bool enableMove = true;
+        bool             isExit       = false;
+        bool             enableMove   = true;
         ImGuiWindowFlags window_flags = 0;
-        int pickedID = -1;
+        int              pickedID     = -1;
 
         ID3D12CommandQueue* cmdQueue;
-        ID3D12Device* device;
+        ID3D12Device*       device;
 
-        int ClientWidth = 0;
+        int ClientWidth  = 0;
         int ClientHeight = 0;
     };
-}
+} // namespace Chen::RToy::Editor

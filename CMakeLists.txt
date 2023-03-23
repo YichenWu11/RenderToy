@@ -19,12 +19,11 @@ project(RenderToy)
 
 add_definitions(-DUNICODE -D_UNICODE)
 
-if(WIN32)
+if(MSVC)
     add_definitions(-DNOMINMAX -D_USE_MATH_DEFINES)
 endif()
 
 # Add sub directories
-add_subdirectory(CDP)
 add_subdirectory(CDX12)
 add_subdirectory(RenderToy)
 add_subdirectory(3rdparty/imgui)

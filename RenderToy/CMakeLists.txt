@@ -1,9 +1,9 @@
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required(VERSION 3.5)
 
 project(RenderToy_Core)
 
 if(MSVC)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS") 
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
 endif()
 
 file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/core/*.cpp include/*.h)
@@ -21,14 +21,13 @@ target_compile_definitions(RenderToy_Core PUBLIC RT_ROOT_DIR=${CMAKE_SOURCE_DIR}
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/include
 )
 
 message(STATUS ${PROJECT_SOURCE_DIR})
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC Chen::CDX12
-    PUBLIC Chen::CDP
     PUBLIC imgui
     PUBLIC rapidjson
     PUBLIC d3d12.lib

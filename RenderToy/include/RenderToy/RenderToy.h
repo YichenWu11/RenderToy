@@ -1,8 +1,9 @@
 #pragma once
 
+#include <CDX12/Common/Camera.h>
 #include <CDX12/Common/DX12App.h>
 #include <CDX12/FrameResource.h>
-#include <CDX12/Common/Camera.h>
+
 
 #include <IComponent.h>
 #include <imgui.h>
@@ -11,11 +12,10 @@ using namespace Chen::CDX12;
 
 namespace Chen::RToy {
 
-    class RenderToy final : public DX12App
-    {
+    class RenderToy final : public DX12App {
     public:
         RenderToy(HINSTANCE hInstance);
-        RenderToy(const RenderToy&) = delete;
+        RenderToy(const RenderToy&)            = delete;
         RenderToy& operator=(const RenderToy&) = delete;
         ~RenderToy();
 
@@ -25,9 +25,9 @@ namespace Chen::RToy {
         int  Run() override;
 
     private:
-        void OnResize() override;
-        void LogicTick(const GameTimer& gt) override;
-        void RenderTick(const GameTimer& gt) override;
+        void    OnResize() override;
+        void    LogicTick(const GameTimer& gt) override;
+        void    RenderTick(const GameTimer& gt) override;
         LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
         // **********************************************************
@@ -52,22 +52,20 @@ namespace Chen::RToy {
         void BuildFrameResource();
 
         // **********************************************************
- 
+
         void LogicalFillPack();
         void RenderFillPack();
-        void Populate(const GameTimer& gt);  // Populate Command
-        void Execute();                      // Submit and Execute Command
+        void Populate(const GameTimer& gt); // Populate Command
+        void Execute();                     // Submit and Execute Command
 
         // **********************************************************
 
-        IComponent* GetRenderComponent() 
-        {
+        IComponent* GetRenderComponent() {
             assert(mComponents.find("RenderComponent") != mComponents.end());
             return mComponents["RenderComponent"].get();
         }
 
-        IComponent* GetLogicalComponent()
-        {
+        IComponent* GetLogicalComponent() {
             assert(mComponents.find("LogicalComponent") != mComponents.end());
             return mComponents["LogicalComponent"].get();
         }
@@ -77,13 +75,13 @@ namespace Chen::RToy {
         std::vector<std::string>& GetComponentNameList() { return nameList; }
 
     private:
-        std::vector<std::string> nameList;
+        std::vector<std::string>                           nameList;
         std::map<std::string, std::unique_ptr<IComponent>> mComponents;
 
-        POINT mLastMousePos;
+        POINT                   mLastMousePos;
         std::unique_ptr<Camera> mCamera;
 
         std::vector<D3D12_INPUT_ELEMENT_DESC> DefaultInputLayout;
-        FrameResource* mCurrFrameResource = nullptr;
+        FrameResource*                        mCurrFrameResource = nullptr;
     };
-}
+} // namespace Chen::RToy

@@ -1,3 +1,6 @@
+#ifndef COMMON_H
+#define COMMON_H
+
 #ifndef NUM_DIR_LIGHTS
 #define NUM_DIR_LIGHTS 3
 #endif
@@ -13,6 +16,7 @@
 // #define COLOR_GRADING
 // #define CARTOON
 // #define SSAO
+#define SKYBOX
 #define PCSS
 
 #include "./LightUtil.hlsl"
@@ -336,8 +340,8 @@ float4 ColorGrading(float4 color) {
 
   float lutCoorY = color.g;
 
-  float2 lutCoordL = float2(lutCoordXL, lutCoorY);
-  float2 lutCoordR = float2(lutCoordXR, lutCoorY);
+  float2 lutCoordL = float2(lutCoordXL, 1.0f-lutCoorY);
+  float2 lutCoordR = float2(lutCoordXR, 1.0f-lutCoorY);
 
   float4 lutcolorL = gCgLutMap.Sample(gsamAnisotropicWrap, lutCoordL);
   float4 lutcolorR = gCgLutMap.Sample(gsamAnisotropicWrap, lutCoordR);
@@ -353,3 +357,117 @@ float4 ColorGrading(float4 color) {
 
   return color;
 }
+
+static const float weights[] = {
+    0.1061154f,
+    0.102850571f,
+    0.102850571f,
+    0.09364651f,
+    0.09364651f,
+    0.0801001f,
+    0.0801001f,
+    0.06436224f,
+    0.06436224f,
+    0.0485831723f,
+    0.0485831723f,
+    0.0344506279f,
+    0.0344506279f,
+    0.0229490642f,
+    0.0229490642f,
+};
+
+static const float2 offsets[] = {
+    float2(0.0f, 0.0f),
+    float2(0.00375f, 0.006250001f),
+    float2(-0.00375f, -0.006250001f),
+    float2(0.00875f, 0.01458333f),
+    float2(-0.00875f, -0.01458333f),
+    float2(0.01375f, 0.02291667f),
+    float2(-0.01375f, -0.02291667f),
+    float2(0.01875f, 0.03125f),
+    float2(-0.01875f, -0.03125f),
+    float2(0.02375f, 0.03958334f),
+    float2(-0.02375f, -0.03958334f),
+    float2(0.02875f, 0.04791667f),
+    float2(-0.02875f, -0.04791667f),
+    float2(0.03375f, 0.05625f),
+    float2(-0.03375f, -0.05625f),
+};
+
+float4 Blur(float3 uv)
+{
+    float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < 15; i++)
+    {
+        uv.xy += offsets[i];
+        color += gCubeMap.Sample(gsamAnisotropicWrap, uv) * weights[i];
+    }
+
+    return color;
+}
+
+float3 ACESToneMapping(float3 color, float adapted_lum)
+{
+  const float A = 2.51f;
+  const float B = 0.03f;
+  const float C = 2.43f;
+  const float D = 0.59f;
+  const float E = 0.14f;
+  color *= adapted_lum;
+  return saturate((color * (A * color + B)) / (color * (C * color + D) + E));
+}
+
+float4 DownsampleBox13Tap(Texture2D tex, float2 uv, float2 texelSize)
+{
+	float4 A = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(-1.0, -1.0));
+	float4 B = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(0.0, -1.0));
+	float4 C = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(1.0, -1.0));
+	float4 D = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(-0.5, -0.5));
+	float4 E = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(0.5, -0.5));
+	float4 F = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(-1.0, 0.0));
+	float4 G = tex.Sample(gsamAnisotropicWrap, uv);
+	float4 H = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(1.0, 0.0));
+	float4 I = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(-0.5, 0.5));
+	float4 J = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(0.5, 0.5));
+	float4 K = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(-1.0, 1.0));
+	float4 L = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(0.0, 1.0));
+	float4 M = tex.Sample(gsamAnisotropicWrap, uv + texelSize * float2(1.0, 1.0));
+
+	half2 div = (1.0 / 4.0) * half2(0.5, 0.125);
+
+	float4 o = (D + E + I + J) * div.x;
+	o += (A + B + G + F) * div.y;
+	o += (B + C + H + G) * div.y;
+	o += (F + G + L + K) * div.y;
+	o += (G + H + M + L) * div.y;
+
+	return o;
+}
+
+// Standard box filtering
+float4 DownsampleBox4Tap(Texture2D tex, float2 uv, float2 texelSize)
+{
+	float4 d = texelSize.xyxy * float4(-1.0, -1.0, 1.0, 1.0);
+
+	float4 s;
+	s = (tex.Sample(gsamAnisotropicWrap, uv + d.xy));
+	s += (tex.Sample(gsamAnisotropicWrap, uv + d.zy));
+	s += (tex.Sample(gsamAnisotropicWrap, uv + d.xw));
+	s += (tex.Sample(gsamAnisotropicWrap, uv + d.zw));
+
+	return s * (1.0 / 4.0);
+}
+
+float3 Uncharted2Tonemap(float3 x)
+{
+    float3 A = 0.15;
+    float3 B = 0.50;
+    float3 C = 0.10;
+    float3 D = 0.20;
+    float3 E = 0.02;
+    float3 F = 0.30;
+    return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
+}
+
+#endif

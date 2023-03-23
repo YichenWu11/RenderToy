@@ -1,6 +1,9 @@
-build
 .cache
 .vscode
 .VSCodeCounter
+.idea
+
+build
+cmake-build-debug-visual-studio
 
 bin/Debug/RenderToy_Core.pdb

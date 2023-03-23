@@ -18,10 +18,10 @@ void Editor::Init(HWND mhMainWnd, ID3D12Device* _device,
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    (void)io;
+    ImGuiIO&    io    = ImGui::GetIO();
     ImGuiStyle& style = ImGui::GetStyle();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     style.FrameRounding = 8.0f;
     style.WindowPadding = ImVec2(8.0, 2.0);
@@ -113,6 +113,8 @@ void Editor::Init(HWND mhMainWnd, ID3D12Device* _device,
     // window_flags |= ImGuiWindowFlags_NoBackground;
     // window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
     // window_flags |= ImGuiWindowFlags_UnsavedDocument;
+
+    // ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 }
 
 void Editor::CleanUp() {
@@ -469,6 +471,11 @@ void Editor::TickLeftSideBar() {
 
 void Editor::TickBottomBar() {
     {
+        // ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+        // ImGui::Begin("Test", NULL, window_flags);
+        // ImGui::Text("TEST");
+        // ImGui::End();
+
         ImGui::Begin("Files", NULL, window_flags);
 
         ImGui::SetWindowPos(ImVec2(0, ClientHeight * 0.75f), ImGuiCond_Always);
@@ -658,6 +665,15 @@ void Editor::Tick() {
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+
+    ImGui::Begin("test");
+
+    ImGui::Image(ImTextureID(
+                     GetRenderRsrcMngr().GetTexMngr()->GetTexAllocation().GetGpuHandle(GetRenderRsrcMngr().GetTexMngr()->GetSMIndex()).ptr),
+                 ImVec2(600, 600));
+
+    ImGui::Text("hello world");
+    ImGui::End();
 
     TickLeftSideBar();
     TickBottomBar();
